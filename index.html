@@ -4,41 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Crack Every Interview</title>
-    <!-- Tailwind CSS for clean styling -->
+    <!-- Tailwind CSS for premium styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-neutral-950 text-white min-h-screen flex flex-col justify-center items-center font-sans px-4">
+<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased">
 
-    <!-- Screen 1: Landing Page Container -->
-    <div id="landing-screen" class="text-center max-w-xl mx-auto space-y-6">
-        
-        <!-- Headline -->
-        <h1 class="text-5xl md:text-6xl font-black tracking-tight">
-            Krackit <span class="text-amber-500">⚡</span>
-        </h1>
-        
-        <!-- Subheadline -->
-        <p class="text-neutral-400 text-lg md:text-xl font-medium max-w-md mx-auto">
-            Crack every interview with AI coaching
-        </p>
-        
-        <!-- Action Button -->
-        <div class="pt-4">
-            <button onclick="goToInputScreen()" class="bg-white text-black hover:bg-neutral-200 transition-colors duration-200 font-bold px-8 py-3 rounded-xl inline-flex items-center space-x-2 text-base md:text-lg shadow-lg shadow-white/5">
-                <span>Start for free</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-            </button>
+    <!-- Top Navbar (Required by Prompt) -->
+    <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2 font-black text-xl tracking-tight">
+            <span>Krackit</span>
+            <span class="text-[#FFE500]">⚡</span>
+        </div>
+        <div class="text-xs text-neutral-500 font-mono tracking-wider uppercase bg-neutral-900/50 px-2.5 py-1 rounded-md border border-neutral-800">
+            v1.0.0
+        </div>
+    </nav>
+
+    <!-- Main Container Layout -->
+    <main class="max-w-4xl mx-auto px-4 pt-16 pb-24 flex flex-col justify-center items-center">
+
+        <!-- ================= SCREEN 1: LANDING SCREEN ================= -->
+        <div id="landing-screen" class="text-center max-w-xl mx-auto space-y-6 transition-all duration-300">
+            <h1 class="text-5xl md:text-6xl font-black tracking-tight">
+                Krackit <span class="text-[#FFE500]">⚡</span>
+            </h1>
+            <p class="text-neutral-400 text-lg md:text-xl font-medium max-w-md mx-auto">
+                Crack every interview with AI coaching
+            </p>
+            <div class="pt-4">
+                <button onclick="showInputScreen()" class="bg-white text-black hover:bg-neutral-200 transition-all duration-200 font-bold px-8 py-3 rounded-xl inline-flex items-center space-x-2 text-base md:text-lg shadow-lg">
+                    <span>Start for free</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
-    </div>
+        <!-- ================= SCREEN 2: INPUT FORM SCREEN (Hidden by Default) ================= -->
+        <div id="input-screen" class="hidden w-full max-w-2xl mx-auto space-y-8 transition-all duration-300">
+            
+            <!-- Headers -->
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight">Crack Every Interview</h2>
+                <p class="text-neutral-400 text-sm md:text-base">
+                    Paste your job description and resume — get custom interview questions in seconds
+                </p>
+            </div>
 
+            <!-- Input Form Structure -->
+            <div class="space-y-5 bg-neutral-900/30 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-xl">
+                
+                <!-- Job Description Textarea -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Job Description</label>
+                    <textarea id="job-desc-input" rows="5" placeholder="Paste the job description here..." 
+                        class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] focus:ring-1 focus:ring-[#FFE500] transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Resume Textarea -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Candidate Resume</label>
+                    <textarea id="resume-input" rows="6" placeholder="Paste your resume here..." 
+                        class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] focus:ring-1 focus:ring-[#FFE500] transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Action Button with Loading States -->
+                <div class="pt-2">
+                    <button id="generate-btn" onclick="submitInterviewData()" 
+                        class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 text-base shadow-lg shadow-[#FFE500]/5 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="btn-text">Generate My Questions ⚡</span>
+                        <!-- Hidden Spinner by default -->
+                        <svg id="btn-spinner" class="hidden animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- App Frontend Controllers -->
     <script>
-        // Placeholder function to handle screen switching later
-        function goToInputScreen() {
-            alert("Landing page works! Next up: building Screen 2 (The Input Screen).");
+        // Transition from Landing to Input Form layout
+        function showInputScreen() {
+            document.getElementById('landing-screen').classList.add('hidden');
+            document.getElementById('input-screen').classList.remove('hidden');
+        }
+
+        // Handles the submission to your Groq backend API
+        async function submitInterviewData() {
+            const jobDesc = document.getElementById('job-desc-input').value.trim();
+            const resume = document.getElementById('resume-input').value.trim();
+
+            if (!jobDesc || !resume) {
+                alert("Please fill out both fields before submitting.");
+                return;
+            }
+
+            // Target DOM items for loading state switches
+            const btn = document.getElementById('generate-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+
+            // Trigger UI Loading State (Analysing... configuration required by prompt)
+            btn.disabled = true;
+            btnText.innerText = "Analysing...";
+            btnSpinner.classList.remove('hidden');
+
+            try {
+                // Call your live backend API route securely
+                const response = await fetch('/api/interview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jobDescription: jobDesc,
+                        resume: resume
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.details || data.error || 'Server error');
+                }
+
+                // Log response details safely to console for verification
+                console.log("Groq Engine Results Loaded:", data);
+                alert("Success! Check your browser console to view the loaded questions array.");
+
+                // NEXT STEP: We will process this dynamic 'data' object on Screen 3!
+
+            } catch (error) {
+                console.error("API Call Failure:", error);
+                alert("Error generating questions: " + error.message);
+            } finally {
+                // Revert Loading State UI switches
+                btn.disabled = false;
+                btnText.innerText = "Generate My Questions ⚡";
+                btnSpinner.add('hidden');
+            }
         }
     </script>
 </body>
+</html>
 </html>
