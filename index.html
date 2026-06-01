@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krackit - Advanced AI Interview Coach</title>
-    <!-- Tailwind CSS for premium utility styling -->
+    <title>Krackit - Premium AI Interview Coach</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 1. ADD PDF.JS SCRIPTS VIA CDN LINK (image_ff601e.png) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        // Set the worker path right after loading the core library
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
@@ -21,22 +18,74 @@
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
-    <!-- Top Navigation Bar -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
         <div onclick="showScreen('landing-screen')" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
             <span>Krackit</span>
             <span class="text-[#FFE500]">⚡</span>
         </div>
-        <div class="text-[11px] text-neutral-400 font-mono tracking-wider uppercase bg-neutral-900/80 px-3 py-1.5 rounded-lg border border-neutral-800 flex items-center space-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Free Tier: Unlimited Build Mode</span>
-        </div>
+        
+        <div id="navbar-session-status-target">
+            </div>
     </nav>
 
-    <!-- Main Content Stage -->
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 fade-in">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-xl p-6 md:p-8 space-y-6 shadow-2xl relative">
+            
+            <div class="text-center space-y-2">
+                <div class="text-3xl">⚡</div>
+                <h3 class="text-2xl font-black tracking-tight text-white">You've used your 3 free sessions</h3>
+                <p class="text-neutral-400 text-sm max-w-sm mx-auto">Upgrade to keep practicing and land your dream job.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                
+                <div class="bg-neutral-950 border-2 border-[#FFE500] rounded-xl p-5 flex flex-col justify-between space-y-4 relative">
+                    <span class="absolute -top-2.5 right-3 bg-[#FFE500] text-black text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">Most Popular</span>
+                    <div class="space-y-2">
+                        <h4 class="text-sm font-bold text-neutral-300 font-mono tracking-wide uppercase">Krackit Pro</h4>
+                        <div class="text-2xl font-black text-white">$19<span class="text-xs font-normal text-neutral-500">/mo</span></div>
+                        <ul class="text-[11px] text-neutral-400 space-y-1 pt-1 font-medium">
+                            <li>✓ Unlimited interview sessions</li>
+                            <li>✓ Salary negotiation tips</li>
+                            <li>✓ Keywords to mention</li>
+                            <li>✓ Full readiness score tracking</li>
+                        </ul>
+                    </div>
+                    <a href="https://krackitai.lemonsqueezy.com/checkout/buy/6f0192d0-c2f8-4e95-a3aa-01c064b13914" target="_blank" 
+                       class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black text-center py-2.5 rounded-lg transition-all shadow-md block">
+                        Get Krackit Pro →
+                    </a>
+                </div>
+
+                <div class="bg-neutral-950 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between space-y-4">
+                    <div class="space-y-2">
+                        <h4 class="text-sm font-bold text-neutral-400 font-mono tracking-wide uppercase">30 Sessions Pack</h4>
+                        <div class="text-2xl font-black text-white">$29<span class="text-xs font-normal text-neutral-500"> total</span></div>
+                        <ul class="text-[11px] text-neutral-400 space-y-1 pt-1 font-medium">
+                            <li>✓ 30 full session packages</li>
+                            <li>✓ All dynamic Pro features</li>
+                            <li>✓ Credits never expire</li>
+                            <li>✓ Ideal for a single job hunt</li>
+                        </ul>
+                    </div>
+                    <a href="https://krackitai.lemonsqueezy.com/checkout/buy/2701ad90-d1cd-40ad-8073-5adf45c38e6d" target="_blank" 
+                       class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white text-xs font-bold text-center py-2.5 rounded-lg transition-all block">
+                        Buy 30 sessions →
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="text-center pt-2">
+                <button onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300 font-medium tracking-wide">
+                    Maybe later
+                </button>
+            </div>
+        </div>
+    </div>
+
     <main class="max-w-4xl mx-auto px-4 pt-12 pb-24 flex flex-col justify-center items-center">
 
-        <!-- ================= SCREEN 1: LANDING SCREEN ================= -->
         <div id="landing-screen" class="text-center max-w-xl mx-auto space-y-6 pt-12">
             <h1 class="text-5xl md:text-6xl font-black tracking-tight leading-none">
                 Krackit <span class="text-[#FFE500]">⚡</span>
@@ -54,7 +103,6 @@
             </div>
         </div>
 
-        <!-- ================= SCREEN 2: INPUT FORM SCREEN ================= -->
         <div id="input-screen" class="hidden w-full max-w-2xl mx-auto space-y-8 fade-in">
             <div class="text-center space-y-2">
                 <h2 class="text-3xl md:text-4xl font-black tracking-tight">Generate Practice Pack</h2>
@@ -65,13 +113,11 @@
 
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
                 
-                <!-- Client Side Validation Banner -->
                 <div id="validation-error-box" class="hidden bg-red-950/40 border border-red-900 text-red-400 p-4 rounded-xl text-sm flex items-start space-x-2.5">
                     <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                    <span id="validation-error-msg">Error details message go here.</span>
+                    <span id="validation-error-msg">Error details.</span>
                 </div>
 
-                <!-- Job Description Input -->
                 <div class="space-y-2">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase flex justify-between">
                         <span>Job Description</span>
@@ -81,11 +127,9 @@
                         class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] focus:ring-1 focus:ring-[#FFE500] transition-all resize-none"></textarea>
                 </div>
 
-                <!-- Candidate Resume Section Container (image_ff5f67.png & image_ff5f28.png) -->
                 <div class="space-y-2.5">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Candidate Resume</label>
                     
-                    <!-- Mode Toggle Buttons -->
                     <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
                         <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" 
                             class="flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">
@@ -97,24 +141,20 @@
                         </button>
                     </div>
 
-                    <!-- UPLOAD ZONE LAYOUT (Tailwind matches image_ff5c7a.png CSS) -->
                     <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-10 text-center cursor-pointer transition-all duration-200 group text-neutral-400 select-none">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
-                        
                         <div id="upload-zone-status" class="space-y-2">
                             <p class="text-base font-bold text-neutral-200 group-hover:text-[#FFE500] transition-colors">Drop your resume PDF here</p>
                             <p class="text-xs text-neutral-500 font-medium">or click to browse local files (Max 5MB)</p>
                         </div>
                     </div>
 
-                    <!-- PASTE TEXTAREA ZONE LAYOUT (Hidden by Default) -->
                     <div id="resume-paste-zone" class="hidden">
                         <textarea id="resume-paste-input" rows="5" placeholder="Paste your detailed resume text background profile details here..." 
                             class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] focus:ring-1 focus:ring-[#FFE500] transition-all resize-none"></textarea>
                     </div>
                 </div>
 
-                <!-- Submit Button Area -->
                 <div class="pt-2">
                     <button id="generate-btn" onclick="handleGenerateFlow()" 
                         class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 text-base shadow-lg shadow-[#FFE500]/5">
@@ -124,7 +164,6 @@
             </div>
         </div>
 
-        <!-- ================= SCREEN 3: ADAPTIVE ROTATING LOADING SCREEN ================= -->
         <div id="loading-screen" class="hidden w-full max-w-md mx-auto text-center py-20 space-y-6 fade-in">
             <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
                 <div class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFE500]/20 opacity-75"></div>
@@ -138,9 +177,7 @@
             </div>
         </div>
 
-        <!-- ================= SCREEN 4: ADVANCED PRODUCTION RESULTS SCREEN ================= -->
         <div id="results-screen" class="hidden w-full max-w-3xl mx-auto space-y-8 fade-in">
-            
             <div class="border-b border-neutral-900 pb-5 w-full">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Custom Analysis Pack</span>
                 <h2 id="hero-role-title" class="text-3xl font-black tracking-tight text-white mt-1">Target Role</h2>
@@ -202,7 +239,6 @@
 
     </main>
 
-    <!-- Global App Engine JavaScript Systems -->
     <script>
         const loadingMessages = [
             "Reading your resume...",
@@ -212,22 +248,59 @@
             "Almost ready..."
         ];
         let loadingIntervalId = null;
+        let currentUploadMode = 'upload'; 
+        let extractedPdfTextState = ''; 
 
-        // Core App Memory Variables
-        let currentUploadMode = 'upload'; // 'upload' or 'paste'
-        let extractedPdfTextState = ''; // Holds the extracted string from pdf parsing logic
+        // ================= 5. WIRE THE FREE TIER COUNTER TO LOCALSTORAGE (image_fe8680.png) =================
+        function getSessionCount() {
+            return parseInt(localStorage.getItem('krackit_sessions')) || 0;
+        }
 
-        // Monitor structural character text length updates for visual feedback
+        function incrementSessionCount() {
+            const current = getSessionCount();
+            localStorage.setItem('krackit_sessions', current + 1);
+            updateNavbarSessionBadge();
+        }
+
+        // 6. SESSIONS COUNTER VIEW INJECTION GENERATOR (image_fe8648.png)
+        function updateNavbarSessionBadge() {
+            const sessions = getSessionCount();
+            const remaining = Math.max(0, 3 - sessions);
+            const target = document.getElementById('navbar-session-status-target');
+
+            if (remaining === 0) {
+                target.innerHTML = `
+                    <button onclick="openPaywallModal()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1 shadow-md">
+                        <span>🔒</span> <span>Upgrade to continue</span>
+                    </button>`;
+            } else {
+                target.innerHTML = `
+                    <div class="text-[11px] text-neutral-400 font-mono tracking-wider uppercase bg-neutral-900/80 px-3 py-1.5 rounded-lg border border-neutral-800 flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span>⚡ ${remaining} free session${remaining !== 1 ? 's' : ''} left</span>
+                    </div>`;
+            }
+        }
+
+        // Modal Action Controller Toggles
+        function openPaywallModal() {
+            document.getElementById('upgrade-modal').classList.remove('hidden');
+        }
+        function closePaywallModal() {
+            document.getElementById('upgrade-modal').classList.add('hidden');
+        }
+
+        // Initialize state markers on browser viewport landing instances
+        updateNavbarSessionBadge();
+
         document.getElementById('job-desc-input').addEventListener('input', e => {
             document.getElementById('job-char-count').innerText = `${e.target.value.length} chars`;
         });
 
-        // 2. CREATE THE PDF TEXT EXTRACTOR FUNCTION (image_ff6000.png)
         async function extractTextFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             let fullText = '';
-
             for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                 const page = await pdf.getPage(pageNum);
                 const textContent = await page.getTextContent();
@@ -237,7 +310,6 @@
             return fullText.trim();
         }
 
-        // Toggle logic interface for managing input mode types
         function switchUploadMode(mode) {
             currentUploadMode = mode;
             const upBtn = document.getElementById('toggle-upload-btn');
@@ -258,7 +330,6 @@
             }
         }
 
-        // Handle File Drop & Trigger Area Clicking
         const dropZone = document.getElementById('resume-upload-zone');
         dropZone.addEventListener('click', () => document.getElementById('pdf-input').click());
         
@@ -288,25 +359,18 @@
 
         function applyZoneFileSuccessStyles(fileName = "Resume File Loaded") {
             dropZone.className = "w-full bg-[#0d1a0d] border-2 border-solid border-[#4CAF50] rounded-xl p-10 text-center cursor-pointer transition-all duration-200 text-[#4CAF50] select-none font-bold text-sm";
-            document.getElementById('upload-zone-status').innerHTML = `
-                <p class="flex items-center justify-center gap-1.5">
-                    <span>✓</span> <span>${fileName} — Ready</span>
-                </p>`;
+            document.getElementById('upload-zone-status').innerHTML = `<p class="flex items-center justify-center gap-1.5"><span>✓</span> <span>${fileName} — Ready</span></p>`;
         }
 
-        // Processing orchestrator wrapper pipeline (image_ff5f67.png constraints)
         async function processIncomingResumeFile(file) {
             const errorBox = document.getElementById('validation-error-box');
             const errorMsg = document.getElementById('validation-error-msg');
 
-            // 1. File type verification boundary
             if (!file.type.includes('pdf') && !file.name.endsWith('.pdf')) {
                 errorMsg.innerText = "Please upload a valid PDF file.";
                 errorBox.classList.remove('hidden');
                 return;
             }
-
-            // 2. Size restriction checks (Max 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 errorMsg.innerText = "File too large — please use a PDF under 5MB.";
                 errorBox.classList.remove('hidden');
@@ -318,26 +382,17 @@
 
             try {
                 const textOutput = await extractTextFromPDF(file);
-
-                if (textOutput.length < 50) {
-                    throw new Error("Could not read PDF text content cleanly. Try pasting your resume text profile layout fallback alternative option.");
-                }
-
+                if (textOutput.length < 50) throw new Error("Could not parse data string cleanly.");
                 extractedPdfTextState = textOutput;
                 applyZoneFileSuccessStyles(file.name);
-
             } catch (err) {
-                console.error("PDF Parsing Failure:", err);
                 errorMsg.innerText = "Could not read PDF — try pasting your resume as text instead.";
                 errorBox.classList.remove('hidden');
-                document.getElementById('upload-zone-status').innerHTML = `
-                    <p class="text-base font-bold text-neutral-200">Drop your resume PDF here</p>
-                    <p class="text-xs text-neutral-500 font-medium">or click to browse local files (Max 5MB)</p>`;
+                document.getElementById('upload-zone-status').innerHTML = `<p class="text-base font-bold text-neutral-200">Drop your resume PDF here</p><p class="text-xs text-neutral-500 font-medium">or click to browse local files (Max 5MB)</p>`;
                 extractedPdfTextState = '';
             }
         }
 
-        // Global Screen Pipeline State transitions
         function showScreen(screenId) {
             document.getElementById('landing-screen').classList.add('hidden');
             document.getElementById('input-screen').classList.add('hidden');
@@ -361,13 +416,18 @@
             }
         }
 
-        // 5. UPDATE HANDEGENERATE TO USE RESUMETEXT MATRIX AS DIRECTED (image_ff5c5e.png)
+        // Adjusted generation runtime handler capturing image_fe8680.png conditional intercepts
         async function handleGenerateFlow() {
+            // INTERCEPT ENFORCEMENT: Enforce the 3-session hard lock locally
+            const runningSessionsCount = getSessionCount();
+            if (runningSessionsCount >= 3) {
+                openPaywallModal();
+                return;
+            }
+
             const jobDesc = document.getElementById('job-desc-input').value.trim();
             const errorBox = document.getElementById('validation-error-box');
             const errorMsg = document.getElementById('validation-error-msg');
-
-            // Formulate resume text parameter string based on runtime selection mode states
             let resumeText = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
             if (!jobDesc) {
@@ -376,16 +436,8 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
-
             if (!resumeText) {
-                errorMsg.innerText = currentUploadMode === 'upload' ? "Please upload your resume PDF profile history block data." : "Please paste your resume text background profile details.";
-                errorBox.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
-
-            if (resumeText.length < 100) {
-                errorMsg.innerText = "Resume content is too short — make sure your PDF uploaded correctly or expand your background description profile history context framework lengths.";
+                errorMsg.innerText = currentUploadMode === 'upload' ? "Please upload your resume PDF." : "Please paste your resume text.";
                 errorBox.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
@@ -402,36 +454,28 @@
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.details || data.error || 'Server error context execution state crash encountered');
+                if (!response.ok) throw new Error(data.details || data.error || 'Server error');
+
+                // SUCCESS PIPELINE: Increment token ledger locally on successful parsing execution matching image_fe8663.png
+                incrementSessionCount();
+                
+                // Override runtime payload attributes dynamically using client state references
+                data.sessionsUsed = getSessionCount();
+                data.sessionsRemaining = Math.max(0, 3 - data.sessionsUsed);
 
                 renderProductionResults(data);
                 showScreen('results-screen');
 
             } catch (error) {
-                console.error("API Processing Error Pipeline Context:", error);
-                alert("Generation failure exception: " + error.message);
+                console.error("Processing breakdown:", error);
+                alert("Generation error: " + error.message);
                 showScreen('input-screen');
-            }
-        }
-
-        function toggleCard(index) {
-            const block = document.getElementById(`answer-block-${index}`);
-            const icon = document.getElementById(`icon-${index}`);
-            if (block.classList.contains('hidden')) {
-                block.classList.remove('hidden');
-                icon.style.transform = "rotate(180deg)";
-            } else {
-                block.classList.add('hidden');
-                icon.style.transform = "rotate(0deg)";
             }
         }
 
         function renderProductionResults(data) {
             document.getElementById('hero-role-title').innerText = data.roleTitle || "Target Professional Role";
-            
-            const sessionsUsed = data.sessionsUsed || 1;
-            const sessionsRemaining = data.sessionsRemaining !== undefined ? data.sessionsRemaining : 2;
-            document.getElementById('usage-stats-badge').innerText = `Sessions used: ${sessionsUsed} | Sessions remaining: ${sessionsRemaining}`;
+            document.getElementById('usage-stats-badge').innerText = `Sessions used: ${data.sessionsUsed} | Free tier sessions remaining: ${data.sessionsRemaining}`;
 
             const rawScore = data.readinessScore || 70;
             document.getElementById('score-circle').setAttribute('stroke-dasharray', `${rawScore}, 100`);
@@ -440,30 +484,21 @@
             const strengthsContainer = document.getElementById('strengths-container');
             strengthsContainer.innerHTML = '';
             (data.strengths || []).forEach(str => {
-                strengthsContainer.innerHTML += `
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/40 border border-emerald-800 text-emerald-400">
-                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                        ${str}
-                    </span>`;
+                strengthsContainer.innerHTML += `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/40 border border-emerald-800 text-emerald-400"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>${str}</span>`;
             });
 
             const weaknessesContainer = document.getElementById('weaknesses-container');
             weaknessesContainer.innerHTML = '';
             (data.weaknesses || []).forEach(wk => {
-                weaknessesContainer.innerHTML += `
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 border border-red-900 text-red-400">
-                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                        ${wk}
-                    </span>`;
+                weaknessesContainer.innerHTML += `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 border border-red-900 text-red-400"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>${wk}</span>`;
             });
 
-            document.getElementById('salary-tip-text').innerText = data.salaryNegotiationTip || "Research standard market rates.";
+            document.getElementById('salary-tip-text').innerText = data.salaryNegotiationTip || "Research market averages.";
             
             const keywordsContainer = document.getElementById('keywords-container');
             keywordsContainer.innerHTML = '';
             (data.keywordsToMention || []).forEach(word => {
-                keywordsContainer.innerHTML += `
-                    <span class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs px-2.5 py-1 rounded-md font-mono">${word}</span>`;
+                keywordsContainer.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs px-2.5 py-1 rounded-md font-mono">${word}</span>`;
             });
 
             const deck = document.getElementById('questions-deck');
@@ -471,7 +506,6 @@
             
             (data.questions || []).forEach((q, idx) => {
                 const badgeColor = q.difficulty === 'Hard' ? 'text-rose-400 border-rose-900/50 bg-rose-950/20' : 'text-amber-400 border-amber-900/50 bg-amber-950/20';
-                
                 deck.innerHTML += `
                     <div class="bg-neutral-900/10 border border-neutral-900 hover:border-neutral-800 rounded-xl transition-all duration-200">
                         <div onclick="toggleCard(${idx})" class="p-5 flex justify-between items-start cursor-pointer space-x-4 select-none">
@@ -482,20 +516,11 @@
                                     <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md border uppercase tracking-wide font-mono ${badgeColor}">${q.difficulty || 'Medium'}</span>
                                 </div>
                                 <h4 class="text-base font-bold text-white tracking-tight leading-snug pt-0.5">${q.question}</h4>
-                                <div class="pt-1">
-                                    <span class="inline-block bg-[#FFE500]/5 border border-[#FFE500]/10 text-[#FFE500] text-[11px] font-medium px-2 py-0.5 rounded-md">
-                                        💡 <strong>Coaching Tip:</strong> ${q.tip}
-                                    </span>
-                                </div>
+                                <div class="pt-1"><span class="inline-block bg-[#FFE500]/5 border border-[#FFE500]/10 text-[#FFE500] text-[11px] font-medium px-2 py-0.5 rounded-md">💡 <strong>Coaching Tip:</strong> ${q.tip}</span></div>
                             </div>
-                            <svg id="icon-${idx}" class="w-5 h-5 text-neutral-600 transition-transform duration-200 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                            </svg>
+                            <svg id="icon-${idx}" class="w-5 h-5 text-neutral-600 transition-transform duration-200 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
                         </div>
-                        <div id="answer-block-${idx}" class="hidden border-t border-neutral-900/60 bg-neutral-950/50 p-5 rounded-b-xl space-y-1.5 fade-in">
-                            <h5 class="text-xs font-bold text-neutral-400 tracking-wider uppercase font-mono">Ideal Resume Response Matrix</h5>
-                            <p class="text-sm text-neutral-300 leading-relaxed font-normal">${q.idealAnswer}</p>
-                        </div>
+                        <div id="answer-block-${idx}" class="hidden border-t border-neutral-900/60 bg-neutral-950/50 p-5 rounded-b-xl space-y-1.5 fade-in"><h5 class="text-xs font-bold text-neutral-400 tracking-wider uppercase font-mono">Ideal Resume Response Matrix</h5><p class="text-sm text-neutral-300 leading-relaxed font-normal">${q.idealAnswer}</p></div>
                     </div>`;
             });
         }
