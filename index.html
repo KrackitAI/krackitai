@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krackit - Premium AI Interview Coach</title>
+    <title>Krackit - Interactive AI Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
-
     <style>
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -18,221 +16,186 @@
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
+    <!-- Top Navigation Bar -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
-        <div onclick="showScreen('landing-screen')" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
-            <span>Krackit</span>
-            <span class="text-[#FFE500]">⚡</span>
+        <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
+            <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
         </div>
-        
-        <div id="navbar-session-status-target">
-            </div>
+        <div id="navbar-session-status-target"></div>
     </nav>
 
+    <!-- Paywall Modal Layer -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 fade-in">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-xl p-6 md:p-8 space-y-6 shadow-2xl relative">
-            
             <div class="text-center space-y-2">
                 <div class="text-3xl">⚡</div>
                 <h3 class="text-2xl font-black tracking-tight text-white">You've used your 3 free sessions</h3>
                 <p class="text-neutral-400 text-sm max-w-sm mx-auto">Upgrade to keep practicing and land your dream job.</p>
             </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                
                 <div class="bg-neutral-950 border-2 border-[#FFE500] rounded-xl p-5 flex flex-col justify-between space-y-4 relative">
                     <span class="absolute -top-2.5 right-3 bg-[#FFE500] text-black text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">Most Popular</span>
                     <div class="space-y-2">
                         <h4 class="text-sm font-bold text-neutral-300 font-mono tracking-wide uppercase">Krackit Pro</h4>
                         <div class="text-2xl font-black text-white">$19<span class="text-xs font-normal text-neutral-500">/mo</span></div>
-                        <ul class="text-[11px] text-neutral-400 space-y-1 pt-1 font-medium">
-                            <li>✓ Unlimited interview sessions</li>
-                            <li>✓ Salary negotiation tips</li>
-                            <li>✓ Keywords to mention</li>
-                            <li>✓ Full readiness score tracking</li>
-                        </ul>
                     </div>
-                    <a href="https://krackitai.lemonsqueezy.com/checkout/buy/6f0192d0-c2f8-4e95-a3aa-01c064b13914" target="_blank" 
-                       class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black text-center py-2.5 rounded-lg transition-all shadow-md block">
-                        Get Krackit Pro →
-                    </a>
+                    <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] text-black text-xs font-black text-center py-2.5 rounded-lg block">Get Krackit Pro →</a>
                 </div>
-
                 <div class="bg-neutral-950 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between space-y-4">
                     <div class="space-y-2">
                         <h4 class="text-sm font-bold text-neutral-400 font-mono tracking-wide uppercase">30 Sessions Pack</h4>
-                        <div class="text-2xl font-black text-white">$29<span class="text-xs font-normal text-neutral-500"> total</span></div>
-                        <ul class="text-[11px] text-neutral-400 space-y-1 pt-1 font-medium">
-                            <li>✓ 30 full session packages</li>
-                            <li>✓ All dynamic Pro features</li>
-                            <li>✓ Credits never expire</li>
-                            <li>✓ Ideal for a single job hunt</li>
-                        </ul>
+                        <div class="text-2xl font-black text-white">$29</div>
                     </div>
-                    <a href="https://krackitai.lemonsqueezy.com/checkout/buy/2701ad90-d1cd-40ad-8073-5adf45c38e6d" target="_blank" 
-                       class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white text-xs font-bold text-center py-2.5 rounded-lg transition-all block">
-                        Buy 30 sessions →
-                    </a>
+                    <a href="YOUR_LEMON_SQUEEZY_ONETIME_URL" target="_blank" class="w-full bg-neutral-900 border border-neutral-800 text-white text-xs font-bold text-center py-2.5 rounded-lg block">Buy 30 sessions →</a>
                 </div>
-
             </div>
-
             <div class="text-center pt-2">
-                <button onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300 font-medium tracking-wide">
-                    Maybe later
-                </button>
+                <button onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300">Maybe later</button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-4xl mx-auto px-4 pt-12 pb-24 flex flex-col justify-center items-center">
+    <!-- Main Content Stage -->
+    <main class="max-w-4xl mx-auto px-4 pt-12 pb-24 flex flex-col justify-center items-center w-full">
 
+        <!-- ================= SCREEN 1: LANDING SCREEN ================= -->
         <div id="landing-screen" class="text-center max-w-xl mx-auto space-y-6 pt-12">
-            <h1 class="text-5xl md:text-6xl font-black tracking-tight leading-none">
-                Krackit <span class="text-[#FFE500]">⚡</span>
-            </h1>
-            <p class="text-neutral-400 text-lg md:text-xl font-medium max-w-md mx-auto">
-                Crack every interview with production-ready AI coaching
-            </p>
+            <h1 class="text-5xl md:text-6xl font-black tracking-tight leading-none">Krackit <span class="text-[#FFE500]">⚡</span></h1>
+            <p class="text-neutral-400 text-lg md:text-xl font-medium max-w-md mx-auto">Interactive Voice & Text Interview Simulator</p>
             <div class="pt-4">
-                <button onclick="showScreen('input-screen')" class="bg-white text-black hover:bg-neutral-200 transition-all duration-200 font-bold px-8 py-3.5 rounded-xl inline-flex items-center space-x-2 text-base md:text-lg shadow-xl">
-                    <span>Start for free</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
+                <button onclick="showScreen('input-screen')" class="bg-white text-black hover:bg-neutral-200 font-bold px-8 py-3.5 rounded-xl inline-flex items-center space-x-2 text-lg shadow-xl">
+                    <span>Start Simulation</span>
                 </button>
             </div>
         </div>
 
+        <!-- ================= SCREEN 2: INPUT FORM SCREEN ================= -->
         <div id="input-screen" class="hidden w-full max-w-2xl mx-auto space-y-8 fade-in">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl md:text-4xl font-black tracking-tight">Generate Practice Pack</h2>
-                <p class="text-neutral-400 text-sm md:text-base">
-                    Provide the job details and attach your background profile history below to get started.
-                </p>
+                <h2 class="text-3xl font-black tracking-tight">Setup Interview Environment</h2>
             </div>
-
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
-                
-                <div id="validation-error-box" class="hidden bg-red-950/40 border border-red-900 text-red-400 p-4 rounded-xl text-sm flex items-start space-x-2.5">
-                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                <div id="validation-error-box" class="hidden bg-red-950/40 border border-red-900 text-red-400 p-4 rounded-xl text-sm">
                     <span id="validation-error-msg">Error details.</span>
                 </div>
-
                 <div class="space-y-2">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase flex justify-between">
                         <span>Job Description</span>
-                        <span id="job-char-count" class="font-mono lowercase text-neutral-600">0 chars</span>
                     </label>
-                    <textarea id="job-desc-input" rows="4" placeholder="Paste the complete job description details here..." 
-                        class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] focus:ring-1 focus:ring-[#FFE500] transition-all resize-none"></textarea>
+                    <textarea id="job-desc-input" rows="4" placeholder="Paste target job requirements details..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                 </div>
-
                 <div class="space-y-2.5">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Candidate Resume</label>
-                    
                     <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
-                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" 
-                            class="flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">
-                            📁 Upload PDF
-                        </button>
-                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" 
-                            class="flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-neutral-400 hover:text-white">
-                            📝 Paste Text
-                        </button>
+                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">📁 Upload PDF</button>
+                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
                     </div>
-
-                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-10 text-center cursor-pointer transition-all duration-200 group text-neutral-400 select-none">
+                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-10 text-center cursor-pointer select-none">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
                         <div id="upload-zone-status" class="space-y-2">
-                            <p class="text-base font-bold text-neutral-200 group-hover:text-[#FFE500] transition-colors">Drop your resume PDF here</p>
-                            <p class="text-xs text-neutral-500 font-medium">or click to browse local files (Max 5MB)</p>
+                            <p class="text-base font-bold text-neutral-200">Drop your resume PDF here</p>
+                            <p class="text-xs text-neutral-500">or click to browse files</p>
                         </div>
                     </div>
-
                     <div id="resume-paste-zone" class="hidden">
-                        <textarea id="resume-paste-input" rows="5" placeholder="Paste your detailed resume text background profile details here..." 
-                            class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] focus:ring-1 focus:ring-[#FFE500] transition-all resize-none"></textarea>
+                        <textarea id="resume-paste-input" rows="5" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                     </div>
                 </div>
-
+                <!-- Interactive Mode Options -->
+                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 space-y-3">
+                    <span class="text-xs font-bold uppercase text-neutral-400 tracking-wider block">Voice Preferences</span>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
+                        <span class="text-sm text-neutral-200">Enable AI Voice Agent (AI will read questions out loud)</span>
+                    </label>
+                </div>
                 <div class="pt-2">
-                    <button id="generate-btn" onclick="handleGenerateFlow()" 
-                        class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 text-base shadow-lg shadow-[#FFE500]/5">
-                        <span>Generate My Questions ⚡</span>
+                    <button id="generate-btn" onclick="handleGenerateFlow()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base shadow-lg shadow-[#FFE500]/5">
+                        <span>Initialize Simulator Stage ⚡</span>
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- ================= SCREEN 3: LOADING SCREEN ================= -->
         <div id="loading-screen" class="hidden w-full max-w-md mx-auto text-center py-20 space-y-6 fade-in">
-            <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
-                <div class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFE500]/20 opacity-75"></div>
-                <div class="relative rounded-full h-12 w-12 bg-neutral-900 border border-neutral-800 flex items-center justify-center text-xl text-[#FFE500] font-bold shadow-md">
-                    ⚡
+            <div class="animate-pulse text-4xl">⚡</div>
+            <p id="loading-message-text" class="text-base font-bold text-white">Configuring simulation arrays...</p>
+        </div>
+
+        <!-- ================= NEW SCREEN 4: INTERACTIVE INTERVIEW SIMULATOR CONTAINER ================= -->
+        <div id="simulator-screen" class="hidden w-full max-w-2xl mx-auto space-y-6 fade-in">
+            <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
+                <div>
+                    <h3 id="sim-role-title" class="text-2xl font-black text-white">Target Role</h3>
+                    <p class="text-xs text-neutral-500 font-mono" id="sim-progress-tracker">Question 1 of 5</p>
                 </div>
+                <button onclick="stopVoiceAgent()" class="text-xs bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg text-neutral-400 hover:text-white">
+                    🔇 Mute Audio
+                </button>
             </div>
-            <div class="space-y-1.5">
-                <p id="loading-message-text" class="text-base font-bold text-white tracking-tight">Reading your resume...</p>
-                <p class="text-xs text-neutral-500 font-mono">Groq Llama-3.3 Core Processing</p>
+
+            <!-- Active Question Output Area -->
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 space-y-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
+                <div class="flex items-center space-x-2 text-xs font-mono font-bold text-[#FFE500] uppercase">
+                    <span id="sim-question-meta">Technical Evaluation</span>
+                </div>
+                <h4 id="sim-active-question-text" class="text-lg font-bold text-white leading-snug">
+                    Loading interactive question string...
+                </h4>
+            </div>
+
+            <!-- Active User Response Interaction Interface -->
+            <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Response</label>
+                    
+                    <!-- Free Microphone Audio Input Toggle Controller -->
+                    <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" 
+                        class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all group">
+                        <span class="w-2 h-2 rounded-full bg-red-500 group-hover:animate-ping" id="mic-pulse-dot"></span>
+                        <span id="mic-action-label">🎤 Speak Answer</span>
+                    </button>
+                </div>
+
+                <textarea id="sim-user-response-box" rows="5" placeholder="Type your answer, or tap 'Speak Answer' to talk directly to the simulator..." 
+                    class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+
+                <div class="pt-2 flex justify-end">
+                    <button onclick="processNextSimQuestion()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md">
+                        Submit Response & Continue →
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div id="results-screen" class="hidden w-full max-w-3xl mx-auto space-y-8 fade-in">
-            <div class="border-b border-neutral-900 pb-5 w-full">
-                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Custom Analysis Pack</span>
-                <h2 id="hero-role-title" class="text-3xl font-black tracking-tight text-white mt-1">Target Role</h2>
-                <div id="usage-stats-badge" class="text-xs text-neutral-400 mt-2 font-medium"></div>
+        <!-- ================= SCREEN 5: COMPREHENSIVE SIMULATOR RESULTS STAGE ================= -->
+        <div id="results-screen" class="hidden w-full max-w-2xl mx-auto space-y-6 fade-in">
+            <div class="border-b border-neutral-900 pb-5 text-center">
+                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Simulation Complete</span>
+                <h2 class="text-3xl font-black tracking-tight text-white mt-1">Reviewing Performance Transcript</h2>
+                <p class="text-xs text-neutral-400 mt-2 font-medium" id="results-meta-usage"></p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
-                    <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">Readiness Score</span>
-                    <div class="relative w-32 h-32 flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-neutral-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path id="score-circle" class="text-[#FFE500] transition-all duration-1000 ease-out" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <div class="absolute text-3xl font-black tracking-tight" id="score-text">0%</div>
-                    </div>
+            <!-- Summary Highlights -->
+            <div class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 space-y-3">
+                <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-[#FFE500]">
+                    <span>💰</span> <span>Target Market Strategy Profile</span>
                 </div>
-
-                <div class="md:col-span-2 bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 space-y-4">
-                    <div>
-                        <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Key Strengths</span>
-                        <div id="strengths-container" class="flex flex-wrap gap-2"></div>
-                    </div>
-                    <hr class="border-neutral-900/60">
-                    <div>
-                        <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">Target Weaknesses</span>
-                        <div id="weaknesses-container" class="flex flex-wrap gap-2"></div>
-                    </div>
+                <p id="salary-tip-text" class="text-sm text-neutral-300 leading-relaxed font-medium"></p>
+                <div class="pt-2">
+                    <span class="text-xs font-bold text-neutral-400 block mb-1.5">Keywords Recommended:</span>
+                    <div id="keywords-container" class="flex flex-wrap gap-1.5"></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-5 space-y-2">
-                    <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-neutral-400">
-                        <span>💰</span> <span>Salary Negotiation Tip</span>
-                    </div>
-                    <p id="salary-tip-text" class="text-sm text-neutral-300 leading-relaxed font-medium"></p>
-                </div>
-                
-                <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-5 space-y-2">
-                    <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-neutral-400">
-                        <span>🎯</span> <span>Keywords To Mention</span>
-                    </div>
-                    <div id="keywords-container" class="flex flex-wrap gap-1.5 pt-1"></div>
-                </div>
-            </div>
+            <!-- Injected Transcript Output -->
+            <div class="space-y-4" id="transcript-deck-target"></div>
 
-            <div class="space-y-4 w-full">
-                <h3 class="text-xl font-bold tracking-tight text-neutral-300 pl-1">Your Structured Question Deck</h3>
-                <div id="questions-deck" class="space-y-4"></div>
-            </div>
-
-            <div class="text-center pt-4 border-t border-neutral-900">
-                <button onclick="showScreen('input-screen')" class="border border-neutral-800 bg-neutral-900/40 hover:bg-neutral-800 text-white font-bold px-8 py-3.5 rounded-xl transition-all duration-200 text-sm">
-                    Practice Again
+            <div class="text-center pt-4">
+                <button onclick="window.location.reload()" class="border border-neutral-800 bg-neutral-900/40 hover:bg-neutral-800 text-white font-bold px-8 py-3.5 rounded-xl text-sm">
+                    Initialize Another Session
                 </button>
             </div>
         </div>
@@ -240,291 +203,248 @@
     </main>
 
     <script>
-        const loadingMessages = [
-            "Reading your resume...",
-            "Analysing the job description...",
-            "Generating your questions...",
-            "Adding coaching tips...",
-            "Almost ready..."
-        ];
+        const loadingMessages = ["Reading documents...", "Generating question grids...", "Booting speech pipelines...", "Ready."];
         let loadingIntervalId = null;
         let currentUploadMode = 'upload'; 
         let extractedPdfTextState = ''; 
 
-        // ================= 5. WIRE THE FREE TIER COUNTER TO LOCALSTORAGE (image_fe8680.png) =================
-        function getSessionCount() {
-            return parseInt(localStorage.getItem('krackit_sessions')) || 0;
-        }
+        // Core Simulator Workspace Memory State Cards
+        let globalQuestionsDeck = [];
+        let currentActiveQuestionIndex = 0;
+        let candidateSessionTranscript = [];
 
-        function incrementSessionCount() {
-            const current = getSessionCount();
-            localStorage.setItem('krackit_sessions', current + 1);
-            updateNavbarSessionBadge();
-        }
+        // Web Audio Native Variable References
+        let activeSpeechRecognitionEngine = null;
+        let isMicrophoneListeningState = false;
 
-        // 6. SESSIONS COUNTER VIEW INJECTION GENERATOR (image_fe8648.png)
+        function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
+        function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
+        
         function updateNavbarSessionBadge() {
-            const sessions = getSessionCount();
-            const remaining = Math.max(0, 3 - sessions);
+            const rem = Math.max(0, 3 - getSessionCount());
             const target = document.getElementById('navbar-session-status-target');
-
-            if (remaining === 0) {
-                target.innerHTML = `
-                    <button onclick="openPaywallModal()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1 shadow-md">
-                        <span>🔒</span> <span>Upgrade to continue</span>
-                    </button>`;
+            if (rem === 0) {
+                target.innerHTML = `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg">🔒 Upgrade to continue</button>`;
             } else {
-                target.innerHTML = `
-                    <div class="text-[11px] text-neutral-400 font-mono tracking-wider uppercase bg-neutral-900/80 px-3 py-1.5 rounded-lg border border-neutral-800 flex items-center space-x-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span>⚡ ${remaining} free session${remaining !== 1 ? 's' : ''} left</span>
-                    </div>`;
+                target.innerHTML = `<div class="text-[11px] text-neutral-400 font-mono tracking-wider bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} sessions left</div>`;
+            }
+        }
+        function openPaywallModal() { document.getElementById('upgrade-modal').classList.remove('hidden'); }
+        function closePaywallModal() { document.getElementById('upgrade-modal').classList.add('hidden'); }
+
+        updateNavbarSessionBadge();
+
+        // Native System Web Speech API Configuration Orchestrator
+        function initializeNativeSpeechEngine() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.warn("Speech recognition interface not accessible in this client browser device context.");
+                return null;
+            }
+            const instance = new SpeechRecognition();
+            instance.continuous = true;
+            instance.interimResults = true;
+            instance.lang = 'en-US';
+
+            instance.onresult = (event) => {
+                let completeBuffer = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        completeBuffer += event.results[i][0].transcript;
+                    }
+                }
+                if(completeBuffer) {
+                    document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + completeBuffer;
+                }
+            };
+
+            instance.onerror = e => console.error("Speech Recognition Engine Exception State:", e);
+            instance.onend = () => { if(isMicrophoneListeningState) instance.start(); };
+            return instance;
+        }
+
+        activeSpeechRecognitionEngine = initializeNativeSpeechEngine();
+
+        function toggleVoiceSpeechInput() {
+            if(!activeSpeechRecognitionEngine) {
+                alert("Voice-to-text is not supported on this browser browser version. Please type your response instead.");
+                return;
+            }
+
+            const btn = document.getElementById('mic-toggle-btn');
+            const dot = document.getElementById('mic-pulse-dot');
+            const lbl = document.getElementById('mic-action-label');
+
+            if (!isMicrophoneListeningState) {
+                isMicrophoneListeningState = true;
+                activeSpeechRecognitionEngine.start();
+                btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-200 animate-pulse";
+                dot.className = "w-2 h-2 rounded-full bg-red-400";
+                lbl.innerText = "Listening... Tap to Stop";
+            } else {
+                isMicrophoneListeningState = false;
+                activeSpeechRecognitionEngine.stop();
+                btn.className = "bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all";
+                dot.className = "w-2 h-2 rounded-full bg-red-500";
+                lbl.innerText = "🎤 Speak Answer";
             }
         }
 
-        // Modal Action Controller Toggles
-        function openPaywallModal() {
-            document.getElementById('upgrade-modal').classList.remove('hidden');
+        // Text To Speech Utterance Interface Trigger
+        function executeVoiceSynthesisOutput(textString) {
+            if (!document.getElementById('voice-synthesis-toggle').checked) return;
+            window.speechSynthesis.cancel(); // Terminate overlapping processing operations
+            const utterance = new SpeechSynthesisUtterance(textString);
+            utterance.rate = 1.05;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
         }
-        function closePaywallModal() {
-            document.getElementById('upgrade-modal').classList.add('hidden');
-        }
 
-        // Initialize state markers on browser viewport landing instances
-        updateNavbarSessionBadge();
+        function stopVoiceAgent() { window.speechSynthesis.cancel(); }
 
-        document.getElementById('job-desc-input').addEventListener('input', e => {
-            document.getElementById('job-char-count').innerText = `${e.target.value.length} chars`;
-        });
-
+        // Local Document Parsing Core Elements
         async function extractTextFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            let fullText = '';
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                const page = await pdf.getPage(pageNum);
-                const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
-                fullText += pageText + '\n';
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(it => it.str).join(' ') + '\n';
             }
-            return fullText.trim();
+            return text.trim();
         }
 
         function switchUploadMode(mode) {
             currentUploadMode = mode;
-            const upBtn = document.getElementById('toggle-upload-btn');
-            const pasteBtn = document.getElementById('toggle-paste-btn');
-            const upZone = document.getElementById('resume-upload-zone');
-            const pasteZone = document.getElementById('resume-paste-zone');
+            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800" : "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400";
+            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800" : "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400";
+            if (mode === 'upload') { document.getElementById('resume-upload-zone').classList.remove('hidden'); document.getElementById('resume-paste-zone').classList.add('hidden'); }
+            else { document.getElementById('resume-paste-zone').classList.remove('hidden'); document.getElementById('resume-upload-zone').classList.add('hidden'); }
+        }
 
-            if (mode === 'upload') {
-                upBtn.className = "flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80";
-                pasteBtn.className = "flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-neutral-400 hover:text-white";
-                upZone.classList.remove('hidden');
-                pasteZone.classList.add('hidden');
-            } else {
-                pasteBtn.className = "flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80";
-                upBtn.className = "flex-1 py-2 text-xs font-bold transition-all duration-200 rounded-lg text-neutral-400 hover:text-white";
-                pasteZone.classList.remove('hidden');
-                upZone.classList.add('hidden');
+        document.getElementById('resume-upload-zone').addEventListener('click', () => document.getElementById('pdf-input').click());
+        function handleFileSelection(e) {
+            const f = e.target.files[0];
+            if (f) {
+                document.getElementById('upload-zone-status').innerHTML = `<p class="text-sm text-[#FFE500] animate-pulse">Processing PDF payload stream...</p>`;
+                extractTextFromPDF(f).then(txt => {
+                    extractedPdfTextState = txt;
+                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border-2 border-solid border-[#4CAF50] rounded-xl p-10 text-center cursor-pointer text-[#4CAF50] text-sm font-bold";
+                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} — Mounted Successfully`;
+                });
             }
         }
 
-        const dropZone = document.getElementById('resume-upload-zone');
-        dropZone.addEventListener('click', () => document.getElementById('pdf-input').click());
-        
-        dropZone.addEventListener('dragover', e => {
-            e.preventDefault();
-            dropZone.className = "w-full bg-[#1a1a00] border-2 border-dashed border-[#FFE500] rounded-xl p-10 text-center cursor-pointer transition-all duration-200 group text-[#FFE500] scale-[1.01]";
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            if(extractedPdfTextState) {
-                applyZoneFileSuccessStyles();
-            } else {
-                dropZone.className = "w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-10 text-center cursor-pointer transition-all duration-200 group text-neutral-400";
-            }
-        });
-
-        dropZone.addEventListener('drop', e => {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file) processIncomingResumeFile(file);
-        });
-
-        function handleFileSelection(event) {
-            const file = event.target.files[0];
-            if (file) processIncomingResumeFile(file);
+        function showScreen(id) {
+            ['landing-screen', 'input-screen', 'loading-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if (id === 'loading-screen') {
+                let idx = 0; document.getElementById('loading-message-text').innerText = loadingMessages[0];
+                loadingIntervalId = setInterval(() => { idx = (idx + 1) % loadingMessages.length; document.getElementById('loading-message-text').innerText = loadingMessages[idx]; }, 1000);
+            } else { clearInterval(loadingIntervalId); }
         }
 
-        function applyZoneFileSuccessStyles(fileName = "Resume File Loaded") {
-            dropZone.className = "w-full bg-[#0d1a0d] border-2 border-solid border-[#4CAF50] rounded-xl p-10 text-center cursor-pointer transition-all duration-200 text-[#4CAF50] select-none font-bold text-sm";
-            document.getElementById('upload-zone-status').innerHTML = `<p class="flex items-center justify-center gap-1.5"><span>✓</span> <span>${fileName} — Ready</span></p>`;
-        }
-
-        async function processIncomingResumeFile(file) {
-            const errorBox = document.getElementById('validation-error-box');
-            const errorMsg = document.getElementById('validation-error-msg');
-
-            if (!file.type.includes('pdf') && !file.name.endsWith('.pdf')) {
-                errorMsg.innerText = "Please upload a valid PDF file.";
-                errorBox.classList.remove('hidden');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                errorMsg.innerText = "File too large — please use a PDF under 5MB.";
-                errorBox.classList.remove('hidden');
-                return;
-            }
-
-            errorBox.classList.add('hidden');
-            document.getElementById('upload-zone-status').innerHTML = `<p class="text-sm font-bold text-[#FFE500] animate-pulse">⚡ Reading your PDF...</p>`;
-
-            try {
-                const textOutput = await extractTextFromPDF(file);
-                if (textOutput.length < 50) throw new Error("Could not parse data string cleanly.");
-                extractedPdfTextState = textOutput;
-                applyZoneFileSuccessStyles(file.name);
-            } catch (err) {
-                errorMsg.innerText = "Could not read PDF — try pasting your resume as text instead.";
-                errorBox.classList.remove('hidden');
-                document.getElementById('upload-zone-status').innerHTML = `<p class="text-base font-bold text-neutral-200">Drop your resume PDF here</p><p class="text-xs text-neutral-500 font-medium">or click to browse local files (Max 5MB)</p>`;
-                extractedPdfTextState = '';
-            }
-        }
-
-        function showScreen(screenId) {
-            document.getElementById('landing-screen').classList.add('hidden');
-            document.getElementById('input-screen').classList.add('hidden');
-            document.getElementById('loading-screen').classList.add('hidden');
-            document.getElementById('results-screen').classList.add('hidden');
-            
-            document.getElementById(screenId).classList.remove('hidden');
-
-            if (screenId === 'loading-screen') {
-                let currentMsgIndex = 0;
-                document.getElementById('loading-message-text').innerText = loadingMessages[0];
-                loadingIntervalId = setInterval(() => {
-                    currentMsgIndex = (currentMsgIndex + 1) % loadingMessages.length;
-                    document.getElementById('loading-message-text').innerText = loadingMessages[currentMsgIndex];
-                }, 1200);
-            } else {
-                if (loadingIntervalId) {
-                    clearInterval(loadingIntervalId);
-                    loadingIntervalId = null;
-                }
-            }
-        }
-
-        // Adjusted generation runtime handler capturing image_fe8680.png conditional intercepts
+        // Processing Generator Initialization
         async function handleGenerateFlow() {
-            // INTERCEPT ENFORCEMENT: Enforce the 3-session hard lock locally
-            const runningSessionsCount = getSessionCount();
-            if (runningSessionsCount >= 3) {
-                openPaywallModal();
-                return;
-            }
+            if (getSessionCount() >= 3) { openPaywallModal(); return; }
+            const job = document.getElementById('job-desc-input').value.trim();
+            let resTxt = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            const jobDesc = document.getElementById('job-desc-input').value.trim();
-            const errorBox = document.getElementById('validation-error-box');
-            const errorMsg = document.getElementById('validation-error-msg');
-            let resumeText = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
-
-            if (!jobDesc) {
-                errorMsg.innerText = "Please paste a job description.";
-                errorBox.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
-            if (!resumeText) {
-                errorMsg.innerText = currentUploadMode === 'upload' ? "Please upload your resume PDF." : "Please paste your resume text.";
-                errorBox.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
-
-            errorBox.classList.add('hidden');
+            if (!job || !resTxt) { alert("Please input both fields before continuing."); return; }
             showScreen('loading-screen');
 
             try {
-                const response = await fetch('/api/interview', {
+                const res = await fetch('/api/interview', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ jobDescription: jobDesc, resume: resumeText })
+                    body: JSON.stringify({ jobDescription: job, resume: resTxt })
                 });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Server processing breakdown execution failure');
 
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.details || data.error || 'Server error');
+                // Bind response configuration structures to global memory
+                globalQuestionsDeck = data.questions || [];
+                currentActiveQuestionIndex = 0;
+                candidateSessionTranscript = [];
 
-                // SUCCESS PIPELINE: Increment token ledger locally on successful parsing execution matching image_fe8663.png
-                incrementSessionCount();
+                // Configure Simulator Window Attributes
+                document.getElementById('sim-role-title').innerText = data.roleTitle || "Target Professional Role";
+                document.getElementById('salary-tip-text').innerText = data.salaryNegotiationTip || "Research global baseline compensation spreads.";
                 
-                // Override runtime payload attributes dynamically using client state references
-                data.sessionsUsed = getSessionCount();
-                data.sessionsRemaining = Math.max(0, 3 - data.sessionsUsed);
+                const keyWrap = document.getElementById('keywords-container'); keyWrap.innerHTML = '';
+                (data.keywordsToMention || []).forEach(w => { keyWrap.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs px-2 py-0.5 rounded font-mono">${w}</span>`; });
 
-                renderProductionResults(data);
-                showScreen('results-screen');
+                incrementSessionCount();
+                launchActiveSimulatorCard();
 
-            } catch (error) {
-                console.error("Processing breakdown:", error);
-                alert("Generation error: " + error.message);
+            } catch (err) {
+                alert("Simulation initialization aborted: " + err.message);
                 showScreen('input-screen');
             }
         }
 
-        function renderProductionResults(data) {
-            document.getElementById('hero-role-title').innerText = data.roleTitle || "Target Professional Role";
-            document.getElementById('usage-stats-badge').innerText = `Sessions used: ${data.sessionsUsed} | Free tier sessions remaining: ${data.sessionsRemaining}`;
+        // Interactive Simulation Stage Controller Matrices
+        function launchActiveSimulatorCard() {
+            if (isMicrophoneListeningState) toggleVoiceSpeechInput(); // Kill listening loops between intervals
+            document.getElementById('sim-user-response-box').value = '';
 
-            const rawScore = data.readinessScore || 70;
-            document.getElementById('score-circle').setAttribute('stroke-dasharray', `${rawScore}, 100`);
-            document.getElementById('score-text').innerText = `${rawScore}%`;
-
-            const strengthsContainer = document.getElementById('strengths-container');
-            strengthsContainer.innerHTML = '';
-            (data.strengths || []).forEach(str => {
-                strengthsContainer.innerHTML += `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/40 border border-emerald-800 text-emerald-400"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>${str}</span>`;
-            });
-
-            const weaknessesContainer = document.getElementById('weaknesses-container');
-            weaknessesContainer.innerHTML = '';
-            (data.weaknesses || []).forEach(wk => {
-                weaknessesContainer.innerHTML += `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 border border-red-900 text-red-400"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>${wk}</span>`;
-            });
-
-            document.getElementById('salary-tip-text').innerText = data.salaryNegotiationTip || "Research market averages.";
+            const activeQuestionObject = globalQuestionsDeck[currentActiveQuestionIndex];
             
-            const keywordsContainer = document.getElementById('keywords-container');
-            keywordsContainer.innerHTML = '';
-            (data.keywordsToMention || []).forEach(word => {
-                keywordsContainer.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs px-2.5 py-1 rounded-md font-mono">${word}</span>`;
+            document.getElementById('sim-progress-tracker').innerText = `Question ${currentActiveQuestionIndex + 1} of ${globalQuestionsDeck.length}`;
+            document.getElementById('sim-question-meta').innerText = `${activeQuestionObject.difficulty || 'Core'} • ${activeQuestionObject.category || 'General'}`;
+            document.getElementById('sim-active-question-text').innerText = activeQuestionObject.question;
+
+            showScreen('simulator-screen');
+            
+            // Execute automated reading loop trigger
+            setTimeout(() => { executeVoiceSynthesisOutput(activeQuestionObject.question); }, 400);
+        }
+
+        function processNextSimQuestion() {
+            stopVoiceAgent();
+            const rawUserAnswer = document.getElementById('sim-user-response-box').value.trim();
+            
+            if(!rawUserAnswer) {
+                if(!confirm("You have left the response completely blank. Continue anyway?")) return;
+            }
+
+            // Push current active object state onto storage ledger arrays
+            candidateSessionTranscript.push({
+                question: globalQuestionsDeck[currentActiveQuestionIndex].question,
+                candidateAnswer: rawUserAnswer || "No verbal or textual response provided."
             });
 
-            const deck = document.getElementById('questions-deck');
-            deck.innerHTML = '';
-            
-            (data.questions || []).forEach((q, idx) => {
-                const badgeColor = q.difficulty === 'Hard' ? 'text-rose-400 border-rose-900/50 bg-rose-950/20' : 'text-amber-400 border-amber-900/50 bg-amber-950/20';
-                deck.innerHTML += `
-                    <div class="bg-neutral-900/10 border border-neutral-900 hover:border-neutral-800 rounded-xl transition-all duration-200">
-                        <div onclick="toggleCard(${idx})" class="p-5 flex justify-between items-start cursor-pointer space-x-4 select-none">
-                            <div class="space-y-2 w-full">
-                                <div class="flex flex-wrap items-center gap-1.5">
-                                    <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-wider">Question 0${idx + 1}</span>
-                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md border border-neutral-800 text-neutral-400 bg-neutral-900/60 uppercase tracking-wide font-mono">${q.category || 'General'}</span>
-                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md border uppercase tracking-wide font-mono ${badgeColor}">${q.difficulty || 'Medium'}</span>
-                                </div>
-                                <h4 class="text-base font-bold text-white tracking-tight leading-snug pt-0.5">${q.question}</h4>
-                                <div class="pt-1"><span class="inline-block bg-[#FFE500]/5 border border-[#FFE500]/10 text-[#FFE500] text-[11px] font-medium px-2 py-0.5 rounded-md">💡 <strong>Coaching Tip:</strong> ${q.tip}</span></div>
-                            </div>
-                            <svg id="icon-${idx}" class="w-5 h-5 text-neutral-600 transition-transform duration-200 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+            currentActiveQuestionIndex++;
+
+            if (currentActiveQuestionIndex < globalQuestionsDeck.length) {
+                launchActiveSimulatorCard();
+            } else {
+                renderTranscriptDashboardOverview();
+            }
+        }
+
+        function renderTranscriptDashboardOverview() {
+            document.getElementById('results-meta-usage').innerText = `Simulation ID Ledger Reference #${Math.floor(Math.random()*90000+10000)}`;
+            const targetDeck = document.getElementById('transcript-deck-target');
+            targetDeck.innerHTML = '';
+
+            candidateSessionTranscript.forEach((item, index) => {
+                targetDeck.innerHTML += `
+                    <div class="bg-neutral-900/20 border border-neutral-950 rounded-xl p-5 space-y-4">
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest">Question 0${index + 1}</span>
+                            <h4 class="text-sm font-bold text-white leading-snug">${item.question}</h4>
                         </div>
-                        <div id="answer-block-${idx}" class="hidden border-t border-neutral-900/60 bg-neutral-950/50 p-5 rounded-b-xl space-y-1.5 fade-in"><h5 class="text-xs font-bold text-neutral-400 tracking-wider uppercase font-mono">Ideal Resume Response Matrix</h5><p class="text-sm text-neutral-300 leading-relaxed font-normal">${q.idealAnswer}</p></div>
+                        <div class="bg-neutral-950/60 border border-neutral-900 p-4 rounded-xl space-y-1">
+                            <span class="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider block">Your Answer Transcript:</span>
+                            <p class="text-sm text-neutral-300 leading-relaxed font-normal">${item.candidateAnswer}</p>
+                        </div>
                     </div>`;
             });
+
+            showScreen('results-screen');
         }
     </script>
 </body>
-</html>
 </html>
