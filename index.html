@@ -3,20 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krackit - Interactive AI Simulator</title>
+    <title>Krackit - Live AI Conversational Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
-    <style>
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
-    <!-- Top Navigation Bar -->
+    <!-- Navbar -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
         <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
             <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
@@ -24,285 +20,189 @@
         <div id="navbar-session-status-target"></div>
     </nav>
 
-    <!-- Paywall Modal Layer -->
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 fade-in">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-xl p-6 md:p-8 space-y-6 shadow-2xl relative">
-            <div class="text-center space-y-2">
-                <div class="text-3xl">⚡</div>
-                <h3 class="text-2xl font-black tracking-tight text-white">You've used your 3 free sessions</h3>
-                <p class="text-neutral-400 text-sm max-w-sm mx-auto">Upgrade to keep practicing and land your dream job.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div class="bg-neutral-950 border-2 border-[#FFE500] rounded-xl p-5 flex flex-col justify-between space-y-4 relative">
-                    <span class="absolute -top-2.5 right-3 bg-[#FFE500] text-black text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">Most Popular</span>
-                    <div class="space-y-2">
-                        <h4 class="text-sm font-bold text-neutral-300 font-mono tracking-wide uppercase">Krackit Pro</h4>
-                        <div class="text-2xl font-black text-white">$19<span class="text-xs font-normal text-neutral-500">/mo</span></div>
-                    </div>
-                    <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] text-black text-xs font-black text-center py-2.5 rounded-lg block">Get Krackit Pro →</a>
-                </div>
-                <div class="bg-neutral-950 border border-neutral-800 rounded-xl p-5 flex flex-col justify-between space-y-4">
-                    <div class="space-y-2">
-                        <h4 class="text-sm font-bold text-neutral-400 font-mono tracking-wide uppercase">30 Sessions Pack</h4>
-                        <div class="text-2xl font-black text-white">$29</div>
-                    </div>
-                    <a href="YOUR_LEMON_SQUEEZY_ONETIME_URL" target="_blank" class="w-full bg-neutral-900 border border-neutral-800 text-white text-xs font-bold text-center py-2.5 rounded-lg block">Buy 30 sessions →</a>
-                </div>
-            </div>
-            <div class="text-center pt-2">
-                <button onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300">Maybe later</button>
+    <!-- Paywall Modal -->
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 space-y-6 text-center">
+            <h3 class="text-2xl font-black text-white">Free Trial Maxed Out</h3>
+            <p class="text-neutral-400 text-sm">Upgrade to get access to unlimited dynamic real-time voice interviews.</p>
+            <div class="space-y-3">
+                <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] text-black py-3 rounded-xl font-bold block">Get Pro Plan ($19/mo)</a>
+                <button onclick="closePaywallModal()" class="text-xs text-neutral-500">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Stage -->
-    <main class="max-w-4xl mx-auto px-4 pt-12 pb-24 flex flex-col justify-center items-center w-full">
+    <!-- Main Workspace -->
+    <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
 
-        <!-- ================= SCREEN 1: LANDING SCREEN ================= -->
-        <div id="landing-screen" class="text-center max-w-xl mx-auto space-y-6 pt-12">
-            <h1 class="text-5xl md:text-6xl font-black tracking-tight leading-none">Krackit <span class="text-[#FFE500]">⚡</span></h1>
-            <p class="text-neutral-400 text-lg md:text-xl font-medium max-w-md mx-auto">Interactive Voice & Text Interview Simulator</p>
-            <div class="pt-4">
-                <button onclick="showScreen('input-screen')" class="bg-white text-black hover:bg-neutral-200 font-bold px-8 py-3.5 rounded-xl inline-flex items-center space-x-2 text-lg shadow-xl">
-                    <span>Start Simulation</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- ================= SCREEN 2: INPUT FORM SCREEN ================= -->
-        <div id="input-screen" class="hidden w-full max-w-2xl mx-auto space-y-8 fade-in">
+        <!-- SCREEN 1: INPUT SCREEN -->
+        <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black tracking-tight">Setup Interview Environment</h2>
+                <h2 class="text-4xl font-black tracking-tight">Live Interview Simulator Stage</h2>
+                <p class="text-neutral-400 text-sm">Upload your files to begin a continuous, real-time interactive voice or text interview.</p>
             </div>
+
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
-                <div id="validation-error-box" class="hidden bg-red-950/40 border border-red-900 text-red-400 p-4 rounded-xl text-sm">
-                    <span id="validation-error-msg">Error details.</span>
-                </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase flex justify-between">
-                        <span>Job Description</span>
-                    </label>
-                    <textarea id="job-desc-input" rows="4" placeholder="Paste target job requirements details..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
+                    <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                 </div>
+
                 <div class="space-y-2.5">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Candidate Resume</label>
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Your Background Profile</label>
                     <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
-                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">📁 Upload PDF</button>
-                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
+                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">📁 Upload PDF</button>
+                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
                     </div>
-                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-10 text-center cursor-pointer select-none">
+
+                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
-                        <div id="upload-zone-status" class="space-y-2">
-                            <p class="text-base font-bold text-neutral-200">Drop your resume PDF here</p>
-                            <p class="text-xs text-neutral-500">or click to browse files</p>
+                        <div id="upload-zone-status" class="space-y-1">
+                            <p class="text-sm font-bold text-neutral-200">Drop resume PDF file here</p>
                         </div>
                     </div>
+
                     <div id="resume-paste-zone" class="hidden">
-                        <textarea id="resume-paste-input" rows="5" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                        <textarea id="resume-paste-input" rows="4" placeholder="Paste your background text here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                     </div>
                 </div>
-                <!-- Interactive Mode Options -->
-                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 space-y-3">
-                    <span class="text-xs font-bold uppercase text-neutral-400 tracking-wider block">Voice Preferences</span>
-                    <label class="flex items-center space-x-3 cursor-pointer">
-                        <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
-                        <span class="text-sm text-neutral-200">Enable AI Voice Agent (AI will read questions out loud)</span>
-                    </label>
+
+                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 flex items-center justify-between">
+                    <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
+                    <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500]">
                 </div>
-                <div class="pt-2">
-                    <button id="generate-btn" onclick="handleGenerateFlow()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base shadow-lg shadow-[#FFE500]/5">
-                        <span>Initialize Simulator Stage ⚡</span>
-                    </button>
-                </div>
+
+                <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">
+                    Start Dynamic Mock Interview ⚡
+                </button>
             </div>
         </div>
 
-        <!-- ================= SCREEN 3: LOADING SCREEN ================= -->
-        <div id="loading-screen" class="hidden w-full max-w-md mx-auto text-center py-20 space-y-6 fade-in">
-            <div class="animate-pulse text-4xl">⚡</div>
-            <p id="loading-message-text" class="text-base font-bold text-white">Configuring simulation arrays...</p>
-        </div>
-
-        <!-- ================= NEW SCREEN 4: INTERACTIVE INTERVIEW SIMULATOR CONTAINER ================= -->
-        <div id="simulator-screen" class="hidden w-full max-w-2xl mx-auto space-y-6 fade-in">
+        <!-- SCREEN 2: THE RUNTIME CONVERSATION STAGE -->
+        <div id="simulator-screen" class="hidden space-y-6">
             <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
                 <div>
-                    <h3 id="sim-role-title" class="text-2xl font-black text-white">Target Role</h3>
-                    <p class="text-xs text-neutral-500 font-mono" id="sim-progress-tracker">Question 1 of 5</p>
+                    <h3 class="text-2xl font-black text-white">Live AI Interview Panel</h3>
+                    <p class="text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">AI is preparing opening response...</p>
                 </div>
-                <button onclick="stopVoiceAgent()" class="text-xs bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg text-neutral-400 hover:text-white">
-                    🔇 Mute Audio
+                <button onclick="finishAndWrapInterview()" class="text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-2 rounded-xl font-bold transition-all">
+                    🏁 Finish Interview
                 </button>
             </div>
 
-            <!-- Active Question Output Area -->
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 space-y-3 relative overflow-hidden">
+            <!-- Interviewer Chat Output Card -->
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
-                <div class="flex items-center space-x-2 text-xs font-mono font-bold text-[#FFE500] uppercase">
-                    <span id="sim-question-meta">Technical Evaluation</span>
-                </div>
-                <h4 id="sim-active-question-text" class="text-lg font-bold text-white leading-snug">
-                    Loading interactive question string...
+                <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
+                <h4 id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed">
+                    Connecting to interface channels...
                 </h4>
             </div>
 
-            <!-- Active User Response Interaction Interface -->
+            <!-- Candidate Response Container -->
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Response</label>
+                    <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Your Turn</label>
                     
-                    <!-- Free Microphone Audio Input Toggle Controller -->
-                    <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" 
-                        class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all group">
-                        <span class="w-2 h-2 rounded-full bg-red-500 group-hover:animate-ping" id="mic-pulse-dot"></span>
+                    <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
                         <span id="mic-action-label">🎤 Speak Answer</span>
                     </button>
                 </div>
 
-                <textarea id="sim-user-response-box" rows="5" placeholder="Type your answer, or tap 'Speak Answer' to talk directly to the simulator..." 
-                    class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or tap 'Speak Answer' to speak..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
 
-                <div class="pt-2 flex justify-end">
-                    <button onclick="processNextSimQuestion()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md">
-                        Submit Response & Continue →
+                <div class="flex justify-end">
+                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md transition-all">
+                        Submit Answer →
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- ================= SCREEN 5: COMPREHENSIVE SIMULATOR RESULTS STAGE ================= -->
-        <div id="results-screen" class="hidden w-full max-w-2xl mx-auto space-y-6 fade-in">
+        <!-- SCREEN 3: TRANSCRIPT RESULTS VIEW -->
+        <div id="results-screen" class="hidden space-y-6">
             <div class="border-b border-neutral-900 pb-5 text-center">
-                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Simulation Complete</span>
-                <h2 class="text-3xl font-black tracking-tight text-white mt-1">Reviewing Performance Transcript</h2>
-                <p class="text-xs text-neutral-400 mt-2 font-medium" id="results-meta-usage"></p>
+                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Session Concluded</span>
+                <h2 class="text-3xl font-black text-white mt-1">Interview Transcript Log</h2>
             </div>
-
-            <!-- Summary Highlights -->
-            <div class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 space-y-3">
-                <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-[#FFE500]">
-                    <span>💰</span> <span>Target Market Strategy Profile</span>
-                </div>
-                <p id="salary-tip-text" class="text-sm text-neutral-300 leading-relaxed font-medium"></p>
-                <div class="pt-2">
-                    <span class="text-xs font-bold text-neutral-400 block mb-1.5">Keywords Recommended:</span>
-                    <div id="keywords-container" class="flex flex-wrap gap-1.5"></div>
-                </div>
-            </div>
-
-            <!-- Injected Transcript Output -->
             <div class="space-y-4" id="transcript-deck-target"></div>
-
-            <div class="text-center pt-4">
-                <button onclick="window.location.reload()" class="border border-neutral-800 bg-neutral-900/40 hover:bg-neutral-800 text-white font-bold px-8 py-3.5 rounded-xl text-sm">
-                    Initialize Another Session
-                </button>
-            </div>
+            <button onclick="window.location.reload()" class="w-full bg-neutral-900 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm">
+                Return to Entry Screen
+            </button>
         </div>
 
     </main>
 
     <script>
-        const loadingMessages = ["Reading documents...", "Generating question grids...", "Booting speech pipelines...", "Ready."];
-        let loadingIntervalId = null;
-        let currentUploadMode = 'upload'; 
-        let extractedPdfTextState = ''; 
+        let currentUploadMode = 'upload';
+        let extractedPdfTextState = '';
+        
+        // Dynamic Rolling Chat Memory Array Matrix
+        let runningChatHistoryLedger = [];
+        let globalJobDescContext = '';
+        let globalResumeContext = '';
 
-        // Core Simulator Workspace Memory State Cards
-        let globalQuestionsDeck = [];
-        let currentActiveQuestionIndex = 0;
-        let candidateSessionTranscript = [];
-
-        // Web Audio Native Variable References
-        let activeSpeechRecognitionEngine = null;
-        let isMicrophoneListeningState = false;
+        let speechRecognitionEngine = null;
+        let isMicrophoneListening = false;
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
-        
         function updateNavbarSessionBadge() {
             const rem = Math.max(0, 3 - getSessionCount());
-            const target = document.getElementById('navbar-session-status-target');
-            if (rem === 0) {
-                target.innerHTML = `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg">🔒 Upgrade to continue</button>`;
-            } else {
-                target.innerHTML = `<div class="text-[11px] text-neutral-400 font-mono tracking-wider bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} sessions left</div>`;
-            }
+            document.getElementById('navbar-session-status-target').innerHTML = rem === 0 
+                ? `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 px-3 py-1.5 rounded-lg">🔒 Paywall Active</button>`
+                : `<div class="text-[11px] text-neutral-400 font-mono bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} free sessions left</div>`;
         }
         function openPaywallModal() { document.getElementById('upgrade-modal').classList.remove('hidden'); }
         function closePaywallModal() { document.getElementById('upgrade-modal').classList.add('hidden'); }
 
         updateNavbarSessionBadge();
 
-        // Native System Web Speech API Configuration Orchestrator
-        function initializeNativeSpeechEngine() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                console.warn("Speech recognition interface not accessible in this client browser device context.");
-                return null;
-            }
-            const instance = new SpeechRecognition();
+        // Native Speech Recognition Hook Setup
+        function initSpeechFramework() {
+            const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechObj) return null;
+            const instance = new SpeechObj();
             instance.continuous = true;
             instance.interimResults = true;
             instance.lang = 'en-US';
-
-            instance.onresult = (event) => {
-                let completeBuffer = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        completeBuffer += event.results[i][0].transcript;
-                    }
+            instance.onresult = (e) => {
+                let textBuffer = '';
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    if (e.results[i].isFinal) textBuffer += e.results[i][0].transcript;
                 }
-                if(completeBuffer) {
-                    document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + completeBuffer;
-                }
+                if(textBuffer) document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
             };
-
-            instance.onerror = e => console.error("Speech Recognition Engine Exception State:", e);
-            instance.onend = () => { if(isMicrophoneListeningState) instance.start(); };
+            instance.onend = () => { if(isMicrophoneListening) instance.start(); };
             return instance;
         }
-
-        activeSpeechRecognitionEngine = initializeNativeSpeechEngine();
+        speechRecognitionEngine = initSpeechFramework();
 
         function toggleVoiceSpeechInput() {
-            if(!activeSpeechRecognitionEngine) {
-                alert("Voice-to-text is not supported on this browser browser version. Please type your response instead.");
-                return;
-            }
-
+            if(!speechRecognitionEngine) { alert("Speech-to-text not supported in this browser version."); return; }
             const btn = document.getElementById('mic-toggle-btn');
-            const dot = document.getElementById('mic-pulse-dot');
             const lbl = document.getElementById('mic-action-label');
-
-            if (!isMicrophoneListeningState) {
-                isMicrophoneListeningState = true;
-                activeSpeechRecognitionEngine.start();
-                btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-200 animate-pulse";
-                dot.className = "w-2 h-2 rounded-full bg-red-400";
-                lbl.innerText = "Listening... Tap to Stop";
+            if(!isMicrophoneListening) {
+                isMicrophoneListening = true; speechRecognitionEngine.start();
+                btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
+                lbl.innerText = "Listening... Click to Pause";
             } else {
-                isMicrophoneListeningState = false;
-                activeSpeechRecognitionEngine.stop();
-                btn.className = "bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all";
-                dot.className = "w-2 h-2 rounded-full bg-red-500";
+                isMicrophoneListening = false; speechRecognitionEngine.stop();
+                btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
                 lbl.innerText = "🎤 Speak Answer";
             }
         }
 
-        // Text To Speech Utterance Interface Trigger
-        function executeVoiceSynthesisOutput(textString) {
+        function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
-            window.speechSynthesis.cancel(); // Terminate overlapping processing operations
-            const utterance = new SpeechSynthesisUtterance(textString);
-            utterance.rate = 1.05;
-            utterance.pitch = 1.0;
-            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(str);
+            speech.rate = 1.05;
+            window.speechSynthesis.speak(speech);
         }
 
-        function stopVoiceAgent() { window.speechSynthesis.cancel(); }
-
-        // Local Document Parsing Core Elements
+        // PDF and Layout Controllers
         async function extractTextFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -317,8 +217,8 @@
 
         function switchUploadMode(mode) {
             currentUploadMode = mode;
-            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800" : "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400";
-            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800" : "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400";
+            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
+            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
             if (mode === 'upload') { document.getElementById('resume-upload-zone').classList.remove('hidden'); document.getElementById('resume-paste-zone').classList.add('hidden'); }
             else { document.getElementById('resume-paste-zone').classList.remove('hidden'); document.getElementById('resume-upload-zone').classList.add('hidden'); }
         }
@@ -326,122 +226,125 @@
         document.getElementById('resume-upload-zone').addEventListener('click', () => document.getElementById('pdf-input').click());
         function handleFileSelection(e) {
             const f = e.target.files[0];
-            if (f) {
-                document.getElementById('upload-zone-status').innerHTML = `<p class="text-sm text-[#FFE500] animate-pulse">Processing PDF payload stream...</p>`;
+            if(f) {
                 extractTextFromPDF(f).then(txt => {
                     extractedPdfTextState = txt;
-                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border-2 border-solid border-[#4CAF50] rounded-xl p-10 text-center cursor-pointer text-[#4CAF50] text-sm font-bold";
-                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} — Mounted Successfully`;
+                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
+                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`;
                 });
             }
         }
 
         function showScreen(id) {
-            ['landing-screen', 'input-screen', 'loading-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            ['input-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            if (id === 'loading-screen') {
-                let idx = 0; document.getElementById('loading-message-text').innerText = loadingMessages[0];
-                loadingIntervalId = setInterval(() => { idx = (idx + 1) % loadingMessages.length; document.getElementById('loading-message-text').innerText = loadingMessages[idx]; }, 1000);
-            } else { clearInterval(loadingIntervalId); }
         }
 
-        // Processing Generator Initialization
-        async function handleGenerateFlow() {
+        // Conversational Pipeline Initialization Engine
+        async function startLiveSimulation() {
             if (getSessionCount() >= 3) { openPaywallModal(); return; }
-            const job = document.getElementById('job-desc-input').value.trim();
-            let resTxt = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+            globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+            globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            if (!job || !resTxt) { alert("Please input both fields before continuing."); return; }
-            showScreen('loading-screen');
-
-            try {
-                const res = await fetch('/api/interview', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ jobDescription: job, resume: resTxt })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Server processing breakdown execution failure');
-
-                // Bind response configuration structures to global memory
-                globalQuestionsDeck = data.questions || [];
-                currentActiveQuestionIndex = 0;
-                candidateSessionTranscript = [];
-
-                // Configure Simulator Window Attributes
-                document.getElementById('sim-role-title').innerText = data.roleTitle || "Target Professional Role";
-                document.getElementById('salary-tip-text').innerText = data.salaryNegotiationTip || "Research global baseline compensation spreads.";
-                
-                const keyWrap = document.getElementById('keywords-container'); keyWrap.innerHTML = '';
-                (data.keywordsToMention || []).forEach(w => { keyWrap.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs px-2 py-0.5 rounded font-mono">${w}</span>`; });
-
-                incrementSessionCount();
-                launchActiveSimulatorCard();
-
-            } catch (err) {
-                alert("Simulation initialization aborted: " + err.message);
-                showScreen('input-screen');
-            }
-        }
-
-        // Interactive Simulation Stage Controller Matrices
-        function launchActiveSimulatorCard() {
-            if (isMicrophoneListeningState) toggleVoiceSpeechInput(); // Kill listening loops between intervals
-            document.getElementById('sim-user-response-box').value = '';
-
-            const activeQuestionObject = globalQuestionsDeck[currentActiveQuestionIndex];
+            if(!globalJobDescContext || !globalResumeContext) { alert("Please input both profiles before generating."); return; }
             
-            document.getElementById('sim-progress-tracker').innerText = `Question ${currentActiveQuestionIndex + 1} of ${globalQuestionsDeck.length}`;
-            document.getElementById('sim-question-meta').innerText = `${activeQuestionObject.difficulty || 'Core'} • ${activeQuestionObject.category || 'General'}`;
-            document.getElementById('sim-active-question-text').innerText = activeQuestionObject.question;
-
+            // Clean dynamic structures
+            runningChatHistoryLedger = [];
+            
+            document.getElementById('input-screen').classList.add('hidden');
+            document.getElementById('simulator-screen').classList.add('hidden');
             showScreen('simulator-screen');
             
-            // Execute automated reading loop trigger
-            setTimeout(() => { executeVoiceSynthesisOutput(activeQuestionObject.question); }, 400);
-        }
-
-        function processNextSimQuestion() {
-            stopVoiceAgent();
-            const rawUserAnswer = document.getElementById('sim-user-response-box').value.trim();
+            // Inject the initial instruction turn to prompt the opening question
+            runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
             
-            if(!rawUserAnswer) {
-                if(!confirm("You have left the response completely blank. Continue anyway?")) return;
-            }
+            incrementSessionCount();
+            await fetchNextInterviewerTurn();
+        }
 
-            // Push current active object state onto storage ledger arrays
-            candidateSessionTranscript.push({
-                question: globalQuestionsDeck[currentActiveQuestionIndex].question,
-                candidateAnswer: rawUserAnswer || "No verbal or textual response provided."
-            });
+        // Dispatches rolling payloads back to Groq
+        async function fetchNextInterviewerTurn() {
+            document.getElementById('sim-status-indicator').innerText = "Interviewer is thinking...";
+            document.getElementById('submit-turn-btn').disabled = true;
 
-            currentActiveQuestionIndex++;
+            try {
+                const response = await fetch('/api/interview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jobDescription: globalJobDescContext,
+                        resume: globalResumeContext,
+                        chatHistory: runningChatHistoryLedger
+                    })
+                });
 
-            if (currentActiveQuestionIndex < globalQuestionsDeck.length) {
-                launchActiveSimulatorCard();
-            } else {
-                renderTranscriptDashboardOverview();
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.details || data.error || "Network error");
+
+                const aiMsgText = data.aiMessage;
+
+                // Append the AI's question string output onto our running memory card tracker ledger
+                runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
+
+                // Render out onto DOM target fields
+                document.getElementById('sim-active-question-text').innerText = aiMsgText;
+                document.getElementById('sim-status-indicator').innerText = "Active Transmission Channel Open";
+                
+                speakTextAloud(aiMsgText);
+
+            } catch (err) {
+                console.error(err);
+                alert("API processing loop crash: " + err.message);
+            } finally {
+                document.getElementById('submit-turn-btn').disabled = false;
             }
         }
 
-        function renderTranscriptDashboardOverview() {
-            document.getElementById('results-meta-usage').innerText = `Simulation ID Ledger Reference #${Math.floor(Math.random()*90000+10000)}`;
+        async function submitCandidateResponseTurn() {
+            window.speechSynthesis.cancel();
+            if(isMicrophoneListening) toggleVoiceSpeechInput();
+
+            const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
+            if(!userTextResponse) { alert("Please input or say an answer before submitting."); return; }
+
+            // Append candidate response text onto rolling state array parameters
+            runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
+            document.getElementById('sim-user-response-box').value = '';
+
+            // Automatically call the backend with the new history to receive the follow-up question
+            await fetchNextInterviewerTurn();
+        }
+
+        function finishAndWrapInterview() {
+            window.speechSynthesis.cancel();
+            if(isMicrophoneListening) toggleVoiceSpeechInput();
+            
             const targetDeck = document.getElementById('transcript-deck-target');
             targetDeck.innerHTML = '';
 
-            candidateSessionTranscript.forEach((item, index) => {
-                targetDeck.innerHTML += `
-                    <div class="bg-neutral-900/20 border border-neutral-950 rounded-xl p-5 space-y-4">
-                        <div class="space-y-1">
-                            <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest">Question 0${index + 1}</span>
-                            <h4 class="text-sm font-bold text-white leading-snug">${item.question}</h4>
-                        </div>
-                        <div class="bg-neutral-950/60 border border-neutral-900 p-4 rounded-xl space-y-1">
-                            <span class="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider block">Your Answer Transcript:</span>
-                            <p class="text-sm text-neutral-300 leading-relaxed font-normal">${item.candidateAnswer}</p>
-                        </div>
-                    </div>`;
+            // Loop through chat history to build a performance log review panel
+            let questionBufferText = '';
+            
+            runningChatHistoryLedger.forEach((msg) => {
+                if (msg.role === 'assistant') {
+                    questionBufferText = msg.content;
+                } else if (msg.role === 'user' && questionBufferText) {
+                    // Render pairs of questions and answers onto the screen
+                    targetDeck.innerHTML += `
+                        <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-3">
+                            <p class="text-xs font-mono font-bold text-neutral-500 uppercase">Question:</p>
+                            <h4 class="text-sm font-bold text-white leading-relaxed">${questionBufferText}</h4>
+                            <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
+                                <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Response:</span>
+                                <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
+                            </div>
+                        </div>`;
+                }
             });
+
+            if(!targetDeck.innerHTML) {
+                targetDeck.innerHTML = `<p class="text-sm text-neutral-500 text-center py-6">No back-and-forth communication rows recorded.</p>`;
+            }
 
             showScreen('results-screen');
         }
