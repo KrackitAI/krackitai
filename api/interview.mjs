@@ -1,31 +1,51 @@
 import Groq from "groq-sdk";
 
-// Initialize the API client inside the request handler loop to guarantee environment variable availability
 export default async function handler(req, res) {
-    // Explicitly handle preflight CORS or non-POST requests cleanly
+    // 1. Enforce strict CORS and Method Handling
     if (req.method !== 'POST') {
         res.setHeader('Allow', ['POST']);
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     try {
-        const { jobDescription, resume } = req.body;
-
-        if (!jobDescription || !resume) {
-            return res.status(400).json({ error: 'Missing required payload parameters: jobDescription and resume are mandatory.' });
+        // 2. Safe Body Parsing Matrix (Fixes the Vercel Undefined Bug)
+        let parsedBody = req.body;
+        
+        if (!parsedBody) {
+            return res.status(400).json({ error: 'Request body is completely empty.' });
         }
 
-        // Verify that the Vercel Environment key is readable at runtime
-        const apiKey = process.env.GROQ_API_KEY;
-        if (!apiKey) {
-            console.error("CRITICAL BACKEND ERROR: GROQ_API_KEY is completely missing or unreadable in the Vercel dashboard.");
-            return res.status(500).json({ 
-                error: "Backend Configuration Error", 
-                details: "The server API key is missing. Ensure GROQ_API_KEY is configured correctly inside your Vercel Environment Variables project settings." 
+        // If Vercel passed the body as a raw unparsed string, parse it manually
+        if (typeof parsedBody === 'string') {
+            try {
+                parsedBody = JSON.parse(parsedBody);
+            } catch (jsonErr) {
+                return res.status(400).json({ 
+                    error: 'Invalid JSON payload structure received.', 
+                    details: jsonErr.message 
+                });
+            }
+        }
+
+        const { jobDescription, resume } = parsedBody;
+
+        if (!jobDescription || !resume) {
+            return res.status(400).json({ 
+                error: 'Missing fields.', 
+                details: `Received jobDescription length: ${jobDescription ? jobDescription.length : 0}, resume length: ${resume ? resume.length : 0}` 
             });
         }
 
-        // Safe, isolated SDK instantiation
+        // 3. Secure Key Validation
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ 
+                error: 'Backend Configuration Error', 
+                details: 'GROQ_API_KEY environment variable is inaccessible to the server runtime.' 
+            });
+        }
+
+        // 4. Instantiate SDK inside the handler runtime
         const groq = new Groq({ apiKey: apiKey });
 
         const targetPrompt = `
@@ -67,11 +87,9 @@ Candidate Resume: ${resume}
 
         const rawContent = chatCompletion.choices[0].message.content.trim();
         
-        // Safety Fallback: Strip out any rogue markdown wrappers if the LLM leaked them despite settings
         let cleanJsonString = rawContent;
         if (cleanJsonString.startsWith("```json")) {
-            cleanJsonString = cleanJsonString.replace(/^
-```json\s*/i, "").replace(/\s*```$/, "");
+            cleanJsonString = cleanJsonString.replace(/^```json\s*/i, "").replace(/\s*```$/, "");
         } else if (cleanJsonString.startsWith("```")) {
             cleanJsonString = cleanJsonString.replace(/^```\s*/i, "").replace(/\s*```$/, "");
         }
@@ -80,9 +98,9 @@ Candidate Resume: ${resume}
         return res.status(200).json(parsedContent);
 
     } catch (error) {
-        console.error("Vercel Function Processing Exception:", error);
+        console.error("Fatal Runtime Exception Block Triggered:", error);
         return res.status(500).json({ 
-            error: "Internal execution processing error handler tripped.", 
+            error: "Internal Server Error", 
             details: error.message 
         });
     }
