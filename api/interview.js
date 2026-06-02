@@ -47,7 +47,7 @@ Candidate Background Resume: ${resume}
 
         const chatCompletion = await groq.chat.completions.create({
             messages: apiMessagesPayload,
-            model: "llama-3.3-70b-specdec",
+            model: "llama-3.3-70b-versatile", // FIXED: Swapped out the dead model name
             temperature: 0.6,
             max_tokens: 400
         });
