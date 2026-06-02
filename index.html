@@ -232,12 +232,37 @@
         }
 
         function speakTextAloud(str) {
-            if (!document.getElementById('voice-synthesis-toggle').checked) return;
-            window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(str);
-            speech.rate = 1.05;
-            window.speechSynthesis.speak(speech);
-        }
+    if (!document.getElementById('voice-synthesis-toggle').checked) return;
+    window.speechSynthesis.cancel(); // Kill any overlapping speech immediately
+
+    const speech = new SpeechSynthesisUtterance(str);
+    
+    // Fetch all available voices installed on the user's browser hardware
+    const availableVoices = window.speechSynthesis.getVoices();
+
+    // Look specifically for premium, high-fidelity neural voices (Google, Microsoft, or Apple Siri)
+    const premiumVoiceFallback = availableVoices.find(voice => 
+        (voice.name.includes('Google') && voice.lang.startsWith('en')) || 
+        (voice.name.includes('Natural') && voice.lang.startsWith('en')) ||
+        (voice.name.includes('Siri') && voice.lang.startsWith('en'))
+    );
+
+    // If a high-quality voice is found, force the engine to use it
+    if (premiumVoiceFallback) {
+        speech.voice = premiumVoiceFallback;
+    }
+
+    // Tweak properties to make the delivery sound less robotic
+    speech.rate = 0.95;  // Slightly slower than default makes it sound more deliberate and human
+    speech.pitch = 1.0;  // Keep the pitch natural
+    
+    window.speechSynthesis.speak(speech);
+}
+
+// Chrome loads voices asynchronously, so we run an empty trigger to warm up the cache
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
 
         // PDF and Layout Controllers
         async function extractTextFromPDF(file) {
