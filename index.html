@@ -104,13 +104,14 @@
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Your Turn</label>
                     
+                    <!-- Fixed Microphone Button -->
                     <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
                         <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
                         <span id="mic-action-label">🎤 Speak Answer</span>
                     </button>
                 </div>
 
-                <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or tap 'Speak Answer' to speak..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                <textarea id="sim-user-response-box" rows="4" placeholder="Type your full answer here, or click 'Speak Answer' to speak directly into your microphone..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
 
                 <div class="flex justify-end">
                     <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md transition-all">
@@ -138,7 +139,6 @@
         let currentUploadMode = 'upload';
         let extractedPdfTextState = '';
         
-        // Dynamic Rolling Chat Memory Array Matrix
         let runningChatHistoryLedger = [];
         let globalJobDescContext = '';
         let globalResumeContext = '';
@@ -159,38 +159,75 @@
 
         updateNavbarSessionBadge();
 
-        // Native Speech Recognition Hook Setup
+        // ================= FIXED HARDWARE-DRIVEN SPEECH RECOGNITION (onstart / onend sync) =================
         function initSpeechFramework() {
             const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
             if(!SpeechObj) return null;
+            
             const instance = new SpeechObj();
             instance.continuous = true;
             instance.interimResults = true;
             instance.lang = 'en-US';
+
+            // Hardware Turn-On Event (Ensures UI updates ONLY when mic is actually working)
+            instance.onstart = () => {
+                isMicrophoneListening = true;
+                const btn = document.getElementById('mic-toggle-btn');
+                const lbl = document.getElementById('mic-action-label');
+                btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
+                lbl.innerText = "Listening... Click to Pause";
+            };
+
+            // Hardware Turn-Off Event (Guarantees the UI resets when dictation is stopped)
+            instance.onend = () => {
+                isMicrophoneListening = false;
+                const btn = document.getElementById('mic-toggle-btn');
+                const lbl = document.getElementById('mic-action-label');
+                btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
+                lbl.innerText = "🎤 Speak Answer";
+            };
+
+            // Explicit Error Handler to give actual diagnostic popups to users
+            instance.onerror = (event) => {
+                console.error("Speech Recognition Engine Error Event:", event.error);
+                if (event.error === 'not-allowed') {
+                    alert("⚠️ Microphone Access Denied!\n\nTo speak, click the lock/settings icon inside your browser's URL bar, allow Microphone permissions, and refresh this page.");
+                } else if (event.error === 'no-speech') {
+                    console.log("No audio speech detected, listening loop idling...");
+                } else {
+                    alert("Microphone capture error: " + event.error);
+                }
+            };
+
             instance.onresult = (e) => {
                 let textBuffer = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) textBuffer += e.results[i][0].transcript;
                 }
-                if(textBuffer) document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
+                if(textBuffer) {
+                    document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
+                }
             };
-            instance.onend = () => { if(isMicrophoneListening) instance.start(); };
+
             return instance;
         }
         speechRecognitionEngine = initSpeechFramework();
 
         function toggleVoiceSpeechInput() {
-            if(!speechRecognitionEngine) { alert("Speech-to-text not supported in this browser version."); return; }
-            const btn = document.getElementById('mic-toggle-btn');
-            const lbl = document.getElementById('mic-action-label');
+            if(!speechRecognitionEngine) { 
+                alert("Speech recognition is not supported on this browser.\n\nPlease open this link inside Google Chrome, Safari, or Microsoft Edge to use the microphone features."); 
+                return; 
+            }
+            
             if(!isMicrophoneListening) {
-                isMicrophoneListening = true; speechRecognitionEngine.start();
-                btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
-                lbl.innerText = "Listening... Click to Pause";
+                try {
+                    speechRecognitionEngine.start();
+                } catch(err) {
+                    console.error("Microphone startup failure:", err);
+                    speechRecognitionEngine.stop();
+                }
             } else {
-                isMicrophoneListening = false; speechRecognitionEngine.stop();
-                btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
-                lbl.innerText = "🎤 Speak Answer";
+                speechRecognitionEngine.stop();
             }
         }
 
@@ -248,14 +285,12 @@
 
             if(!globalJobDescContext || !globalResumeContext) { alert("Please input both profiles before generating."); return; }
             
-            // Clean dynamic structures
             runningChatHistoryLedger = [];
             
             document.getElementById('input-screen').classList.add('hidden');
             document.getElementById('simulator-screen').classList.add('hidden');
             showScreen('simulator-screen');
             
-            // Inject the initial instruction turn to prompt the opening question
             runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
             
             incrementSessionCount();
@@ -283,10 +318,8 @@
 
                 const aiMsgText = data.aiMessage;
 
-                // Append the AI's question string output onto our running memory card tracker ledger
                 runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
 
-                // Render out onto DOM target fields
                 document.getElementById('sim-active-question-text').innerText = aiMsgText;
                 document.getElementById('sim-status-indicator').innerText = "Active Transmission Channel Open";
                 
@@ -307,11 +340,9 @@
             const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
             if(!userTextResponse) { alert("Please input or say an answer before submitting."); return; }
 
-            // Append candidate response text onto rolling state array parameters
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
 
-            // Automatically call the backend with the new history to receive the follow-up question
             await fetchNextInterviewerTurn();
         }
 
@@ -322,14 +353,12 @@
             const targetDeck = document.getElementById('transcript-deck-target');
             targetDeck.innerHTML = '';
 
-            // Loop through chat history to build a performance log review panel
             let questionBufferText = '';
             
             runningChatHistoryLedger.forEach((msg) => {
                 if (msg.role === 'assistant') {
                     questionBufferText = msg.content;
                 } else if (msg.role === 'user' && questionBufferText) {
-                    // Render pairs of questions and answers onto the screen
                     targetDeck.innerHTML += `
                         <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-3">
                             <p class="text-xs font-mono font-bold text-neutral-500 uppercase">Question:</p>
