@@ -174,22 +174,35 @@
     </main>
 
     <script>
-        // CONFIGURATION: Mirror your exact Supabase Dashboard credential properties here
-        const SUPABASE_URL = https://zlzprbespegemxnhwnuu.supabase.co;
-        const SUPABASE_ANON_KEY = sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ;
+        // CONFIGURATION: Replace these values with your actual keys from the Supabase Dashboard
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         
-        // Initialize the connection instance pipeline client
-        const supabaseClientInstance = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        let supabaseClientInstance = null;
 
-        // AUTHENTICATION SECURITY CHECK RUNTIME GATE: Bounces users to login page if unauthorized
-        async function enforceSecuritySessionWall() {
-            if (!supabaseClientInstance) return;
-            const { data: { session } } = await supabaseClientInstance.auth.getSession();
-            if (!session) {
-                window.location.href = '/auth.html';
+        // SAFE BOOT CHANNELS: Safely initialize Supabase without breaking the UI thread execution loop
+        function initializeSecureAccessClient() {
+            if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                console.warn("🔒 Security Notice: Database connection variables are currently set to local template strings. Bypassing authentication gates for debugging.");
+                return;
+            }
+            if (window.supabase) {
+                supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                enforceSecuritySessionWall();
             }
         }
-        enforceSecuritySessionWall();
+
+        async function enforceSecuritySessionWall() {
+            if (!supabaseClientInstance) return;
+            try {
+                const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                if (!session) {
+                    window.location.href = '/auth.html';
+                }
+            } catch (err) {
+                console.error("Auth system session validation dropout exception:", err);
+            }
+        }
 
         let currentUploadMode = 'upload';
         let extractedPdfTextState = '';
@@ -207,14 +220,15 @@
         
         function updateNavbarSessionBadge() {
             const rem = Math.max(0, 3 - getSessionCount());
-            document.getElementById('navbar-session-status-target').innerHTML = rem === 0 
+            const target = document.getElementById('navbar-session-status-target');
+            if (!target) return;
+            
+            target.innerHTML = rem === 0 
                 ? `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 px-3 py-1.5 rounded-lg text-white font-bold">🔒 Paywall Active</button>`
                 : `<div class="text-[11px] text-neutral-400 font-mono bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} free sessions left</div>`;
         }
         function openPaywallModal() { document.getElementById('upgrade-modal').classList.remove('hidden'); }
         function closePaywallModal() { document.getElementById('upgrade-modal').classList.add('hidden'); }
-
-        updateNavbarSessionBadge();
 
         function initSpeechFramework() {
             const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -252,7 +266,6 @@
             };
             return instance;
         }
-        speechRecognitionEngine = initSpeechFramework();
 
         function toggleVoiceSpeechInput() {
             if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
@@ -281,10 +294,6 @@
             window.speechSynthesis.speak(speech);
         }
 
-        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-        }
-
         async function extractTextFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -305,7 +314,6 @@
             else { document.getElementById('resume-paste-zone').classList.remove('hidden'); document.getElementById('resume-upload-zone').classList.add('hidden'); }
         }
 
-        document.getElementById('resume-upload-zone').addEventListener('click', () => document.getElementById('pdf-input').click());
         function handleFileSelection(e) {
             const f = e.target.files[0];
             if(f) {
@@ -316,39 +324,6 @@
                 });
             }
         }
-
-        // ================= INTERCEPTIVE NATIVE DRAG AND DROP HANDLERS =================
-        ['dragenter', 'dragover'].forEach(eventName => {
-            document.getElementById('resume-upload-zone').addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('resume-upload-zone').style.borderColor = '#FFE500';
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            document.getElementById('resume-upload-zone').addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('resume-upload-zone').style.borderColor = '#262626';
-            }, false);
-        });
-
-        document.getElementById('resume-upload-zone').addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            const f = files[0];
-
-            if (f && f.type === "application/pdf") {
-                extractTextFromPDF(f).then(txt => {
-                    extractedPdfTextState = txt;
-                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
-                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Dragged & Ready`;
-                });
-            } else {
-                alert("Please drop a valid PDF document file.");
-            }
-        });
 
         function showScreen(id) {
             ['input-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
@@ -390,7 +365,6 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.details || data.error || "Packaging breakdown.");
 
-                // INTERCEPT LOGIC: If 'isConcluded' arrives, render the evaluation report card view
                 if (data.isConcluded) {
                     latestEvaluationReportCache = data;
                     
@@ -495,6 +469,47 @@
             document.getElementById('mic-toggle-btn').style.display = 'block';
             showScreen('results-screen');
         }
+
+        // Global Event Wireup execution on page instantiation load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateNavbarSessionBadge();
+            speechRecognitionEngine = initSpeechFramework();
+            initializeSecureAccessClient();
+
+            // Drag and drop event tracking attachments
+            const zone = document.getElementById('resume-upload-zone');
+            if(zone) {
+                zone.addEventListener('click', () => document.getElementById('pdf-input').click());
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    zone.addEventListener(eventName, (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        zone.style.borderColor = '#FFE500';
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    zone.addEventListener(eventName, (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        zone.style.borderColor = '#262626';
+                    }, false);
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const f = e.dataTransfer.files[0];
+                    if (f && f.type === "application/pdf") {
+                        extractTextFromPDF(f).then(txt => {
+                            extractedPdfTextState = txt;
+                            zone.className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
+                            document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Dragged & Ready`;
+                        });
+                    } else {
+                        alert("Please drop a valid PDF document file.");
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
