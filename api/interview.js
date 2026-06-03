@@ -26,32 +26,27 @@ export default async function handler(req, res) {
         const groq = new Groq({ apiKey: apiKey });
 
         const systemPersona = `
-You are a brilliant, highly critical, and professional technical interviewer. 
-Your goal is to conduct a live, realistic back-and-forth mock interview based on the provided Job Description and Candidate Resume.
+You are an expert, highly critical, and professional technical interviewer. Your goal is to conduct a live, realistic back-and-forth mock interview based on the provided Job Description and Candidate Resume.
 
-CRITICAL CONVERSATIONAL RULES:
+CONVERSATIONAL RULES:
 1. Ask exactly ONE sharp question at a time. Never dump multiple questions.
-2. Listen closely to the candidate's responses. Challenge their assumptions or dig deeper if they do well.
+2. Listen closely to the candidate's responses. Challenge their assumptions, press them on shallow technical answers, or offer a brief hint if they completely stall out.
+3. Keep the interview going naturally for as long as you feel is necessary to truly evaluate their depth. Do not count turns or announce question numbers.
 
-CRITICAL ADAPTIVE PACING & TURNS CONTROL:
-1. You must ask exactly 5 distinct technical questions.
-2. Track the conversation length via the history log. On your 5th turn, ask your 5th and final technical question normally. DO NOT say goodbye or conclude the interview on this turn.
+HOW TO END THE INTERVIEW (DYNAMIC CLOSING):
+When you feel you have gathered enough concrete data to confidently grade this candidate's profile, or if they are failing completely and cannot clear basic entry thresholds, you must decisively end the interview.
 
-THE CRITICAL EVALUATION TURN (TURN 6):
-After the candidate submits their 5th answer, you enter your 6th and final turn. On this turn, you must calculate their final grade and compile a brutally honest, direct technical performance review.
-You must return your output strictly as a valid JSON object on this final turn. Do not include markdown text wrappers outside the JSON structure.
-
-JSON Structure for Turn 6:
+To end the interview, you must immediately shift your response format and return a strictly valid JSON object structured exactly like this:
 {
   "isConcluded": true,
-  "aiMessage": "Your final spoken goodbye message to the candidate (e.g., 'That concludes our technical evaluation today. Your data has been processed. Goodbye.')",
+  "aiMessage": "Your final spoken goodbye message to the candidate out loud (e.g., 'Alright, that gives me a clear picture of your technical background. We are done here. Goodbye.')",
   "score": 45, 
   "verdict": "REJECTED / STRONG REJECT / PASS / STRONG PASS",
-  "brutallyHonestReview": "A detailed, critical, and completely unvarnished assessment of their performance. Point out exactly where their technical knowledge failed, where they sounded shallow, and what specific concepts they completely got wrong based on their answers.",
+  "brutallyHonestReview": "A deeply detailed, critical, and completely unvarnished assessment of their performance. Point out exactly where their technical knowledge failed, where they sounded shallow, and what specific engineering concepts they got wrong.",
   "gapsToFix": ["Concept 1", "Concept 2", "Concept 3"]
 }
 
-For standard conversation turns (Turns 1 through 5), simply reply with a normal plain text message containing your next interview question. Do not return JSON during standard turns.
+For normal ongoing interview turns, simply reply with a normal plain text message containing your next interview question. Do not include JSON structures until you are completely ready to end the interview.
 
 Context Profile Data:
 Target Job Description: ${jobDescription}
@@ -63,30 +58,22 @@ Candidate Background Resume: ${resume}
             ...chatHistory
         ];
 
-        // Determine if we are on the final evaluation turn to enforce JSON constraints
-        const assistantTurnsCount = chatHistory.filter(msg => msg.role === 'assistant').length;
-        const isFinalEvaluationTurn = (assistantTurnsCount >= 5);
-
-        const requestPayload = {
+        // We use a high-quality versatile model that can handle changing from text to JSON dynamically
+        const chatCompletion = await groq.chat.completions.create({
             messages: apiMessagesPayload,
             model: "llama-3.3-70b-versatile",
-            temperature: 0.4,
-            max_tokens: 800
-        };
+            temperature: 0.5,
+            max_tokens: 1000
+        });
 
-        if (isFinalEvaluationTurn) {
-            requestPayload.response_format = { type: "json_object" };
-        }
-
-        const chatCompletion = await groq.chat.completions.create(requestPayload);
         const rawResponseContent = chatCompletion.choices[0].message.content.trim();
 
-        if (isFinalEvaluationTurn) {
-            // Parse the JSON data safely to hand back to the frontend report stage
+        // Dynamically detect if the AI decided to output the final evaluation JSON payload
+        if (rawResponseContent.startsWith('{') && rawResponseContent.endsWith('}')) {
             const parsedEvaluationData = JSON.parse(rawResponseContent);
             return res.status(200).json(parsedEvaluationData);
         } else {
-            // Return standard question format
+            // Return standard text question back to the running interface
             return res.status(200).json({ aiMessage: rawResponseContent, isConcluded: false });
         }
 
