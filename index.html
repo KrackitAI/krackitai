@@ -1,11 +1,21 @@
+Ah, my bad! Looking back at the code structure, I accidentally trimmed the layout slightly in the middle of that last update. Let's make sure your file is 100% complete so you don't have to piece things together manually.
+
+Here is the absolute complete, uninterrupted master index.html file. It contains the updated fetchNextInterviewerTurn() function—complete with the hidden token interceptor and the popup-free UI transitions—nested perfectly inside the rest of your application code.
+
+The Complete Master index.html
+Go to your GitHub repository, click on index.html, click the Pencil icon to edit, clear out everything, and paste this entire file:
+
+HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Adaptive AI Interview Coach</title>
+    <!-- Tailwind CSS for high-end styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- PDF.js Core Client Engines -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -13,13 +23,16 @@
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
+    <!-- Global App Top Navigation Bar -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
         <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
             <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
         </div>
+        <!-- Live session tracking badge placeholder -->
         <div id="navbar-session-status-target"></div>
     </nav>
 
+    <!-- Lemon Squeezy Project Revenue Paywall Modal -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 space-y-6 text-center shadow-2xl">
             <h3 class="text-2xl font-black text-white">Free Trial Allowance Maxed Out</h3>
@@ -31,8 +44,10 @@
         </div>
     </div>
 
+    <!-- Main Dynamic Content Wrapper Stage -->
     <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
 
+        <!-- ================= STAGE 1: INPUT ENVIRONMENT SETUP SCREEN ================= -->
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8 animate-fade-in">
             <div class="text-center space-y-2">
                 <h2 class="text-4xl font-black tracking-tight">Setup Interview Environment</h2>
@@ -40,15 +55,18 @@
             </div>
 
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
+                <!-- Validation Alerts Box -->
                 <div id="validation-error-box" class="hidden bg-red-950/40 border border-red-900 text-red-400 p-4 rounded-xl text-sm">
                     <span id="validation-error-msg">Field validation warning string placeholder.</span>
                 </div>
 
+                <!-- Job Description Input Container -->
                 <div class="space-y-2">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
                     <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description details here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                 </div>
 
+                <!-- Resume Multi-Mode File Input Section -->
                 <div class="space-y-2.5">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Your Background Profile</label>
                     <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
@@ -56,6 +74,7 @@
                         <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
                     </div>
 
+                    <!-- PDF Drag and Drop Area Block Container -->
                     <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
                         <div id="upload-zone-status" class="space-y-1">
@@ -64,22 +83,26 @@
                         </div>
                     </div>
 
+                    <!-- Text Area Fallback Container Layout Panel -->
                     <div id="resume-paste-zone" class="hidden">
                         <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                     </div>
                 </div>
 
+                <!-- Web Voice Output Preference Flags Container -->
                 <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 flex items-center justify-between">
                     <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
                     <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
                 </div>
 
+                <!-- Submission Main Triggers -->
                 <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">
                     Start Dynamic Mock Interview ⚡
                 </button>
             </div>
         </div>
 
+        <!-- ================= STAGE 2: ADAPTIVE RUNTIME SIMULATOR OVERLAY PANEL ================= -->
         <div id="simulator-screen" class="hidden space-y-6">
             <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
                 <div>
@@ -91,6 +114,7 @@
                 </button>
             </div>
 
+            <!-- Intersecting Question Display Interface -->
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
                 <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
@@ -99,10 +123,12 @@
                 </h4>
             </div>
 
+            <!-- Active User Response Processing Box -->
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Your Response Turn</label>
                     
+                    <!-- Free Browser Audio Microphones Toggles -->
                     <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
                         <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
                         <span id="mic-action-label">🎤 Speak Answer</span>
@@ -119,6 +145,7 @@
             </div>
         </div>
 
+        <!-- ================= STAGE 3: INTERACTIVE PERFORMANCE TRANSCRIPT REVIEW ================= -->
         <div id="results-screen" class="hidden space-y-6">
             <div class="border-b border-neutral-900 pb-5 text-center">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Session Concluded</span>
@@ -126,6 +153,7 @@
                 <p class="text-xs text-neutral-500 mt-2">Review your complete evaluation thread records below.</p>
             </div>
             
+            <!-- Target container destination for transcript items injection mapping loops -->
             <div class="space-y-4" id="transcript-deck-target"></div>
             
             <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">
@@ -135,6 +163,7 @@
 
     </main>
 
+    <!-- Core Interactive Client Execution Architecture Script -->
     <script>
         let currentUploadMode = 'upload';
         let extractedPdfTextState = '';
@@ -323,7 +352,7 @@
 
                 let aiMsgText = data.aiMessage;
 
-                // INTERCEPT ENFORCEMENT: Detect if the AI has applied the termination closure token
+                // INTERCEPT ENFORCEMENT: Detect if the AI has applied the final termination closure token
                 if (aiMsgText.includes('[INTERVIEW_CONCLUDED]')) {
                     aiMsgText = aiMsgText.replace('[INTERVIEW_CONCLUDED]', '').trim();
                     
@@ -331,11 +360,13 @@
                     document.getElementById('sim-active-question-text').innerText = aiMsgText;
                     speakTextAloud(aiMsgText);
 
-                    document.getElementById('sim-status-indicator').innerText = "Session Concluded Matrix Built";
+                    document.getElementById('sim-status-indicator').innerText = "Concluding session... Wrapping up logs.";
+                    document.getElementById('submit-turn-btn').style.display = 'none';
+                    document.getElementById('mic-toggle-btn').style.display = 'none';
+
                     setTimeout(() => {
-                        alert("The mock evaluation session has naturally concluded. Reviewing your final logs.");
                         finishAndWrapInterview();
-                    }, 4500); // Grants the voice synthesis engine an audio-clear buffer time window
+                    }, 5000); 
                     return;
                 }
 
@@ -348,7 +379,7 @@
             } catch (err) {
                 console.error(err);
                 alert("API conversation sync channel drop exception: " + err.message);
-            } {
+            } finally {
                 document.getElementById('submit-turn-btn').disabled = false;
             }
         }
@@ -396,6 +427,10 @@
             if(!targetDeck.innerHTML) {
                 targetDeck.innerHTML = `<p class="text-sm text-neutral-600 text-center py-6">No historical conversation streams were successfully logged this run.</p>`;
             }
+
+            // Bring inputs back for future sessions if needed
+            document.getElementById('submit-turn-btn').style.display = 'block';
+            document.getElementById('mic-toggle-btn').style.display = 'block';
 
             showScreen('results-screen');
         }
