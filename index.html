@@ -40,7 +40,7 @@
     <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
 
         <!-- ================= STAGE 1: INPUT ENVIRONMENT SETUP SCREEN ================= -->
-        <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8 animate-fade-in">
+        <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
                 <h2 class="text-4xl font-black tracking-tight">Setup Interview Environment</h2>
                 <p class="text-neutral-400 text-sm">Provide your target job context to initialize an adaptive premium voice or text session.</p>
@@ -114,7 +114,6 @@
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Your Response Turn</label>
-                    
                     <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
                         <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
                         <span id="mic-action-label">🎤 Speak Answer</span>
@@ -131,14 +130,13 @@
             </div>
         </div>
 
-        <!-- ================= STAGE 3: INTERACTIVE PERFORMANCE TRANSCRIPT REVIEW ================= -->
+        <!-- ================= STAGE 3: INTERACTIVE DIAGNOSTIC REPORT CARD VIEW ================= -->
         <div id="results-screen" class="hidden space-y-8">
             <div class="border-b border-neutral-900 pb-5 text-center">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
                 <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
             </div>
 
-            <!-- PREMIUM FEEDBACK SCOREBOARD CARD PANEL -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center space-y-1">
                     <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Overall Rating</span>
@@ -147,42 +145,31 @@
                 </div>
                 <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center flex flex-col justify-center items-center space-y-2 col-span-2">
                     <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Decision Verdict</span>
-                    <div id="report-verdict-badge" class="px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide">
-                        PENDING
-                    </div>
+                    <div id="report-verdict-badge" class="px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide">PENDING</div>
                 </div>
             </div>
 
-            <!-- BRUTALLY HONEST REVIEW CRITIQUE PANEL -->
             <div class="bg-neutral-900/20 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-red-500" id="report-accent-bar"></div>
                 <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Unvarnished Technical Critique:</h4>
-                <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">
-                    Analyzing historical response streams...
-                </blockquote>
+                <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">Analyzing response logs...</blockquote>
             </div>
 
-            <!-- TECHNICAL GAPS TO FIX CHECKLIST -->
             <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
                 <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
-                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1">
-                    <!-- Dynamic list items injected here -->
-                </ul>
+                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
             </div>
             
             <div class="border-t border-neutral-900 pt-6">
-                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4 uppercase">Full Interaction Timeline:</h4>
+                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
                 <div class="space-y-4" id="transcript-deck-target"></div>
             </div>
             
-            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">
-                Return to Entry Screen
-            </button>
+            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">Return to Entry Screen</button>
         </div>
 
     </main>
 
-    <!-- Core Interactive Client Execution Architecture Script -->
     <script>
         let currentUploadMode = 'upload';
         let extractedPdfTextState = '';
@@ -193,8 +180,6 @@
 
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
-
-        // Global structural cache for the final JSON payload
         let latestEvaluationReportCache = null;
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
@@ -245,16 +230,12 @@
                     document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
                 }
             };
-
             return instance;
         }
         speechRecognitionEngine = initSpeechFramework();
 
         function toggleVoiceSpeechInput() {
-            if(!speechRecognitionEngine) { 
-                alert("Speech recognition is not fully supported on this web client version."); 
-                return; 
-            }
+            if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
             if(!isMicrophoneListening) {
                 try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); }
             } else {
@@ -277,7 +258,6 @@
 
             if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
             speech.rate = 0.96;
-            
             window.speechSynthesis.speak(speech);
         }
 
@@ -312,10 +292,43 @@
                 extractTextFromPDF(f).then(txt => {
                     extractedPdfTextState = txt;
                     document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
-                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Mounted Successfully`;
+                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`;
                 });
             }
         }
+
+        // ================= INTERCEPTIVE NATIVE DRAG AND DROP HANDLERS =================
+        ['dragenter', 'dragover'].forEach(eventName => {
+            document.getElementById('resume-upload-zone').addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('resume-upload-zone').style.borderColor = '#FFE500';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            document.getElementById('resume-upload-zone').addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('resume-upload-zone').style.borderColor = '#262626';
+            }, false);
+        });
+
+        document.getElementById('resume-upload-zone').addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            const f = files[0];
+
+            if (f && f.type === "application/pdf") {
+                extractTextFromPDF(f).then(txt => {
+                    extractedPdfTextState = txt;
+                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
+                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Dragged & Ready`;
+                });
+            } else {
+                alert("Please drop a valid PDF document file.");
+            }
+        });
 
         function showScreen(id) {
             ['input-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
@@ -327,7 +340,7 @@
             globalJobDescContext = document.getElementById('job-desc-input').value.trim();
             globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            if(!globalJobDescContext || !globalResumeContext) { alert("Please compile input parameters completely before initiating."); return; }
+            if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
             
             runningChatHistoryLedger = [];
             latestEvaluationReportCache = null;
@@ -357,16 +370,16 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.details || data.error || "Packaging breakdown.");
 
-                // INTERCEPT EVALUATION: Check if the returned object contains the evaluation flag
-                if (data.isConcluded || data.score !== undefined) {
-                    latestEvaluationReportCache = data; // Cache metrics to render on the final dashboard view
+                // INTERCEPT LOGIC: If 'isConcluded' arrives, render the evaluation report card view
+                if (data.isConcluded) {
+                    latestEvaluationReportCache = data;
                     
                     const goodbyeText = data.aiMessage;
                     runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
                     document.getElementById('sim-active-question-text').innerText = goodbyeText;
                     speakTextAloud(goodbyeText);
 
-                    document.getElementById('sim-status-indicator').innerText = "Concluding session... Compiling report card.";
+                    document.getElementById('sim-status-indicator').innerText = "Concluding session... Compiling critique matrices.";
                     document.getElementById('submit-turn-btn').style.display = 'none';
                     document.getElementById('mic-toggle-btn').style.display = 'none';
 
@@ -376,7 +389,6 @@
                     return;
                 }
 
-                // Normal question turn route path
                 let aiMsgText = data.aiMessage;
                 runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
                 document.getElementById('sim-active-question-text').innerText = aiMsgText;
@@ -397,7 +409,7 @@
             if(isMicrophoneListening) toggleVoiceSpeechInput();
 
             const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
-            if(!userTextResponse) { alert("Please type or speak an answer before submitting."); return; }
+            if(!userTextResponse) { alert("Please provide an answer before submitting."); return; }
 
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
@@ -409,12 +421,11 @@
             window.speechSynthesis.cancel();
             if(isMicrophoneListening) toggleVoiceSpeechInput();
             
-            // 1. POPULATE THE REPORT CARD NUMERIC & TEXT METRICS
             if (latestEvaluationReportCache) {
                 const report = latestEvaluationReportCache;
                 
                 document.getElementById('report-score-target').innerText = report.score || 0;
-                document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No critique generated.";
+                document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
                 
                 const badge = document.getElementById('report-verdict-badge');
                 const accentBar = document.getElementById('report-accent-bar');
@@ -429,25 +440,19 @@
                     accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
                 }
 
-                // Inject the checklist of gaps
                 const gapsList = document.getElementById('report-gaps-list-target');
                 gapsList.innerHTML = '';
                 if (report.gapsToFix && report.gapsToFix.length > 0) {
                     report.gapsToFix.forEach(gap => {
-                        gapsList.innerHTML += `<li class="flex items-start space-x-2">
-                            <span class="text-rose-500 font-bold">✕</span>
-                            <span>${gap}</span>
-                        </li>`;
+                        gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`;
                     });
                 } else {
-                    gapsList.innerHTML = `<li class="text-neutral-500 italic">No specific macro deficiencies identified.</li>`;
+                    gapsList.innerHTML = `<li class="text-neutral-500 italic">No structural deficiencies found.</li>`;
                 }
             }
 
-            // 2. BUILD THE RAW TRANSCRIPT HISTORICAL TIMELINE
             const targetDeck = document.getElementById('transcript-deck-target');
             targetDeck.innerHTML = '';
-
             let questionBufferText = '';
             
             runningChatHistoryLedger.forEach((msg) => {
@@ -466,14 +471,8 @@
                 }
             });
 
-            if(!targetDeck.innerHTML) {
-                targetDeck.innerHTML = `<p class="text-sm text-neutral-600 text-center py-6">No historical conversation streams were successfully logged this run.</p>`;
-            }
-
-            // Reset UI interactive controls visibility states for potential re-runs
             document.getElementById('submit-turn-btn').style.display = 'block';
             document.getElementById('mic-toggle-btn').style.display = 'block';
-
             showScreen('results-screen');
         }
     </script>
