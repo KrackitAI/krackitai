@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krackit - Secure Access Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import the official Supabase Client JS Library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased flex items-center justify-center p-4">
+
+    <!-- Auth Container Box -->
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-8 space-y-6 shadow-2xl">
+        <div class="text-center space-y-2 select-none">
+            <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
+            <p class="text-neutral-400 text-xs" id="auth-subtitle">Sign in to access your interview simulator workspace</p>
+        </div>
+
+        <!-- Dynamic Error Alert Window Box -->
+        <div id="auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
+            <span id="auth-error-msg">Error alert description placeholder.</span>
+        </div>
+
+        <!-- Standard Credentials Form Structure -->
+        <div class="space-y-4">
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
+                <input type="email" id="auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
+                <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+            </div>
+
+            <button id="auth-submit-btn" onclick="executeAuthenticationAction()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
+                Sign In to Account →
+            </button>
+        </div>
+
+        <!-- Mode Toggler Switcher Layout Footer links -->
+        <div class="text-center pt-2">
+            <button onclick="toggleAuthModeLayout()" id="auth-toggle-link" class="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-4">
+                Don't have an account? Sign up instead
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION: Replace these placeholders with your actual Supabase Dashboard credentials
+        const SUPABASE_URL = https://zlzprbespegemxnhwnuu.supabase.co;
+        const SUPABASE_ANON_KEY = sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ;
+
+        // Initialize the global connection instance pipeline client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentAuthMode = 'signin'; // Options: 'signin' or 'signup'
+
+        function toggleAuthModeLayout() {
+            const subtitle = document.getElementById('auth-subtitle');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleLink = document.getElementById('auth-toggle-link');
+            document.getElementById('auth-error-box').classList.add('hidden');
+
+            if (currentAuthMode === 'signin') {
+                currentAuthMode = 'signup';
+                subtitle.innerText = "Create an account to begin practicing engineering interviews.";
+                submitBtn.innerText = "Create Account ⚡";
+                toggleLink.innerText = "Already have an account? Sign in instead";
+            } else {
+                currentAuthMode = 'signin';
+                subtitle.innerText = "Sign in to access your interview simulator workspace.";
+                submitBtn.innerText = "Sign In to Account →";
+                toggleLink.innerText = "Don't have an account? Sign up instead";
+            }
+        }
+
+        async function executeAuthenticationAction() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const errorBox = document.getElementById('auth-error-box');
+            const errorMsg = document.getElementById('auth-error-msg');
+            
+            errorBox.classList.add('hidden');
+
+            if (!email || !password) {
+                errorMsg.innerText = "Please complete all input validation credential properties.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                document.getElementById('auth-submit-btn').disabled = true;
+
+                if (currentAuthMode === 'signup') {
+                    // Route sign up registration credentials pipeline
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+                    
+                    alert("Registration successful! Check your email inbox to confirm validation verification verification link.");
+                    currentAuthMode = 'signup';
+                    toggleAuthModeLayout();
+                } else {
+                    // Route active authorization validation session check paths
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+
+                    // On successful login, the Supabase SDK handles session sync saving automatically. Redirect user immediately.
+                    window.location.href = '/';
+                }
+            } catch (err) {
+                console.error("Auth process failure context exception:", err);
+                errorMsg.innerText = err.message || "An unexpected validation crash happened.";
+                errorBox.classList.remove('hidden');
+            } finally {
+                document.getElementById('auth-submit-btn').disabled = false;
+            }
+        }
+
+        // AUTOSECURE BOOT INTERCEPTOR: If a user lands here but is ALREADY logged in, skip page and redirect home
+        window.addEventListener('load', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>
