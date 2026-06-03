@@ -47,11 +47,6 @@
             </div>
 
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
-                <!-- Validation Alerts Box -->
-                <div id="validation-error-box" class="hidden bg-red-950/40 border border-red-900 text-red-400 p-4 rounded-xl text-sm">
-                    <span id="validation-error-msg">Field validation warning string placeholder.</span>
-                </div>
-
                 <!-- Job Description Input Container -->
                 <div class="space-y-2">
                     <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
@@ -102,7 +97,7 @@
                     <p class="text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is gathering data matrices...</p>
                 </div>
                 <button onclick="finishAndWrapInterview()" class="text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-2 rounded-xl font-bold transition-all">
-                    🏁 Finish Interview
+                    🏁 Cancel Session
                 </button>
             </div>
 
@@ -120,7 +115,6 @@
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Your Response Turn</label>
                     
-                    <!-- Free Browser Audio Microphones Toggles -->
                     <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
                         <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
                         <span id="mic-action-label">🎤 Speak Answer</span>
@@ -138,15 +132,48 @@
         </div>
 
         <!-- ================= STAGE 3: INTERACTIVE PERFORMANCE TRANSCRIPT REVIEW ================= -->
-        <div id="results-screen" class="hidden space-y-6">
+        <div id="results-screen" class="hidden space-y-8">
             <div class="border-b border-neutral-900 pb-5 text-center">
-                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Session Concluded</span>
-                <h2 class="text-3xl font-black text-white mt-1">Interview Performance Transcript Log</h2>
-                <p class="text-xs text-neutral-500 mt-2">Review your complete evaluation thread records below.</p>
+                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
+                <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
+            </div>
+
+            <!-- PREMIUM FEEDBACK SCOREBOARD CARD PANEL -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Overall Rating</span>
+                    <h3 class="text-5xl font-black text-white" id="report-score-target">0</h3>
+                    <span class="text-xs font-medium text-neutral-400 block">out of 100 points</span>
+                </div>
+                <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center flex flex-col justify-center items-center space-y-2 col-span-2">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Decision Verdict</span>
+                    <div id="report-verdict-badge" class="px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide">
+                        PENDING
+                    </div>
+                </div>
+            </div>
+
+            <!-- BRUTALLY HONEST REVIEW CRITIQUE PANEL -->
+            <div class="bg-neutral-900/20 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-red-500" id="report-accent-bar"></div>
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Unvarnished Technical Critique:</h4>
+                <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">
+                    Analyzing historical response streams...
+                </blockquote>
+            </div>
+
+            <!-- TECHNICAL GAPS TO FIX CHECKLIST -->
+            <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
+                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1">
+                    <!-- Dynamic list items injected here -->
+                </ul>
             </div>
             
-            <!-- Target container destination for transcript items injection mapping loops -->
-            <div class="space-y-4" id="transcript-deck-target"></div>
+            <div class="border-t border-neutral-900 pt-6">
+                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4 uppercase">Full Interaction Timeline:</h4>
+                <div class="space-y-4" id="transcript-deck-target"></div>
+            </div>
             
             <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">
                 Return to Entry Screen
@@ -160,13 +187,15 @@
         let currentUploadMode = 'upload';
         let extractedPdfTextState = '';
         
-        // Runtime Adaptive Token Memory Trackers
         let runningChatHistoryLedger = [];
         let globalJobDescContext = '';
         let globalResumeContext = '';
 
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
+
+        // Global structural cache for the final JSON payload
+        let latestEvaluationReportCache = null;
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
@@ -182,7 +211,6 @@
 
         updateNavbarSessionBadge();
 
-        // Native Hardware-Driven Speech Recognition Orchestration Loop (Fixed Async Syncing)
         function initSpeechFramework() {
             const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
             if(!SpeechObj) return null;
@@ -208,13 +236,6 @@
                 lbl.innerText = "🎤 Speak Answer";
             };
 
-            instance.onerror = (event) => {
-                console.error("Speech Recognition capture block caught state error exception:", event.error);
-                if (event.error === 'not-allowed') {
-                    alert("⚠️ Microphone Access Denied!\n\nClick the lock/settings icon inside your browser's URL input address bar, allow microphone device capture permissions, and refresh this page.");
-                }
-            };
-
             instance.onresult = (e) => {
                 let textBuffer = '';
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
@@ -231,7 +252,7 @@
 
         function toggleVoiceSpeechInput() {
             if(!speechRecognitionEngine) { 
-                alert("Speech recognition is not fully supported on this web client engine framework version."); 
+                alert("Speech recognition is not fully supported on this web client version."); 
                 return; 
             }
             if(!isMicrophoneListening) {
@@ -241,7 +262,6 @@
             }
         }
 
-        // High-Quality Client Hardware Voice-Synthesis Utterance Picker Fallback Matrix
         function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
             window.speechSynthesis.cancel();
@@ -249,7 +269,6 @@
             const speech = new SpeechSynthesisUtterance(str);
             const availableVoices = window.speechSynthesis.getVoices();
 
-            // Intercept standard robotic channels and force high-fidelity neural speech if accessible
             const premiumVoiceFallback = availableVoices.find(voice => 
                 (voice.name.includes('Google') && voice.lang.startsWith('en')) || 
                 (voice.name.includes('Natural') && voice.lang.startsWith('en')) ||
@@ -257,7 +276,7 @@
             );
 
             if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
-            speech.rate = 0.96; // Slightly slower pacing feels significantly more human and deliberate
+            speech.rate = 0.96;
             
             window.speechSynthesis.speak(speech);
         }
@@ -266,7 +285,6 @@
             speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
         }
 
-        // Local Binary Document Reader Subroutines
         async function extractTextFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -304,26 +322,23 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // Live Chat Initializer Entry Pipeline
         async function startLiveSimulation() {
             if (getSessionCount() >= 3) { openPaywallModal(); return; }
             globalJobDescContext = document.getElementById('job-desc-input').value.trim();
             globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            if(!globalJobDescContext || !globalResumeContext) { alert("Please compile input parameters completely before initiating context setups."); return; }
+            if(!globalJobDescContext || !globalResumeContext) { alert("Please compile input parameters completely before initiating."); return; }
             
-            // Wipe running chat logs memory references
             runningChatHistoryLedger = [];
+            latestEvaluationReportCache = null;
             showScreen('simulator-screen');
             
-            // Prompt initial connection greet statement sequence
             runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
             
             incrementSessionCount();
             await fetchNextInterviewerTurn();
         }
 
-        // Rolling network payload dispatcher synchronization handler
         async function fetchNextInterviewerTurn() {
             document.getElementById('sim-status-indicator').innerText = "Interviewer is analyzing profile...";
             document.getElementById('submit-turn-btn').disabled = true;
@@ -340,19 +355,18 @@
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.details || data.error || "Internal response packaging breakdown.");
+                if (!response.ok) throw new Error(data.details || data.error || "Packaging breakdown.");
 
-                let aiMsgText = data.aiMessage;
-
-                // INTERCEPT ENFORCEMENT: Detect if the AI has applied the final termination closure token
-                if (aiMsgText.includes('[INTERVIEW_CONCLUDED]')) {
-                    aiMsgText = aiMsgText.replace('[INTERVIEW_CONCLUDED]', '').trim();
+                // INTERCEPT EVALUATION: Check if the returned object contains the evaluation flag
+                if (data.isConcluded || data.score !== undefined) {
+                    latestEvaluationReportCache = data; // Cache metrics to render on the final dashboard view
                     
-                    runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
-                    document.getElementById('sim-active-question-text').innerText = aiMsgText;
-                    speakTextAloud(aiMsgText);
+                    const goodbyeText = data.aiMessage;
+                    runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
+                    document.getElementById('sim-active-question-text').innerText = goodbyeText;
+                    speakTextAloud(goodbyeText);
 
-                    document.getElementById('sim-status-indicator').innerText = "Concluding session... Wrapping up logs.";
+                    document.getElementById('sim-status-indicator').innerText = "Concluding session... Compiling report card.";
                     document.getElementById('submit-turn-btn').style.display = 'none';
                     document.getElementById('mic-toggle-btn').style.display = 'none';
 
@@ -362,6 +376,8 @@
                     return;
                 }
 
+                // Normal question turn route path
+                let aiMsgText = data.aiMessage;
                 runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
                 document.getElementById('sim-active-question-text').innerText = aiMsgText;
                 document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
@@ -370,7 +386,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert("API conversation sync channel drop exception: " + err.message);
+                alert("API conversation sync drop: " + err.message);
             } finally {
                 document.getElementById('submit-turn-btn').disabled = false;
             }
@@ -381,7 +397,7 @@
             if(isMicrophoneListening) toggleVoiceSpeechInput();
 
             const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
-            if(!userTextResponse) { alert("Please deliver or speak a textual block response before submitting."); return; }
+            if(!userTextResponse) { alert("Please type or speak an answer before submitting."); return; }
 
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
@@ -389,17 +405,51 @@
             await fetchNextInterviewerTurn();
         }
 
-        // Structural Transcript Generator Formatter
         function finishAndWrapInterview() {
             window.speechSynthesis.cancel();
             if(isMicrophoneListening) toggleVoiceSpeechInput();
             
+            // 1. POPULATE THE REPORT CARD NUMERIC & TEXT METRICS
+            if (latestEvaluationReportCache) {
+                const report = latestEvaluationReportCache;
+                
+                document.getElementById('report-score-target').innerText = report.score || 0;
+                document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No critique generated.";
+                
+                const badge = document.getElementById('report-verdict-badge');
+                const accentBar = document.getElementById('report-accent-bar');
+                const verdictStr = (report.verdict || "REJECTED").toUpperCase();
+                badge.innerText = verdictStr;
+
+                if (verdictStr.includes('PASS')) {
+                    badge.className = "px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
+                    accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
+                } else {
+                    badge.className = "px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
+                    accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                }
+
+                // Inject the checklist of gaps
+                const gapsList = document.getElementById('report-gaps-list-target');
+                gapsList.innerHTML = '';
+                if (report.gapsToFix && report.gapsToFix.length > 0) {
+                    report.gapsToFix.forEach(gap => {
+                        gapsList.innerHTML += `<li class="flex items-start space-x-2">
+                            <span class="text-rose-500 font-bold">✕</span>
+                            <span>${gap}</span>
+                        </li>`;
+                    });
+                } else {
+                    gapsList.innerHTML = `<li class="text-neutral-500 italic">No specific macro deficiencies identified.</li>`;
+                }
+            }
+
+            // 2. BUILD THE RAW TRANSCRIPT HISTORICAL TIMELINE
             const targetDeck = document.getElementById('transcript-deck-target');
             targetDeck.innerHTML = '';
 
             let questionBufferText = '';
             
-            // Re-iterate historical logs to build a paired diagnostic breakdown panel
             runningChatHistoryLedger.forEach((msg) => {
                 if (msg.role === 'assistant') {
                     questionBufferText = msg.content;
@@ -420,7 +470,7 @@
                 targetDeck.innerHTML = `<p class="text-sm text-neutral-600 text-center py-6">No historical conversation streams were successfully logged this run.</p>`;
             }
 
-            // Bring inputs back for future sessions if needed
+            // Reset UI interactive controls visibility states for potential re-runs
             document.getElementById('submit-turn-btn').style.display = 'block';
             document.getElementById('mic-toggle-btn').style.display = 'block';
 
