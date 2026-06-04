@@ -17,10 +17,10 @@
         </div>
 
         <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
-            <button id="tab-signin-btn" type="button" onclick="switchAuthViewMode('signin')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all">
+            <button id="tab-signin-btn" type="button" onclick="switchAuthViewMode('signin')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">
                 Sign In
             </button>
-            <button id="tab-signup-btn" type="button" onclick="switchAuthViewMode('signup')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all">
+            <button id="tab-signup-btn" type="button" onclick="switchAuthViewMode('signup')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">
                 Sign Up / Register
             </button>
         </div>
@@ -40,13 +40,13 @@
             </div>
 
             <div id="form-action-signin-container" class="block">
-                <button type="button" onclick="executeAuthenticationAction('signin')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
+                <button type="button" onclick="executeAuthenticationAction('signin')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
                     Sign In to Account →
                 </button>
             </div>
 
             <div id="form-action-signup-container" class="hidden">
-                <button type="button" onclick="executeAuthenticationAction('signup')" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
+                <button type="button" onclick="executeAuthenticationAction('signup')" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
                     Create New Account ⚡
                 </button>
             </div>
@@ -65,7 +65,7 @@
             supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         }
 
-        // VISUAL VIEW LAYER ROUTER: Handles shifting layouts without altering tracking string memories
+        // VISUAL VIEW LAYER ROUTER: Handles shifting layouts beautifully
         function switchAuthViewMode(targetMode) {
             const btnSignIn = document.getElementById('tab-signin-btn');
             const btnSignUp = document.getElementById('tab-signup-btn');
@@ -76,19 +76,15 @@
             if (errorBox) errorBox.classList.add('hidden');
 
             if (targetMode === 'signin') {
-                // Focus styling allocations on sign-in elements view
-                btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all";
-                btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all";
-                
-                formSignIn.className = "block";
-                formSignUp.className = "hidden";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignIn) formSignIn.className = "block";
+                if (formSignUp) formSignUp.className = "hidden";
             } else {
-                // Focus styling allocations on registration parameters view
-                btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all";
-                btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all";
-                
-                formSignUp.className = "block";
-                formSignIn.className = "hidden";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignUp) formSignUp.className = "block";
+                if (formSignIn) formSignIn.className = "hidden";
             }
         }
 
@@ -103,6 +99,7 @@
             const password = document.getElementById('auth-password').value.trim();
             const errorBox = document.getElementById('auth-error-box');
             const errorMsg = document.getElementById('auth-error-msg');
+            const submitBtn = document.getElementById('auth-submit-btn');
             
             if (errorBox) errorBox.classList.add('hidden');
 
@@ -115,6 +112,8 @@
             }
 
             try {
+                if (submitBtn) submitBtn.disabled = true;
+
                 if (actionType === 'signup') {
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
@@ -134,6 +133,8 @@
                     errorMsg.innerText = err.message || "An error occurred during database transit connectivity execution paths.";
                     errorBox.classList.remove('hidden');
                 }
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
             }
         }
 
