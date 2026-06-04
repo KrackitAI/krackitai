@@ -520,19 +520,28 @@
             document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
             document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
             
+            const alertBox = document.getElementById('preflight-audit-alert-box');
+
             if (mode === 'upload') {
+                document.getElementById('resume-paste-zone').classList.add('hidden');
                 if (extractedPdfTextState) {
                     document.getElementById('resume-file-card-preview').classList.remove('hidden');
                     document.getElementById('resume-upload-zone').classList.add('hidden');
                 } else {
                     document.getElementById('resume-upload-zone').classList.remove('hidden');
                     document.getElementById('resume-file-card-preview').classList.add('hidden');
+                    if (alertBox) alertBox.classList.add('hidden');
                 }
-                document.getElementById('resume-paste-zone').classList.add('hidden');
             } else {
                 document.getElementById('resume-paste-zone').classList.remove('hidden');
                 document.getElementById('resume-upload-zone').classList.add('hidden');
                 document.getElementById('resume-file-card-preview').classList.add('hidden');
+                
+                // If there is already text in the paste box, make sure the alert box stays visible
+                const pasteContent = document.getElementById('resume-paste-input').value.trim();
+                if (pasteContent && alertBox && !alertBox.classList.contains('hidden')) {
+                    alertBox.classList.remove('hidden');
+                }
             }
         }
 
