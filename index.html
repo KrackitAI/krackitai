@@ -19,7 +19,13 @@
         <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
             <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
         </div>
-        <div id="navbar-session-status-target"></div>
+        
+        <div class="flex items-center space-x-4">
+            <div id="navbar-session-status-target"></div>
+            
+            <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs">
+                </div>
+        </div>
     </nav>
 
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
@@ -156,16 +162,15 @@
     </main>
 
     <script>
-        // CONFIGURATION: Mirror your exact Supabase Dashboard credential properties here
+        // CONFIGURATION: Replace with your actual Supabase credentials inside the single quotes
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
         let supabaseClientInstance = null;
 
-        // SAFE BOOT CHANNELS: Verification guard layer
         function initializeSecureAccessClient() {
             if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-                console.warn("🔒 Security Notice: Database connection variables are empty. Running local bypass mode.");
+                console.warn("🔒 Running local bypass mode without active keys.");
                 return;
             }
             if (window.supabase) {
@@ -180,9 +185,31 @@
                 const { data: { session } } = await supabaseClientInstance.auth.getSession();
                 if (!session) {
                     window.location.href = '/auth.html';
+                } else {
+                    // Injecting user profile elements natively into the Header
+                    const email = session.user.email;
+                    const profileHolder = document.getElementById('navbar-user-profile-holder');
+                    if (profileHolder) {
+                        profileHolder.innerHTML = `
+                            <span class="text-neutral-400 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-xl font-mono select-none">${email}</span>
+                            <button onclick="triggerUserLogoutPipeline()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer transition-colors">Logout</button>
+                        `;
+                    }
                 }
             } catch (err) {
-                console.error("Auth layer exception:", err);
+                console.error("Auth layout sync failure:", err);
+            }
+        }
+
+        // LOGOUT SERVICE PIPELINE CHANNEL
+        async function triggerUserLogoutPipeline() {
+            if (!supabaseClientInstance) return;
+            try {
+                const { error } = await supabaseClientInstance.auth.signOut();
+                if (error) throw error;
+                window.location.href = '/auth.html';
+            } catch (err) {
+                alert("Error during sign out execution: " + err.message);
             }
         }
 
@@ -225,16 +252,20 @@
                 isMicrophoneListening = true;
                 const btn = document.getElementById('mic-toggle-btn');
                 const lbl = document.getElementById('mic-action-label');
-                btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
-                lbl.innerText = "Listening... Click to Pause";
+                if (btn && lbl) {
+                    btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
+                    lbl.innerText = "Listening... Click to Pause";
+                }
             };
 
             instance.onend = () => {
                 isMicrophoneListening = false;
                 const btn = document.getElementById('mic-toggle-btn');
                 const lbl = document.getElementById('mic-action-label');
-                btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
-                lbl.innerText = "🎤 Speak Answer";
+                if (btn && lbl) {
+                    btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
+                    lbl.innerText = "🎤 Speak Answer";
+                }
             };
 
             instance.onresult = (e) => {
@@ -258,7 +289,6 @@
             }
         }
 
-        // High-Quality Client Hardware Voice-Synthesis Utterance Picker Fallback Matrix
         function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
             window.speechSynthesis.cancel();
@@ -275,10 +305,6 @@
             if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
             speech.rate = 0.96;
             window.speechSynthesis.speak(speech);
-        }
-
-        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
         }
 
         async function extractTextFromPDF(file) {
@@ -299,6 +325,17 @@
             document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
             if (mode === 'upload') { document.getElementById('resume-upload-zone').classList.remove('hidden'); document.getElementById('resume-paste-zone').classList.add('hidden'); }
             else { document.getElementById('resume-paste-zone').classList.remove('hidden'); document.getElementById('resume-upload-zone').classList.add('hidden'); }
+        }
+
+        function handleFileSelection(e) {
+            const f = e.target.files[0];
+            if(f) {
+                extractTextFromPDF(f).then(txt => {
+                    extractedPdfTextState = txt;
+                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
+                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`;
+                });
+            }
         }
 
         function showScreen(id) {
