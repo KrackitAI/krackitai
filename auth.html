@@ -4,21 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Secure Access Gateway</title>
+    <!-- Tailwind CSS for high-end styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import the official Supabase Client JS Library from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased flex items-center justify-center p-4">
 
+    <!-- Auth Container Box -->
     <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-8 space-y-6 shadow-2xl">
         <div class="text-center space-y-2 select-none">
-            <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
+            <!-- Fresh UI Header to prove exactly what screen state is active -->
+            <div id="auth-badge-label" class="text-[10px] bg-neutral-950 text-neutral-400 border border-neutral-800 px-3 py-1 rounded-full font-mono inline-block font-bold uppercase tracking-widest">
+                SIGN IN MODE
+            </div>
+            <h2 class="text-3xl font-black tracking-tight mt-2">Krackit<span class="text-[#FFE500]">⚡</span></h2>
             <p class="text-neutral-400 text-xs" id="auth-subtitle">Sign in to access your interview simulator workspace</p>
         </div>
 
+        <!-- Dynamic Error Alert Window Box -->
         <div id="auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
             <span id="auth-error-msg">Error alert description placeholder.</span>
         </div>
 
+        <!-- Standard Credentials Form Structure -->
         <div class="space-y-4">
             <div class="space-y-1.5">
                 <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
@@ -29,13 +38,14 @@
                 <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
             </div>
 
-            <button id="auth-submit-btn" onclick="executeAuthenticationAction()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
+            <button type="button" id="auth-submit-btn" onclick="executeAuthenticationAction()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
                 Sign In to Account →
             </button>
         </div>
 
+        <!-- Mode Toggler Switcher Layout Footer link - Fixed with type="button" attributes -->
         <div class="text-center pt-2">
-            <button onclick="toggleAuthModeLayout()" id="auth-toggle-link" class="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-4">
+            <button type="button" onclick="toggleAuthModeLayout()" id="auth-toggle-link" class="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-4 cursor-pointer">
                 Don't have an account? Sign up instead
             </button>
         </div>
@@ -55,23 +65,23 @@
         let currentAuthMode = 'signin'; // Options: 'signin' or 'signup'
 
         function toggleAuthModeLayout() {
+            const badge = document.getElementById('auth-badge-label');
             const subtitle = document.getElementById('auth-subtitle');
             const submitBtn = document.getElementById('auth-submit-btn');
             const toggleLink = document.getElementById('auth-toggle-link');
             const errorBox = document.getElementById('auth-error-box');
             
-            // Safe clear without breaking code execution if element status shifts
-            if (errorBox) {
-                errorBox.classList.add('hidden');
-            }
+            if (errorBox) errorBox.classList.add('hidden');
 
             if (currentAuthMode === 'signin') {
                 currentAuthMode = 'signup';
+                if (badge) { badge.innerText = "ACCOUNT REGISTRATION"; badge.className = "text-[10px] bg-[#FFE500]/10 text-[#FFE500] border border-[#FFE500]/20 px-3 py-1 rounded-full font-mono inline-block font-bold uppercase tracking-widest"; }
                 if (subtitle) subtitle.innerText = "Create an account to begin practicing engineering interviews.";
                 if (submitBtn) submitBtn.innerText = "Create Account ⚡";
                 if (toggleLink) toggleLink.innerText = "Already have an account? Sign in instead";
             } else {
                 currentAuthMode = 'signin';
+                if (badge) { badge.innerText = "SIGN IN MODE"; badge.className = "text-[10px] bg-neutral-950 text-neutral-400 border border-neutral-800 px-3 py-1 rounded-full font-mono inline-block font-bold uppercase tracking-widest"; }
                 if (subtitle) subtitle.innerText = "Sign in to access your interview simulator workspace.";
                 if (submitBtn) submitBtn.innerText = "Sign In to Account →";
                 if (toggleLink) toggleLink.innerText = "Don't have an account? Sign up instead";
@@ -80,7 +90,7 @@
 
         async function executeAuthenticationAction() {
             if (!supabase) {
-                alert("Database routing setup mismatch. Please ensure your Supabase URL and public anon keys are pasted inside the strings correctly.");
+                alert("Configuration Warning: Please verify your Supabase keys are securely pasted inside the single quotes.");
                 return;
             }
 
@@ -93,7 +103,7 @@
 
             if (!email || !password) {
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = "Please complete all input validation credential fields.";
+                    errorMsg.innerText = "Please deliver both an email and password parameter.";
                     errorBox.classList.remove('hidden');
                 }
                 return;
@@ -106,23 +116,22 @@
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
                     
-                    alert("Registration successful! Check your email inbox to confirm your verification verification link.");
+                    alert("Registration complete! A confirmation link has been sent to your email inbox. Confirm it to unlock your login access.");
                     currentAuthMode = 'signup';
                     toggleAuthModeLayout();
                 } else {
                     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
 
-                    // Bounce home seamlessly
                     window.location.href = '/';
                 }
             } catch (err) {
-                console.error("Auth process error:", err);
+                console.error("Auth Exception:", err);
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = err.message || "An unexpected validation exception happened.";
+                    errorMsg.innerText = err.message || "Authentication routing failed.";
                     errorBox.classList.remove('hidden');
                 }
-            } finally {
+            } finaly {
                 document.getElementById('auth-submit-btn').disabled = false;
             }
         }
