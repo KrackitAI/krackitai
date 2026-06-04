@@ -55,17 +55,14 @@
     </div>
 
     <script>
-        // CONFIGURATION: Replace these placeholders with your actual Supabase Dashboard credentials
-        const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
+        // CONFIGURATION: Paste your actual Supabase credentials here inside the single quotes
+        const DB_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
+        const DB_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
 
-        // FIXED INITIALIZATION: Removed duplicate 'let' or 'const' declarations to stop the compiler crash
-        let supabase = null;
-        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-            supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-        }
+        // Direct single-line declaration. No nested if-statements, no variable re-declarations.
+        const supabase = (DB_URL !== 'YOUR_SUPABASE_URL') ? window.supabase.createClient(DB_URL, DB_KEY) : null;
 
-        // VISUAL VIEW LAYER ROUTER: Swaps layout states smoothly
+        // VISUAL VIEW LAYER ROUTER: Handles sliding layouts smoothly
         function switchAuthViewMode(targetMode) {
             const btnSignIn = document.getElementById('tab-signin-btn');
             const btnSignUp = document.getElementById('tab-signup-btn');
@@ -88,10 +85,10 @@
             }
         }
 
-        // DATABASE PAYLOAD DISPATCHER PIPELINE CHANNEL
+        // DATABASE TRANSIT GATEWAY
         async function executeAuthenticationAction(actionType) {
             if (!supabase) {
-                alert("Configuration Notice: Please ensure your Supabase URL and public anon keys are safely pasted inside the single quotes.");
+                alert("Database Client Not Initialized. Make sure you replaced YOUR_SUPABASE_URL and YOUR_SUPABASE_ANON_KEY configuration strings.");
                 return;
             }
 
@@ -104,7 +101,7 @@
 
             if (!email || !password) {
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = "Please fill out both your email address and password fields.";
+                    errorMsg.innerText = "Please complete both your email and password fields.";
                     errorBox.classList.remove('hidden');
                 }
                 return;
@@ -115,49 +112,38 @@
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
                     
-                    alert("Registration Successful!\n\nIf email confirmations are enabled, check your inbox. Otherwise, switch to the Sign In tab and log in directly!");
+                    alert("Registration Successful!\n\nSwitching to Sign In tab. You can now log in directly.");
                     switchAuthViewMode('signin');
                 } else {
                     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
 
-                    // Bounce back safely to home workspace root dashboard
                     window.location.href = '/';
                 }
             } catch (err) {
-                console.error("Auth routing failure:", err);
+                console.error("Authentication Process Error:", err);
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = err.message || "An error occurred during network transit.";
+                    errorMsg.innerText = err.message || "Network request failed.";
                     errorBox.classList.remove('hidden');
                 }
             }
         }
 
-        // NATIVE HARDWIRED EVENT LISTENERS: Bypasses HTML parsing bugs completely
+        // HARDWIRED EVENT REGISTRATIONS
         window.addEventListener('DOMContentLoaded', async () => {
-            // Wire up the Tab triggers natively
             const btnSignIn = document.getElementById('tab-signin-btn');
             const btnSignUp = document.getElementById('tab-signup-btn');
             
-            if (btnSignIn) {
-                btnSignIn.addEventListener('click', () => switchAuthViewMode('signin'));
-            }
-            if (btnSignUp) {
-                btnSignUp.addEventListener('click', () => switchAuthViewMode('signup'));
-            }
+            if (btnSignIn) btnSignIn.addEventListener('click', () => switchAuthViewMode('signin'));
+            if (btnSignUp) btnSignUp.addEventListener('click', () => switchAuthViewMode('signup'));
 
-            // Wire up the Submit buttons natively
             const submitSignIn = document.getElementById('submit-signin-btn');
             const submitSignUp = document.getElementById('submit-signup-btn');
 
-            if (submitSignIn) {
-                submitSignIn.addEventListener('click', () => executeAuthenticationAction('signin'));
-            }
-            if (submitSignUp) {
-                submitSignUp.addEventListener('click', () => executeAuthenticationAction('signup'));
-            }
+            if (submitSignIn) submitSignIn.addEventListener('click', () => executeAuthenticationAction('signin'));
+            if (submitSignUp) submitSignUp.addEventListener('click', () => executeAuthenticationAction('signup'));
 
-            // Session check guard layer
+            // Auto-redirect tracking session logic
             if (!supabase) return;
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
