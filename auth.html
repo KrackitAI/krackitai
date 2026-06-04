@@ -17,10 +17,10 @@
         </div>
 
         <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
-            <button id="tab-signin-btn" type="button" onclick="switchAuthViewMode('signin')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">
+            <button id="tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">
                 Sign In
             </button>
-            <button id="tab-signup-btn" type="button" onclick="switchAuthViewMode('signup')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">
+            <button id="tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">
                 Sign Up / Register
             </button>
         </div>
@@ -40,13 +40,13 @@
             </div>
 
             <div id="form-action-signin-container" class="block">
-                <button type="button" onclick="executeAuthenticationAction('signin')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
+                <button id="submit-signin-btn" type="button" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
                     Sign In to Account →
                 </button>
             </div>
 
             <div id="form-action-signup-container" class="hidden">
-                <button type="button" onclick="executeAuthenticationAction('signup')" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
+                <button id="submit-signup-btn" type="button" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
                     Create New Account ⚡
                 </button>
             </div>
@@ -65,7 +65,7 @@
             supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         }
 
-        // VISUAL VIEW LAYER ROUTER: Handles shifting layouts beautifully
+        // VISUAL VIEW LAYER ROUTER: Swaps layouts directly using CSS classes
         function switchAuthViewMode(targetMode) {
             const btnSignIn = document.getElementById('tab-signin-btn');
             const btnSignUp = document.getElementById('tab-signup-btn');
@@ -99,7 +99,6 @@
             const password = document.getElementById('auth-password').value.trim();
             const errorBox = document.getElementById('auth-error-box');
             const errorMsg = document.getElementById('auth-error-msg');
-            const submitBtn = document.getElementById('auth-submit-btn');
             
             if (errorBox) errorBox.classList.add('hidden');
 
@@ -112,8 +111,6 @@
             }
 
             try {
-                if (submitBtn) submitBtn.disabled = true;
-
                 if (actionType === 'signup') {
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
@@ -128,17 +125,39 @@
                     window.location.href = '/';
                 }
             } catch (err) {
-                console.error("Auth routing failure context catch:", err);
+                console.error("Auth routing failure:", err);
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = err.message || "An error occurred during database transit connectivity execution paths.";
+                    errorMsg.innerText = err.message || "An error occurred during network transit.";
                     errorBox.classList.remove('hidden');
                 }
-            } finally {
-                if (submitBtn) submitBtn.disabled = false;
             }
         }
 
+        // NATIVE HARDWIRED EVENT LISTENERS: Bypasses HTML parsing bugs completely
         window.addEventListener('DOMContentLoaded', async () => {
+            // Wire up the Tab triggers natively
+            const btnSignIn = document.getElementById('tab-signin-btn');
+            const btnSignUp = document.getElementById('tab-signup-btn');
+            
+            if (btnSignIn) {
+                btnSignIn.addEventListener('click', () => switchAuthViewMode('signin'));
+            }
+            if (btnSignUp) {
+                btnSignUp.addEventListener('click', () => switchAuthViewMode('signup'));
+            }
+
+            // Wire up the Submit buttons natively
+            const submitSignIn = document.getElementById('submit-signin-btn');
+            const submitSignUp = document.getElementById('submit-signup-btn');
+
+            if (submitSignIn) {
+                submitSignIn.addEventListener('click', () => executeAuthenticationAction('signin'));
+            }
+            if (submitSignUp) {
+                submitSignUp.addEventListener('click', () => executeAuthenticationAction('signup'));
+            }
+
+            // Session check guard layer
             if (!supabase) return;
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
