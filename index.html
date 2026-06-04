@@ -244,4 +244,262 @@
 
             <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
                 <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
-                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-30
+                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
+            </div>
+            
+            <div class="border-t border-neutral-900 pt-6">
+                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
+                <div class="space-y-4" id="transcript-deck-target"></div>
+            </div>
+            
+            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">Return to Entry Screen</button>
+        </div>
+
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
+        
+        let supabaseClientInstance = null;
+
+        function initializeSecureAccessClient() {
+            if (window.supabase) {
+                supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                enforceSecuritySessionWall();
+            }
+        }
+
+        async function enforceSecuritySessionWall() {
+            if (!supabaseClientInstance) return;
+            try {
+                const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                const overlayWall = document.getElementById('homepage-secure-overlay-wall');
+                const profileHolder = document.getElementById('navbar-user-profile-holder');
+
+                if (!session) {
+                    if (profileHolder) {
+                        profileHolder.innerHTML = `
+                            <button onclick="triggerInlineAuthWall('signin')" class="text-neutral-400 hover:text-white font-bold px-3 py-1.5 transition-colors cursor-pointer">Login</button>
+                            <button onclick="triggerInlineAuthWall('signup')" class="bg-[#FFE500] text-black font-black px-4 py-1.5 rounded-xl hover:bg-[#ebd300] transition-colors cursor-pointer">Sign Up ⚡</button>
+                        `;
+                    }
+                } else {
+                    if (overlayWall) overlayWall.classList.add('hidden');
+                    if (profileHolder) {
+                        profileHolder.innerHTML = `
+                            <span class="text-neutral-400 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-xl font-mono select-none">${session.user.email}</span>
+                            <button onclick="triggerUserLogoutPipeline()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer transition-colors">Logout</button>
+                        `;
+                    }
+                }
+            } catch (err) {
+                console.error("Auth session engine exception:", err);
+            }
+        }
+
+        function triggerInlineAuthWall(mode) {
+            const overlayWall = document.getElementById('homepage-secure-overlay-wall');
+            if (overlayWall) overlayWall.classList.remove('hidden');
+            switchOverlayAuthViewMode(mode);
+        }
+
+        function closeInlineAuthWall() {
+            const overlayWall = document.getElementById('homepage-secure-overlay-wall');
+            if (overlayWall) overlayWall.classList.add('hidden');
+        }
+
+        async function triggerUserLogoutPipeline() {
+            if (!supabaseClientInstance) return;
+            try {
+                await supabaseClientInstance.auth.signOut();
+                window.location.reload();
+            } catch (err) {
+                alert("Signout error: " + err.message);
+            }
+        }
+
+        function switchOverlayAuthViewMode(targetMode) {
+            const btnSignIn = document.getElementById('overlay-tab-signin-btn');
+            const btnSignUp = document.getElementById('overlay-tab-signup-btn');
+            const formSignIn = document.getElementById('overlay-action-signin-container');
+            const formSignUp = document.getElementById('overlay-action-signup-container');
+            const errorBox = document.getElementById('overlay-auth-error-box');
+
+            if (errorBox) errorBox.classList.add('hidden');
+
+            if (targetMode === 'signin') {
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignIn) formSignIn.className = "block";
+                if (formSignUp) formSignUp.className = "hidden";
+            } else {
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignUp) formSignUp.className = "block";
+                if (formSignIn) formSignIn.className = "hidden";
+            }
+        }
+
+        async function executeOverlayAuthAction(actionType) {
+            if (!supabaseClientInstance) return;
+            const email = document.getElementById('overlay-auth-email').value.trim();
+            const password = document.getElementById('overlay-auth-password').value.trim();
+            const errorBox = document.getElementById('overlay-auth-error-box');
+            const errorMsg = document.getElementById('overlay-auth-error-msg');
+
+            if (errorBox) errorBox.classList.add('hidden');
+
+            if (!email || !password) {
+                if (errorMsg && errorBox) { errorMsg.innerText = "Please complete all inputs."; errorBox.classList.remove('hidden'); }
+                return;
+            }
+
+            try {
+                if (actionType === 'signup') {
+                    const { error } = await supabaseClientInstance.auth.signUp({ email, password });
+                    if (error) throw error;
+                    alert("Registration Successful! Please complete logging into your account.");
+                    switchOverlayAuthViewMode('signin');
+                } else {
+                    const { error } = await supabaseClientInstance.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    window.location.reload();
+                }
+            } catch (err) {
+                if (errorMsg && errorBox) { errorMsg.innerText = err.message; errorBox.classList.remove('hidden'); }
+            }
+        }
+
+        let currentUploadMode = 'upload';
+        let extractedPdfTextState = '';
+        let runningChatHistoryLedger = [];
+        let globalJobDescContext = '';
+        let globalResumeContext = '';
+        let speechRecognitionEngine = null;
+        let isMicrophoneListening = false;
+        let latestEvaluationReportCache = null;
+
+        function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
+        function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
+        
+        function updateNavbarSessionBadge() {
+            const rem = Math.max(0, 3 - getSessionCount());
+            const target = document.getElementById('navbar-session-status-target');
+            if (!target) return;
+            
+            if (rem === 0) {
+                target.innerHTML = `<button onclick="openPaywallModal()" class="text-xs bg-[#FFE500] text-black px-4 py-1.5 rounded-xl font-black hover:bg-[#ebd300] transition-colors cursor-pointer shadow-lg shadow-[#FFE500]/10">Upgrade to Pro ⚡</button>`;
+            } else {
+                target.innerHTML = `<button onclick="openPaywallModal()" class="text-sm text-neutral-400 hover:text-neutral-200 font-bold px-3 py-1.5 transition-colors cursor-pointer select-none">Pricing</button>`;
+            }
+        }
+        function openPaywallModal() { document.getElementById('upgrade-modal').classList.remove('hidden'); }
+        function closePaywallModal() { document.getElementById('upgrade-modal').classList.add('hidden'); }
+
+        function initSpeechFramework() {
+            const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechObj) return null;
+            const instance = new SpeechObj();
+            instance.continuous = true;
+            instance.interimResults = true;
+            instance.lang = 'en-US';
+
+            instance.onstart = () => {
+                isMicrophoneListening = true;
+                if (document.getElementById('mic-toggle-btn') && document.getElementById('mic-action-label')) {
+                    document.getElementById('mic-toggle-btn').className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
+                    document.getElementById('mic-action-label').innerText = "Listening... Click to Pause";
+                }
+            };
+
+            instance.onend = () => {
+                isMicrophoneListening = false;
+                if (document.getElementById('mic-toggle-btn') && document.getElementById('mic-action-label')) {
+                    document.getElementById('mic-toggle-btn').className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
+                    document.getElementById('mic-action-label').innerText = "🎤 Speak Answer";
+                }
+            };
+
+            instance.onresult = (e) => {
+                let textBuffer = '';
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    if (e.results[i].isFinal) textBuffer += e.results[i][0].transcript;
+                }
+                if(textBuffer) {
+                    const textfield = document.getElementById('sim-user-response-box');
+                    textfield.value += (textfield.value ? ' ' : '') + textBuffer;
+                    triggerLiveCounterUpdate(textfield.value);
+                }
+            };
+            return instance;
+        }
+
+        function toggleVoiceSpeechInput() {
+            if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
+            if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); } } 
+            else { speechRecognitionEngine.stop(); }
+        }
+
+        function speakTextAloud(str) {
+            if (!document.getElementById('voice-synthesis-toggle').checked) return;
+            window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(str);
+            const availableVoices = window.speechSynthesis.getVoices();
+            const premiumVoiceFallback = availableVoices.find(v => (v.name.includes('Google') && v.lang.startsWith('en')) || (v.name.includes('Natural') && v.lang.startsWith('en')) || (v.name.includes('Siri') && v.lang.startsWith('en')));
+            if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
+            speech.rate = 0.96;
+            window.speechSynthesis.speak(speech);
+        }
+
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(it => it.str).join(' ') + '\n';
+            }
+            return text.trim();
+        }
+
+        function switchUploadMode(mode) {
+            currentUploadMode = mode;
+            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
+            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
+            
+            if (mode === 'upload') {
+                if (extractedPdfTextState) {
+                    document.getElementById('resume-file-card-preview').classList.remove('hidden');
+                    document.getElementById('resume-upload-zone').classList.add('hidden');
+                } else {
+                    document.getElementById('resume-upload-zone').classList.remove('hidden');
+                    document.getElementById('resume-file-card-preview').classList.add('hidden');
+                }
+                document.getElementById('resume-paste-zone').classList.add('hidden');
+            } else {
+                document.getElementById('resume-paste-zone').classList.remove('hidden');
+                document.getElementById('resume-upload-zone').classList.add('hidden');
+                document.getElementById('resume-file-card-preview').classList.add('hidden');
+            }
+        }
+
+        function resetFileSelectionState() {
+            extractedPdfTextState = '';
+            document.getElementById('pdf-input').value = '';
+            document.getElementById('resume-file-card-preview').classList.add('hidden');
+            
+            const zone = document.getElementById('resume-upload-zone');
+            zone.className = "w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all";
+            document.getElementById('upload-zone-status').innerHTML = `
+                <p class="text-sm font-bold text-neutral-200">Drop resume PDF file here</p>
+                <p class="text-xs text-neutral-500">or click to browse local files (Max 5MB)</p>
+            `;
+            zone.classList.remove('hidden');
+        }
+
+        function handleFileSelection(e) {
+            const f = e.target.files[0];
+            if(f) {
+                document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning context vectors...</p>`;
