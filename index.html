@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Adaptive AI Interview Coach</title>
+    <!-- Tailwind CSS for high-end styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- PDF.js Core Client Engines -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
+    <!-- Import the official Supabase Client JS Library from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
+    <!-- INLINE AUTH WALL GATING CONTAINER -->
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
             <button type="button" onclick="closeInlineAuthWall()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
@@ -24,6 +28,7 @@
                 <p class="text-neutral-400 text-xs">Unlock your adaptive engineering interview simulator</p>
             </div>
 
+            <!-- Visual inline Navigation Tab Switcher -->
             <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
                 <button id="overlay-tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">Sign In</button>
                 <button id="overlay-tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">Sign Up</button>
@@ -53,6 +58,7 @@
         </div>
     </div>
 
+    <!-- Global App Top Navigation Bar -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
         <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
             <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
@@ -61,13 +67,14 @@
         <div class="flex items-center space-x-4">
             <div id="navbar-session-status-target"></div>
             <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs">
-                </div>
+                <!-- Profile badge generated via javascript -->
+            </div>
         </div>
     </nav>
 
+    <!-- REDESIGNED HIGH-CONVERTING PRICING & UPGRADE MODAL -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-2xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
-            
             <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1">
@@ -76,7 +83,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                
+                <!-- Free Tier Specs Card -->
                 <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <div>
@@ -84,25 +91,16 @@
                             <h4 class="text-xl font-bold text-neutral-300 mt-0.5">Free Account</h4>
                         </div>
                         <ul class="space-y-2.5 text-xs text-neutral-400">
-                            <li class="flex items-center space-x-2">
-                                <span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <span class="text-[#FFE500]">✓</span> <span>Standard LLM reasoning speeds</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unlimited simulation runtime</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished technical critiques</span>
-                            </li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>Standard LLM reasoning speeds</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unlimited simulation runtime</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished technical critiques</span></li>
                         </ul>
                     </div>
-                    <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">
-                        Continue Practicing
-                    </button>
+                    <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
                 </div>
 
+                <!-- Premium Pro Tier Specs Card -->
                 <div class="bg-neutral-900 border border-[#FFE500]/30 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.03)]">
                     <div class="absolute -top-2.5 right-4 bg-[#FFE500] text-black text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full select-none">Recommended</div>
                     <div class="space-y-4">
@@ -114,31 +112,22 @@
                             </div>
                         </div>
                         <ul class="space-y-2.5 text-xs text-neutral-200">
-                            <li class="flex items-center space-x-2">
-                                <span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span>
-                            </li>
-                            <li class="flex items-center space-x-2">
-                                <span class="text-[#FFE500] font-bold">⚡</span> <span>Detailed deficiency gap logging</span>
-                            </li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Detailed deficiency gap logging</span></li>
                         </ul>
                     </div>
-                    <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/5">
-                        Upgrade Workspace Now →
-                    </a>
+                    <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/5">Upgrade Workspace Now →</a>
                 </div>
-
             </div>
         </div>
     </div>
 
+    <!-- Main Dynamic Content Workspace Wrapper -->
     <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
 
+        <!-- ================= STAGE 1: INPUT ENVIRONMENT SETUP SCREEN ================= -->
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
                 <h2 class="text-4xl font-black tracking-tight">Setup Interview Environment</h2>
@@ -158,6 +147,7 @@
                         <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
                     </div>
 
+                    <!-- PDF Drag and Drop Area Block Container -->
                     <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
                         <div id="upload-zone-status" class="space-y-1">
@@ -166,6 +156,27 @@
                         </div>
                     </div>
 
+                    <!-- NEW DYNAMIC DOCUMENT METADATA PREVIEW CARD (Hidden by default) -->
+                    <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex items-center justify-between shadow-inner">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <!-- Minimalist Document Vector Icon -->
+                            <div class="bg-neutral-900 text-[#FFE500] p-2.5 rounded-lg border border-neutral-800 select-none">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <div class="min-w-0 space-y-0.5">
+                                <p id="preview-file-title" class="text-xs font-black text-neutral-200 truncate pr-2">resume.pdf</p>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                    <span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">Engine Scan Ready</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="resetFileSelectionState()" class="text-xs bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer select-none">
+                            Remove
+                        </button>
+                    </div>
+
+                    <!-- Text Area Fallback Panel -->
                     <div id="resume-paste-zone" class="hidden">
                         <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                     </div>
@@ -176,12 +187,11 @@
                     <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
                 </div>
 
-                <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">
-                    Start Dynamic Mock Interview ⚡
-                </button>
+                <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview ⚡</button>
             </div>
         </div>
 
+        <!-- ================= STAGE 2: ADAPTIVE RUNTIME SIMULATOR OVERLAY PANEL ================= -->
         <div id="simulator-screen" class="hidden space-y-6">
             <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
                 <div>
@@ -218,6 +228,7 @@
             </div>
         </div>
 
+        <!-- ================= STAGE 3: INTERACTIVE DIAGNOSTIC REPORT CARD VIEW ================= -->
         <div id="results-screen" class="hidden space-y-8">
             <div class="border-b border-neutral-900 pb-5 text-center">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
@@ -258,7 +269,6 @@
     </main>
 
     <script>
-        // IMMUTABLE ENVIRONMENT CONFIGURATION
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
@@ -469,17 +479,56 @@
             currentUploadMode = mode;
             document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
             document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
-            if (mode === 'upload') { document.getElementById('resume-upload-zone').classList.remove('hidden'); document.getElementById('resume-paste-zone').classList.add('hidden'); }
-            else { document.getElementById('resume-paste-zone').classList.remove('hidden'); document.getElementById('resume-upload-zone').classList.add('hidden'); }
+            
+            if (mode === 'upload') {
+                // Return to dropzone or custom card block state based on string presence
+                if (extractedPdfTextState) {
+                    document.getElementById('resume-file-card-preview').classList.remove('hidden');
+                    document.getElementById('resume-upload-zone').classList.add('hidden');
+                } else {
+                    document.getElementById('resume-upload-zone').classList.remove('hidden');
+                    document.getElementById('resume-file-card-preview').classList.add('hidden');
+                }
+                document.getElementById('resume-paste-zone').classList.add('hidden');
+            } else {
+                document.getElementById('resume-paste-zone').classList.remove('hidden');
+                document.getElementById('resume-upload-zone').classList.add('hidden');
+                document.getElementById('resume-file-card-preview').classList.add('hidden');
+            }
+        }
+
+        // DISMISS ENGINE RESET: Safely clears the memory array states and returns to default upload box
+        function resetFileSelectionState() {
+            extractedPdfTextState = '';
+            document.getElementById('pdf-input').value = ''; // Empty raw element value
+            document.getElementById('resume-file-card-preview').classList.add('hidden');
+            
+            // Restore default dashboard drag container metrics
+            const zone = document.getElementById('resume-upload-zone');
+            zone.className = "w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all";
+            document.getElementById('upload-zone-status').innerHTML = `
+                <p class="text-sm font-bold text-neutral-200">Drop resume PDF file here</p>
+                <p class="text-xs text-neutral-500">or click to browse local files (Max 5MB)</p>
+            `;
+            zone.classList.remove('hidden');
         }
 
         function handleFileSelection(e) {
             const f = e.target.files[0];
             if(f) {
+                // Ingest process animation block trigger
+                document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning context vectors...</p>`;
+                
                 extractTextFromPDF(f).then(txt => {
                     extractedPdfTextState = txt;
-                    document.getElementById('resume-upload-zone').className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
-                    document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`;
+                    
+                    // Reveal high-end Document Metadata pill and collapse raw drop zone
+                    document.getElementById('preview-file-title').innerText = f.name;
+                    document.getElementById('resume-upload-zone').classList.add('hidden');
+                    document.getElementById('resume-file-card-preview').classList.remove('hidden');
+                }).catch(err => {
+                    alert("Engine failed processing PDF context structure: " + err.message);
+                    resetFileSelectionState();
                 });
             }
         }
@@ -648,7 +697,18 @@
                 zone.addEventListener('drop', (ev) => {
                     ev.preventDefault(); const f = ev.dataTransfer.files[0];
                     if (f && f.type === "application/pdf") {
-                        extractTextFromPDF(f).then(txt => { extractedPdfTextState = txt; zone.className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold"; document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`; });
+                        // Display vector scanning indicator inside default container state bounds
+                        document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning drop matrices...</p>`;
+                        
+                        extractTextFromPDF(f).then(txt => {
+                            extractedPdfTextState = txt;
+                            document.getElementById('preview-file-title').innerText = f.name;
+                            zone.classList.add('hidden');
+                            document.getElementById('resume-file-card-preview').classList.remove('hidden');
+                        }).catch(err => {
+                            alert("Drop read failure: " + err.message);
+                            resetFileSelectionState();
+                        });
                     } else { alert("Please drop a valid PDF document file."); }
                 });
             }
