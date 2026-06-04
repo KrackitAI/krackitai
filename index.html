@@ -924,6 +924,7 @@
         }
 
         // DOM CORE ROUTING INITIALIZATIONS
+       // DOM CORE ROUTING INITIALIZATIONS
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
@@ -944,6 +945,32 @@
                     }
                 });
             }
+
+            // ================= NEW PASTE TEXT SCREENING DETECTOR =================
+            const pasteInputArea = document.getElementById('resume-paste-input');
+            let pasteDebounceTimer = null;
+
+            if (pasteInputArea) {
+                pasteInputArea.addEventListener('input', (e) => {
+                    const rawText = e.target.value.trim();
+                    clearTimeout(pasteDebounceTimer);
+                    
+                    if (rawText.length > 100) { 
+                        const alertBox = document.getElementById('preflight-audit-alert-box');
+                        if (alertBox) alertBox.classList.remove('hidden');
+                        
+                        const preflightStatus = document.getElementById('resume-preflight-status-indicator');
+                        if (preflightStatus) {
+                            preflightStatus.innerHTML = `<span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-amber-400 tracking-wider">Analyzing Pasted Context...</span>`;
+                        }
+                        
+                        pasteDebounceTimer = setTimeout(() => {
+                            executePreflightResumeScreening(rawText);
+                        }, 1500);
+                    }
+                });
+            }
+            // =====================================================================
 
             const zone = document.getElementById('resume-upload-zone');
             if(zone) {
