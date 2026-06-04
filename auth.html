@@ -4,30 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Secure Access Gateway</title>
-    <!-- Tailwind CSS for high-end styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Import the official Supabase Client JS Library from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased flex items-center justify-center p-4">
 
-    <!-- Auth Container Box -->
-    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-8 space-y-6 shadow-2xl">
-        <div class="text-center space-y-2 select-none">
-            <!-- Fresh UI Header to prove exactly what screen state is active -->
-            <div id="auth-badge-label" class="text-[10px] bg-neutral-950 text-neutral-400 border border-neutral-800 px-3 py-1 rounded-full font-mono inline-block font-bold uppercase tracking-widest">
-                SIGN IN MODE
-            </div>
-            <h2 class="text-3xl font-black tracking-tight mt-2">Krackit<span class="text-[#FFE500]">⚡</span></h2>
-            <p class="text-neutral-400 text-xs" id="auth-subtitle">Sign in to access your interview simulator workspace</p>
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl">
+        
+        <div class="text-center space-y-1 select-none">
+            <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
+            <p class="text-neutral-400 text-xs">Dynamic Mock Interview Engineering Workspace</p>
         </div>
 
-        <!-- Dynamic Error Alert Window Box -->
+        <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
+            <button id="tab-signin-btn" type="button" onclick="switchAuthViewMode('signin')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all">
+                Sign In
+            </button>
+            <button id="tab-signup-btn" type="button" onclick="switchAuthViewMode('signup')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all">
+                Sign Up / Register
+            </button>
+        </div>
+
         <div id="auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
-            <span id="auth-error-msg">Error alert description placeholder.</span>
+            <span id="auth-error-msg">Error alert string placeholder.</span>
         </div>
 
-        <!-- Standard Credentials Form Structure -->
         <div class="space-y-4">
             <div class="space-y-1.5">
                 <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
@@ -38,17 +39,19 @@
                 <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
             </div>
 
-            <button type="button" id="auth-submit-btn" onclick="executeAuthenticationAction()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
-                Sign In to Account →
-            </button>
+            <div id="form-action-signin-container" class="block">
+                <button type="button" onclick="executeAuthenticationAction('signin')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
+                    Sign In to Account →
+                </button>
+            </div>
+
+            <div id="form-action-signup-container" class="hidden">
+                <button type="button" onclick="executeAuthenticationAction('signup')" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all">
+                    Create New Account ⚡
+                </button>
+            </div>
         </div>
 
-        <!-- Mode Toggler Switcher Layout Footer link - Fixed with type="button" attributes -->
-        <div class="text-center pt-2">
-            <button type="button" onclick="toggleAuthModeLayout()" id="auth-toggle-link" class="text-xs text-neutral-500 hover:text-neutral-300 underline underline-offset-4 cursor-pointer">
-                Don't have an account? Sign up instead
-            </button>
-        </div>
     </div>
 
     <script>
@@ -56,41 +59,43 @@
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
 
-        // Initialize connection safely
+        // Initialize secure connectivity client channels safely
         let supabase = null;
         if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
             supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         }
 
-        let currentAuthMode = 'signin'; // Options: 'signin' or 'signup'
-
-        function toggleAuthModeLayout() {
-            const badge = document.getElementById('auth-badge-label');
-            const subtitle = document.getElementById('auth-subtitle');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const toggleLink = document.getElementById('auth-toggle-link');
+        // VISUAL VIEW LAYER ROUTER: Handles shifting layouts without altering tracking string memories
+        function switchAuthViewMode(targetMode) {
+            const btnSignIn = document.getElementById('tab-signin-btn');
+            const btnSignUp = document.getElementById('tab-signup-btn');
+            const formSignIn = document.getElementById('form-action-signin-container');
+            const formSignUp = document.getElementById('form-action-signup-container');
             const errorBox = document.getElementById('auth-error-box');
-            
+
             if (errorBox) errorBox.classList.add('hidden');
 
-            if (currentAuthMode === 'signin') {
-                currentAuthMode = 'signup';
-                if (badge) { badge.innerText = "ACCOUNT REGISTRATION"; badge.className = "text-[10px] bg-[#FFE500]/10 text-[#FFE500] border border-[#FFE500]/20 px-3 py-1 rounded-full font-mono inline-block font-bold uppercase tracking-widest"; }
-                if (subtitle) subtitle.innerText = "Create an account to begin practicing engineering interviews.";
-                if (submitBtn) submitBtn.innerText = "Create Account ⚡";
-                if (toggleLink) toggleLink.innerText = "Already have an account? Sign in instead";
+            if (targetMode === 'signin') {
+                // Focus styling allocations on sign-in elements view
+                btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all";
+                btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all";
+                
+                formSignIn.className = "block";
+                formSignUp.className = "hidden";
             } else {
-                currentAuthMode = 'signin';
-                if (badge) { badge.innerText = "SIGN IN MODE"; badge.className = "text-[10px] bg-neutral-950 text-neutral-400 border border-neutral-800 px-3 py-1 rounded-full font-mono inline-block font-bold uppercase tracking-widest"; }
-                if (subtitle) subtitle.innerText = "Sign in to access your interview simulator workspace.";
-                if (submitBtn) submitBtn.innerText = "Sign In to Account →";
-                if (toggleLink) toggleLink.innerText = "Don't have an account? Sign up instead";
+                // Focus styling allocations on registration parameters view
+                btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all";
+                btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all";
+                
+                formSignUp.className = "block";
+                formSignIn.className = "hidden";
             }
         }
 
-        async function executeAuthenticationAction() {
+        // DATABASE PAYLOAD DISPATCHER PIPELINE CHANNEL
+        async function executeAuthenticationAction(actionType) {
             if (!supabase) {
-                alert("Configuration Warning: Please verify your Supabase keys are securely pasted inside the single quotes.");
+                alert("Configuration Notice: Please ensure your Supabase URL and public anon keys are safely pasted inside the single quotes.");
                 return;
             }
 
@@ -103,36 +108,32 @@
 
             if (!email || !password) {
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = "Please deliver both an email and password parameter.";
+                    errorMsg.innerText = "Please fill out both your email address and password fields.";
                     errorBox.classList.remove('hidden');
                 }
                 return;
             }
 
             try {
-                document.getElementById('auth-submit-btn').disabled = true;
-
-                if (currentAuthMode === 'signup') {
+                if (actionType === 'signup') {
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
                     
-                    alert("Registration complete! A confirmation link has been sent to your email inbox. Confirm it to unlock your login access.");
-                    currentAuthMode = 'signup';
-                    toggleAuthModeLayout();
+                    alert("Registration Successful!\n\nIf email confirmations are enabled, check your inbox. Otherwise, switch to the Sign In tab and log in directly!");
+                    switchAuthViewMode('signin');
                 } else {
                     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
 
+                    // Bounce back safely to home workspace root dashboard
                     window.location.href = '/';
                 }
             } catch (err) {
-                console.error("Auth Exception:", err);
+                console.error("Auth routing failure context catch:", err);
                 if (errorMsg && errorBox) {
-                    errorMsg.innerText = err.message || "Authentication routing failed.";
+                    errorMsg.innerText = err.message || "An error occurred during database transit connectivity execution paths.";
                     errorBox.classList.remove('hidden');
                 }
-            } finally {
-                document.getElementById('auth-submit-btn').disabled = false;
             }
         }
 
