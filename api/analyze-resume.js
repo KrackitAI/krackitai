@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     try {
         const completion = await groq.chat.completions.create({
-            model: "llama-3.1-70b-versatile", // Use a fast, highly capable reasoning model
+            model: "llama-3.1-8b-instant", // Use a fast, highly capable reasoning model
             response_format: { type: "json_object" },
             temperature: 0.2, // Low temperature for consistent grading metrics
             messages: [
