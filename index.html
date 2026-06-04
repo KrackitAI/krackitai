@@ -60,7 +60,6 @@
 
     <!-- GLOBAL APP TOP NAVIGATION BAR -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50 select-none">
-        <!-- Left Side: Brand & Workspace Toggles -->
         <div class="flex items-center space-x-8">
             <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer">
                 <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
@@ -71,12 +70,9 @@
             </div>
         </div>
         
-        <!-- Right Side: Split Asset Mounting Anchors -->
         <div class="flex items-center space-x-6">
             <div id="navbar-session-status-target" class="flex items-center"></div>
-            <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs">
-                <!-- Profile elements painted directly via auth session queries -->
-            </div>
+            <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs"></div>
         </div>
     </nav>
 
@@ -91,7 +87,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                <!-- Free Tier Specs Card -->
                 <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <div>
@@ -108,7 +103,6 @@
                     <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
                 </div>
 
-                <!-- Premium Pro Tier Specs Card -->
                 <div class="bg-neutral-900 border border-[#FFE500]/30 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.03)]">
                     <div class="absolute -top-2.5 right-4 bg-[#FFE500] text-black text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full select-none">Recommended</div>
                     <div class="space-y-4">
@@ -132,7 +126,7 @@
         </div>
     </div>
 
-    <!-- WIDENED COMPREHENSIVE PAST SESSIONS SLIDING OVERLAY DRAWER -->
+    <!-- SESSIONS SLIDING OVERLAY DRAWER -->
     <div id="history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-end">
         <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between">
             <div class="space-y-6">
@@ -143,7 +137,6 @@
                     </div>
                     <button type="button" onclick="closeHistoryModal()" class="text-neutral-500 hover:text-white font-mono text-sm font-bold cursor-pointer select-none">✕ Close</button>
                 </div>
-                <!-- Interactive Accordion Append Target -->
                 <div id="history-rows-container" class="space-y-3"></div>
             </div>
         </div>
@@ -172,7 +165,6 @@
                         <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
                     </div>
 
-                    <!-- PDF Drag and Drop Area Block Container -->
                     <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
                         <div id="upload-zone-status" class="space-y-1">
@@ -181,26 +173,38 @@
                         </div>
                     </div>
 
-                    <!-- DYNAMIC DOCUMENT METADATA PREVIEW CARD -->
-                    <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex items-center justify-between shadow-inner">
-                        <div class="flex items-center space-x-3 min-w-0">
-                            <div class="bg-neutral-900 text-[#FFE500] p-2.5 rounded-lg border border-neutral-800 select-none">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            </div>
-                            <div class="min-w-0 space-y-0.5">
-                                <p id="preview-file-title" class="text-xs font-black text-neutral-200 truncate pr-2">resume.pdf</p>
-                                <div class="flex items-center space-x-1.5">
-                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                    <span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">Engine Scan Ready</span>
+                    <!-- RE-ENGINEERED DYNAMIC DOCUMENT METADATA & PRE-FLIGHT ATS AUDIT BADGE -->
+                    <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex flex-col space-y-4 shadow-inner">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="bg-neutral-900 text-[#FFE500] p-2.5 rounded-lg border border-neutral-800 select-none">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                                <div class="min-w-0 space-y-0.5">
+                                    <p id="preview-file-title" class="text-xs font-black text-neutral-200 truncate pr-2">resume.pdf</p>
+                                    <div class="flex items-center space-x-1.5" id="resume-preflight-status-indicator">
+                                        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                                        <span class="text-[10px] font-mono uppercase font-bold text-amber-400 tracking-wider">Analyzing Context Matrix...</span>
+                                    </div>
                                 </div>
                             </div>
+                            <button type="button" onclick="resetFileSelectionState()" class="text-xs bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-rose-400 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer select-none">Remove</button>
                         </div>
-                        <button type="button" onclick="resetFileSelectionState()" class="text-xs bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer select-none">
-                            Remove
-                        </button>
+                        
+                        <!-- Inline Pre-flight feedback panel element -->
+                        <div id="preflight-audit-alert-box" class="hidden bg-neutral-900/60 border border-neutral-800 rounded-lg p-3.5 flex items-start justify-between gap-4">
+                            <div class="space-y-1">
+                                <span class="text-[9px] font-mono font-black uppercase text-neutral-500 tracking-widest block">Immediate ATS Screening Audit:</span>
+                                <p id="preflight-audit-critique-msg" class="text-xs text-neutral-300 font-medium italic leading-normal"></p>
+                                <div id="preflight-missing-keywords-holder" class="flex flex-wrap gap-1.5 pt-1"></div>
+                            </div>
+                            <div class="text-center font-mono shrink-0">
+                                <span class="text-[9px] font-black text-neutral-500 uppercase block tracking-wider">ATS Score</span>
+                                <span id="preflight-audit-score-badge" class="text-xl font-black block mt-0.5">0</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Text Area Fallback Panel -->
                     <div id="resume-paste-zone" class="hidden">
                         <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                     </div>
@@ -414,6 +418,7 @@
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
         let latestEvaluationReportCache = null;
+        let cachedResumePreflightScore = 0; // State variable capturing top-funnel metrics
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
@@ -522,8 +527,10 @@
 
         function resetFileSelectionState() {
             extractedPdfTextState = '';
+            cachedResumePreflightScore = 0;
             document.getElementById('pdf-input').value = '';
             document.getElementById('resume-file-card-preview').classList.add('hidden');
+            document.getElementById('preflight-audit-alert-box').classList.add('hidden');
             
             const zone = document.getElementById('resume-upload-zone');
             zone.className = "w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all";
@@ -544,6 +551,9 @@
                     document.getElementById('preview-file-title').innerText = f.name;
                     document.getElementById('resume-upload-zone').classList.add('hidden');
                     document.getElementById('resume-file-card-preview').classList.remove('hidden');
+                    
+                    // Fire background pre-flight ATS analysis instantly
+                    executePreflightResumeScreening(txt);
                 }).catch(err => {
                     alert("Engine failed processing PDF context structure: " + err.message);
                     resetFileSelectionState();
@@ -551,7 +561,50 @@
             }
         }
 
-        // ================= NEW WORKSPACE HISTORY AND ACCORDION ENGINE MIGRATIONS =================
+        // ASYNCHRONOUS PRE-FLIGHT ANALYSIS ENGINE ROUTING
+        async function executePreflightResumeScreening(rawText) {
+            const statusIndicator = document.getElementById('resume-preflight-status-indicator');
+            const alertBox = document.getElementById('preflight-audit-alert-box');
+            
+            try {
+                const response = await fetch('/api/analyze-resume', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resumeText: rawText })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Failed screening loop.");
+
+                cachedResumePreflightScore = data.score || 0;
+                
+                // Paint the score badge using severity coloring
+                const scoreBadge = document.getElementById('preflight-audit-score-badge');
+                scoreBadge.innerText = cachedResumePreflightScore;
+                if (cachedResumePreflightScore >= 75) {
+                    scoreBadge.className = "text-xl font-black block mt-0.5 text-emerald-400";
+                    statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">ATS Score Passed</span>`;
+                } else {
+                    scoreBadge.className = "text-xl font-black block mt-0.5 text-rose-400";
+                    statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">ATS Flaws Detected</span>`;
+                }
+
+                document.getElementById('preflight-audit-critique-msg').innerText = data.critique || "Formatting optimization advised.";
+                
+                const keywordsHolder = document.getElementById('preflight-missing-keywords-holder');
+                keywordsHolder.innerHTML = '';
+                if (data.missingKeywords && data.missingKeywords.length > 0) {
+                    data.missingKeywords.forEach(word => {
+                        keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
+                    });
+                }
+                alertBox.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
+            }
+        }
+
         async function revealPastSessionsModal() {
             if (!supabaseClientInstance) return;
             const { data: { session } } = await supabaseClientInstance.auth.getSession();
@@ -582,6 +635,7 @@
                     
                     const gaps = Array.isArray(row.gaps_to_fix) ? row.gaps_to_fix : [];
                     const transcriptDeck = Array.isArray(row.transcript) ? row.transcript : [];
+                    const atsScore = row.resume_screening_score || 0;
 
                     let gapsHtml = '';
                     if (gaps.length > 0) {
@@ -612,6 +666,7 @@
                                     <div class="flex items-center space-x-2">
                                         <span class="text-[10px] font-mono font-bold text-neutral-500">${dateStr}</span>
                                         <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/30' : 'bg-rose-950/60 text-rose-400 border border-rose-900/30'}">${verdictStr}</span>
+                                        ${atsScore > 0 ? `<span class="text-[9px] font-mono bg-neutral-950 border border-neutral-800 text-neutral-400 px-1.5 rounded">ATS: ${atsScore}</span>` : ''}
                                     </div>
                                     <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]">Job Simulation Record</h4>
                                 </div>
@@ -679,7 +734,8 @@
                         verdict: reportPayload.verdict || "REJECTED",
                         brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
                         gaps_to_fix: reportPayload.gapsToFix || [],
-                        transcript: runningChatHistoryLedger || []
+                        transcript: runningChatHistoryLedger || [],
+                        resume_screening_score: cachedResumePreflightScore // Committing top-funnel analytical grade
                     }]);
 
                 if (error) console.error("Database persistence fault:", error.message);
@@ -861,6 +917,7 @@
                             document.getElementById('preview-file-title').innerText = f.name;
                             zone.classList.add('hidden');
                             document.getElementById('resume-file-card-preview').classList.remove('hidden');
+                            executePreflightResumeScreening(txt);
                         }).catch(err => {
                             alert("Drop read failure: " + err.message);
                             resetFileSelectionState();
