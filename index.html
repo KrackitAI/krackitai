@@ -4,17 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Adaptive AI Interview Coach</title>
+    <!-- Tailwind CSS for high-end styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- PDF.js Core Client Engines -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
+    <!-- Import the official Supabase Client JS Library from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
+    <!-- INLINE AUTH WALL GATING CONTAINER: Blurs and covers workspace if user is anonymous -->
+    <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl">
+            
+            <div class="text-center space-y-1 select-none">
+                <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
+                <p class="text-neutral-400 text-xs">Unlock your adaptive engineering interview simulator</p>
+            </div>
+
+            <!-- Visual inline Navigation Tab Switcher -->
+            <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
+                <button id="overlay-tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">Sign In</button>
+                <button id="overlay-tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">Sign Up</button>
+            </div>
+
+            <div id="overlay-auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
+                <span id="overlay-auth-error-msg"></span>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
+                    <input type="email" id="overlay-auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
+                    <input type="password" id="overlay-auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+                </div>
+
+                <div id="overlay-action-signin-container" class="block">
+                    <button id="overlay-submit-signin-btn" type="button" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">Sign In to Account →</button>
+                </div>
+                <div id="overlay-action-signup-container" class="hidden">
+                    <button id="overlay-submit-signup-btn" type="button" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">Create Free Account ⚡</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global App Top Navigation Bar -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
         <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
             <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
@@ -22,25 +65,28 @@
         
         <div class="flex items-center space-x-4">
             <div id="navbar-session-status-target"></div>
-            
             <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs">
-                </div>
+                <!-- Profile badge or inline login triggers generate here -->
+            </div>
         </div>
     </nav>
 
+    <!-- Lemon Squeezy Paywall Modal -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 space-y-6 text-center shadow-2xl">
             <h3 class="text-2xl font-black text-white">Free Trial Allowance Maxed Out</h3>
             <p class="text-neutral-400 text-sm">Upgrade to get access to unlimited dynamic real-time adaptive voice interviews.</p>
             <div class="space-y-3">
                 <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] text-black py-3 rounded-xl font-bold block hover:bg-[#ebd300] transition-colors">Get Pro Plan ($19/mo)</a>
-                <button onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300">Close</button>
+                <button type="button" onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300">Close</button>
             </div>
         </div>
     </div>
 
+    <!-- Main Dynamic Content Workspace Wrapper -->
     <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
 
+        <!-- ================= STAGE 1: INPUT ENVIRONMENT SETUP SCREEN ================= -->
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
                 <h2 class="text-4xl font-black tracking-tight">Setup Interview Environment</h2>
@@ -84,23 +130,20 @@
             </div>
         </div>
 
+        <!-- ================= STAGE 2: ADAPTIVE RUNTIME SIMULATOR OVERLAY PANEL ================= -->
         <div id="simulator-screen" class="hidden space-y-6">
             <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
                 <div>
                     <h3 class="text-2xl font-black text-white">Live AI Interview Panel</h3>
                     <p class="text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is gathering data matrices...</p>
                 </div>
-                <button onclick="finishAndWrapInterview()" class="text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-2 rounded-xl font-bold transition-all">
-                    🏁 Cancel Session
-                </button>
+                <button onclick="finishAndWrapInterview()" class="text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-2 rounded-xl font-bold transition-all">🏁 Cancel Session</button>
             </div>
 
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
                 <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
-                <h4 id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed">
-                    Initializing digital handshake channels...
-                </h4>
+                <h4 id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed">Initializing digital handshake channels...</h4>
             </div>
 
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
@@ -111,17 +154,14 @@
                         <span id="mic-action-label">🎤 Speak Answer</span>
                     </button>
                 </div>
-
                 <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or click 'Speak Answer' to speak out loud..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
-
                 <div class="flex justify-end">
-                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md transition-all">
-                        Submit Answer →
-                    </button>
+                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md transition-all">Submit Answer →</button>
                 </div>
             </div>
         </div>
 
+        <!-- ================= STAGE 3: INTERACTIVE DIAGNOSTIC REPORT CARD VIEW ================= -->
         <div id="results-screen" class="hidden space-y-8">
             <div class="border-b border-neutral-900 pb-5 text-center">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
@@ -162,7 +202,7 @@
     </main>
 
     <script>
-        // CONFIGURATION: Replace with your actual Supabase credentials inside the single quotes
+        // CONFIGURATION: Mirror your exact Supabase Dashboard credential properties here
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
@@ -170,7 +210,7 @@
 
         function initializeSecureAccessClient() {
             if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-                console.warn("🔒 Running local bypass mode without active keys.");
+                console.warn("🔒 Security Notice: Database variables unassigned. Running layout preview.");
                 return;
             }
             if (window.supabase) {
@@ -183,43 +223,108 @@
             if (!supabaseClientInstance) return;
             try {
                 const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                const overlayWall = document.getElementById('homepage-secure-overlay-wall');
+                const profileHolder = document.getElementById('navbar-user-profile-holder');
+
                 if (!session) {
-                    window.location.href = '/auth.html';
-                } else {
-                    // Injecting user profile elements natively into the Header
-                    const email = session.user.email;
-                    const profileHolder = document.getElementById('navbar-user-profile-holder');
+                    // Reveal overlay blur wall and provide inline navbar option triggers
+                    if (overlayWall) overlayWall.classList.remove('hidden');
                     if (profileHolder) {
                         profileHolder.innerHTML = `
-                            <span class="text-neutral-400 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-xl font-mono select-none">${email}</span>
+                            <button onclick="triggerInlineAuthWall('signin')" class="text-neutral-400 hover:text-white font-bold px-3 py-1.5 transition-colors cursor-pointer">Login</button>
+                            <button onclick="triggerInlineAuthWall('signup')" class="bg-[#FFE500] text-black font-black px-4 py-1.5 rounded-xl hover:bg-[#ebd300] transition-colors cursor-pointer">Sign Up ⚡</button>
+                        `;
+                    }
+                } else {
+                    // Authenticated state configuration
+                    if (overlayWall) overlayWall.classList.add('hidden');
+                    if (profileHolder) {
+                        profileHolder.innerHTML = `
+                            <span class="text-neutral-400 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-xl font-mono select-none">${session.user.email}</span>
                             <button onclick="triggerUserLogoutPipeline()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer transition-colors">Logout</button>
                         `;
                     }
                 }
             } catch (err) {
-                console.error("Auth layout sync failure:", err);
+                console.error("Auth session engine exception:", err);
             }
         }
 
-        // LOGOUT SERVICE PIPELINE CHANNEL
+        function triggerInlineAuthWall(mode) {
+            const overlayWall = document.getElementById('homepage-secure-overlay-wall');
+            if (overlayWall) overlayWall.classList.remove('hidden');
+            switchOverlayAuthViewMode(mode);
+        }
+
         async function triggerUserLogoutPipeline() {
             if (!supabaseClientInstance) return;
             try {
-                const { error } = await supabaseClientInstance.auth.signOut();
-                if (error) throw error;
-                window.location.href = '/auth.html';
+                await supabaseClientInstance.auth.signOut();
+                window.location.reload();
             } catch (err) {
-                alert("Error during sign out execution: " + err.message);
+                alert("Signout error: " + err.message);
+            }
+        }
+
+        // VISUAL ROUTER FOR INLINE OVERLAY CARD
+        function switchOverlayAuthViewMode(targetMode) {
+            const btnSignIn = document.getElementById('overlay-tab-signin-btn');
+            const btnSignUp = document.getElementById('overlay-tab-signup-btn');
+            const formSignIn = document.getElementById('overlay-action-signin-container');
+            const formSignUp = document.getElementById('overlay-action-signup-container');
+            const errorBox = document.getElementById('overlay-auth-error-box');
+
+            if (errorBox) errorBox.classList.add('hidden');
+
+            if (targetMode === 'signin') {
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignIn) formSignIn.className = "block";
+                if (formSignUp) formSignUp.className = "hidden";
+            } else {
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignUp) formSignUp.className = "block";
+                if (formSignIn) formSignIn.className = "hidden";
+            }
+        }
+
+        // MODULAR AUTH PIPELINE ON THE MAIN DASHBOARD
+        async function executeOverlayAuthAction(actionType) {
+            if (!supabaseClientInstance) return;
+            const email = document.getElementById('overlay-auth-email').value.trim();
+            const password = document.getElementById('overlay-auth-password').value.trim();
+            const errorBox = document.getElementById('overlay-auth-error-box');
+            const errorMsg = document.getElementById('overlay-auth-error-msg');
+
+            if (errorBox) errorBox.classList.add('hidden');
+
+            if (!email || !password) {
+                if (errorMsg && errorBox) { errorMsg.innerText = "Please complete all inputs."; errorBox.classList.remove('hidden'); }
+                return;
+            }
+
+            try {
+                if (actionType === 'signup') {
+                    const { error } = await supabaseClientInstance.auth.signUp({ email, password });
+                    if (error) throw error;
+                    alert("Registration Successful! Please complete logging into your account.");
+                    switchOverlayAuthViewMode('signin');
+                } else {
+                    const { error } = await supabaseClientInstance.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    window.location.reload();
+                }
+            } catch (err) {
+                if (errorMsg && errorBox) { errorMsg.innerText = err.message; errorBox.classList.remove('hidden'); }
             }
         }
 
         let currentUploadMode = 'upload';
         let extractedPdfTextState = '';
-        
         let runningChatHistoryLedger = [];
         let globalJobDescContext = '';
         let globalResumeContext = '';
-
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
         let latestEvaluationReportCache = null;
@@ -231,7 +336,6 @@
             const rem = Math.max(0, 3 - getSessionCount());
             const target = document.getElementById('navbar-session-status-target');
             if (!target) return;
-            
             target.innerHTML = rem === 0 
                 ? `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 px-3 py-1.5 rounded-lg text-white font-bold">🔒 Paywall Active</button>`
                 : `<div class="text-[11px] text-neutral-400 font-mono bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} free sessions left</div>`;
@@ -242,7 +346,6 @@
         function initSpeechFramework() {
             const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
             if(!SpeechObj) return null;
-            
             const instance = new SpeechObj();
             instance.continuous = true;
             instance.interimResults = true;
@@ -250,21 +353,17 @@
 
             instance.onstart = () => {
                 isMicrophoneListening = true;
-                const btn = document.getElementById('mic-toggle-btn');
-                const lbl = document.getElementById('mic-action-label');
-                if (btn && lbl) {
-                    btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
-                    lbl.innerText = "Listening... Click to Pause";
+                if (document.getElementById('mic-toggle-btn') && document.getElementById('mic-action-label')) {
+                    document.getElementById('mic-toggle-btn').className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
+                    document.getElementById('mic-action-label').innerText = "Listening... Click to Pause";
                 }
             };
 
             instance.onend = () => {
                 isMicrophoneListening = false;
-                const btn = document.getElementById('mic-toggle-btn');
-                const lbl = document.getElementById('mic-action-label');
-                if (btn && lbl) {
-                    btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
-                    lbl.innerText = "🎤 Speak Answer";
+                if (document.getElementById('mic-toggle-btn') && document.getElementById('mic-action-label')) {
+                    document.getElementById('mic-toggle-btn').className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
+                    document.getElementById('mic-action-label').innerText = "🎤 Speak Answer";
                 }
             };
 
@@ -273,35 +372,23 @@
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) textBuffer += e.results[i][0].transcript;
                 }
-                if(textBuffer) {
-                    document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
-                }
+                if(textBuffer) document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
             };
             return instance;
         }
 
         function toggleVoiceSpeechInput() {
             if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
-            if(!isMicrophoneListening) {
-                try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); }
-            } else {
-                speechRecognitionEngine.stop();
-            }
+            if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); } } 
+            else { speechRecognitionEngine.stop(); }
         }
 
         function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
             window.speechSynthesis.cancel();
-            
             const speech = new SpeechSynthesisUtterance(str);
             const availableVoices = window.speechSynthesis.getVoices();
-
-            const premiumVoiceFallback = availableVoices.find(voice => 
-                (voice.name.includes('Google') && voice.lang.startsWith('en')) || 
-                (voice.name.includes('Natural') && voice.lang.startsWith('en')) ||
-                (voice.name.includes('Siri') && voice.lang.startsWith('en'))
-            );
-
+            const premiumVoiceFallback = availableVoices.find(v => (v.name.includes('Google') && v.lang.startsWith('en')) || (v.name.includes('Natural') && v.lang.startsWith('en')) || (v.name.includes('Siri') && v.lang.startsWith('en')));
             if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
             speech.rate = 0.96;
             window.speechSynthesis.speak(speech);
@@ -349,15 +436,9 @@
             globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
             if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
-            
-            runningChatHistoryLedger = [];
-            latestEvaluationReportCache = null;
-            showScreen('simulator-screen');
-            
+            runningChatHistoryLedger = []; latestEvaluationReportCache = null; showScreen('simulator-screen');
             runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
-            
-            incrementSessionCount();
-            await fetchNextInterviewerTurn();
+            incrementSessionCount(); await fetchNextInterviewerTurn();
         }
 
         async function fetchNextInterviewerTurn() {
@@ -368,31 +449,24 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jobDescription: globalJobDescContext,
-                        resume: globalResumeContext,
-                        chatHistory: runningChatHistoryLedger
-                    })
+                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.details || data.error || "Packaging breakdown.");
+                if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
 
                 if (data.isConcluded) {
                     latestEvaluationReportCache = data;
-                    
                     const goodbyeText = data.aiMessage;
                     runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
                     document.getElementById('sim-active-question-text').innerText = goodbyeText;
                     speakTextAloud(goodbyeText);
 
-                    document.getElementById('sim-status-indicator').innerText = "Concluding session... Compiling critique matrices.";
+                    document.getElementById('sim-status-indicator').innerText = "Concluding session...";
                     document.getElementById('submit-turn-btn').style.display = 'none';
                     document.getElementById('mic-toggle-btn').style.display = 'none';
 
-                    setTimeout(() => {
-                        finishAndWrapInterview();
-                    }, 5000); 
+                    setTimeout(() => { finishAndWrapInterview(); }, 5000); 
                     return;
                 }
 
@@ -400,40 +474,31 @@
                 runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
                 document.getElementById('sim-active-question-text').innerText = aiMsgText;
                 document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
-                
                 speakTextAloud(aiMsgText);
 
             } catch (err) {
-                console.error(err);
-                alert("API conversation sync drop: " + err.message);
+                console.error(err); alert("Sync drop: " + err.message);
             } finally {
                 document.getElementById('submit-turn-btn').disabled = false;
             }
         }
 
         async function submitCandidateResponseTurn() {
-            window.speechSynthesis.cancel();
-            if(isMicrophoneListening) toggleVoiceSpeechInput();
-
+            window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
             if(!userTextResponse) { alert("Please provide an answer before submitting."); return; }
 
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
-
             await fetchNextInterviewerTurn();
         }
 
         function finishAndWrapInterview() {
-            window.speechSynthesis.cancel();
-            if(isMicrophoneListening) toggleVoiceSpeechInput();
-            
+            window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             if (latestEvaluationReportCache) {
                 const report = latestEvaluationReportCache;
-                
                 document.getElementById('report-score-target').innerText = report.score || 0;
                 document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
-                
                 const badge = document.getElementById('report-verdict-badge');
                 const accentBar = document.getElementById('report-accent-bar');
                 const verdictStr = (report.verdict || "REJECTED").toUpperCase();
@@ -447,25 +512,17 @@
                     accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
                 }
 
-                const gapsList = document.getElementById('report-gaps-list-target');
-                gapsList.innerHTML = '';
+                const gapsList = document.getElementById('report-gaps-list-target'); gapsList.innerHTML = '';
                 if (report.gapsToFix && report.gapsToFix.length > 0) {
-                    report.gapsToFix.forEach(gap => {
-                        gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`;
-                    });
-                } else {
-                    gapsList.innerHTML = `<li class="text-neutral-500 italic">No structural deficiencies found.</li>`;
-                }
+                    report.gapsToFix.forEach(gap => { gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; });
+                } else { gapsList.innerHTML = `<li class="text-neutral-500 italic">No structural deficiencies found.</li>`; }
             }
 
-            const targetDeck = document.getElementById('transcript-deck-target');
-            targetDeck.innerHTML = '';
+            const targetDeck = document.getElementById('transcript-deck-target'); targetDeck.innerHTML = '';
             let questionBufferText = '';
-            
             runningChatHistoryLedger.forEach((msg) => {
-                if (msg.role === 'assistant') {
-                    questionBufferText = msg.content;
-                } else if (msg.role === 'user' && questionBufferText) {
+                if (msg.role === 'assistant') { questionBufferText = msg.content; } 
+                else if (msg.role === 'user' && questionBufferText) {
                     targetDeck.innerHTML += `
                         <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-3">
                             <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
@@ -477,49 +534,32 @@
                         </div>`;
                 }
             });
-
-            document.getElementById('submit-turn-btn').style.display = 'block';
-            document.getElementById('mic-toggle-btn').style.display = 'block';
+            document.getElementById('submit-turn-btn').style.display = 'block'; document.getElementById('mic-toggle-btn').style.display = 'block';
             showScreen('results-screen');
         }
 
-        // Global Event Wireup execution on page instantiation load
+        // DOM CORE ROUTING INITIALIZATIONS
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
             initializeSecureAccessClient();
 
-            // Drag and drop event tracking attachments
+            // Native Event registrations for modular overlay card buttons
+            document.getElementById('overlay-tab-signin-btn').addEventListener('click', () => switchOverlayAuthViewMode('signin'));
+            document.getElementById('overlay-tab-signup-btn').addEventListener('click', () => switchOverlayAuthViewMode('signup'));
+            document.getElementById('overlay-submit-signin-btn').addEventListener('click', () => executeOverlayAuthAction('signin'));
+            document.getElementById('overlay-submit-signup-btn').addEventListener('click', () => executeOverlayAuthAction('signup'));
+
             const zone = document.getElementById('resume-upload-zone');
             if(zone) {
                 zone.addEventListener('click', () => document.getElementById('pdf-input').click());
-                
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    zone.addEventListener(eventName, (e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        zone.style.borderColor = '#FFE500';
-                    }, false);
-                });
-
-                ['dragleave', 'drop'].forEach(eventName => {
-                    zone.addEventListener(eventName, (e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        zone.style.borderColor = '#262626';
-                    }, false);
-                });
-
-                zone.addEventListener('drop', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    const f = e.dataTransfer.files[0];
+                ['dragenter', 'dragover'].forEach(e => zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.style.borderColor = '#FFE500'; }, false));
+                ['dragleave', 'drop'].forEach(e => zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.style.borderColor = '#262626'; }, false));
+                zone.addEventListener('drop', (ev) => {
+                    ev.preventDefault(); const f = ev.dataTransfer.files[0];
                     if (f && f.type === "application/pdf") {
-                        extractTextFromPDF(f).then(txt => {
-                            extractedPdfTextState = txt;
-                            zone.className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold";
-                            document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`;
-                        });
-                    } else {
-                        alert("Please drop a valid PDF document file.");
-                    }
+                        extractTextFromPDF(f).then(txt => { extractedPdfTextState = txt; zone.className = "w-full bg-[#0d1a0d] border border-solid border-[#4CAF50] rounded-xl p-8 text-center text-[#4CAF50] text-sm font-bold"; document.getElementById('upload-zone-status').innerHTML = `✓ ${f.name} Ready`; });
+                    } else { alert("Please drop a valid PDF document file."); }
                 });
             }
         });
