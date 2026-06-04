@@ -343,13 +343,25 @@
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
         
         function updateNavbarSessionBadge() {
-            const rem = Math.max(0, 3 - getSessionCount());
-            const target = document.getElementById('navbar-session-status-target');
-            if (!target) return;
-            target.innerHTML = rem === 0 
-                ? `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 px-3 py-1.5 rounded-lg text-white font-bold">🔒 Paywall Active</button>`
-                : `<div class="text-[11px] text-neutral-400 font-mono bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} free sessions left</div>`;
-        }
+    const rem = Math.max(0, 3 - getSessionCount());
+    const target = document.getElementById('navbar-session-status-target');
+    if (!target) return;
+    
+    // Option 1 Implementation: Clean, standard SaaS structural layout
+    if (rem === 0) {
+        target.innerHTML = `
+            <button onclick="openPaywallModal()" class="text-xs bg-[#FFE500] text-black px-4 py-1.5 rounded-xl font-black hover:bg-[#ebd300] transition-colors cursor-pointer shadow-lg shadow-[#FFE500]/10">
+                Upgrade to Pro ⚡
+            </button>
+        `;
+    } else {
+        target.innerHTML = `
+            <button onclick="openPaywallModal()" class="text-sm text-neutral-400 hover:text-neutral-200 font-bold px-3 py-1.5 transition-colors cursor-pointer select-none">
+                Pricing
+            </button>
+        `;
+    }
+}
         function openPaywallModal() { document.getElementById('upgrade-modal').classList.remove('hidden'); }
         function closePaywallModal() { document.getElementById('upgrade-modal').classList.add('hidden'); }
 
