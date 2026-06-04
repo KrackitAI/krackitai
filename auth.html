@@ -46,8 +46,11 @@
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
 
-        // Initialize connection
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        // Initialize connection safely
+        let supabase = null;
+        if (SUPABASE_URL !== 'https://zlzprbespegemxnhwnuu.supabase.co' && SUPABASE_ANON_KEY !== 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ') {
+            supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        }
 
         let currentAuthMode = 'signin'; // Options: 'signin' or 'signup'
 
@@ -55,26 +58,29 @@
             const subtitle = document.getElementById('auth-subtitle');
             const submitBtn = document.getElementById('auth-submit-btn');
             const toggleLink = document.getElementById('auth-toggle-link');
+            const errorBox = document.getElementById('auth-error-box');
             
-            // Safe clear of any past error views
-            document.getElementById('auth-error-box').classList.add('hidden');
+            // Safe clear without breaking code execution if element status shifts
+            if (errorBox) {
+                errorBox.classList.add('hidden');
+            }
 
             if (currentAuthMode === 'signin') {
                 currentAuthMode = 'signup';
-                if(subtitle) subtitle.innerText = "Create an account to begin practicing engineering interviews.";
-                if(submitBtn) submitBtn.innerText = "Create Account ⚡";
-                if(toggleLink) toggleLink.innerText = "Already have an account? Sign in instead";
+                if (subtitle) subtitle.innerText = "Create an account to begin practicing engineering interviews.";
+                if (submitBtn) submitBtn.innerText = "Create Account ⚡";
+                if (toggleLink) toggleLink.innerText = "Already have an account? Sign in instead";
             } else {
                 currentAuthMode = 'signin';
-                if(subtitle) subtitle.innerText = "Sign in to access your interview simulator workspace.";
-                if(submitBtn) submitBtn.innerText = "Sign In to Account →";
-                if(toggleLink) toggleLink.innerText = "Don't have an account? Sign up instead";
+                if (subtitle) subtitle.innerText = "Sign in to access your interview simulator workspace.";
+                if (submitBtn) submitBtn.innerText = "Sign In to Account →";
+                if (toggleLink) toggleLink.innerText = "Don't have an account? Sign up instead";
             }
         }
 
         async function executeAuthenticationAction() {
             if (!supabase) {
-                alert("Database routing error. Please ensure your Supabase URL and keys are set inside the quotes.");
+                alert("Database routing setup mismatch. Please ensure your Supabase URL and public anon keys are pasted inside the strings correctly.");
                 return;
             }
 
@@ -83,11 +89,13 @@
             const errorBox = document.getElementById('auth-error-box');
             const errorMsg = document.getElementById('auth-error-msg');
             
-            errorBox.classList.add('hidden');
+            if (errorBox) errorBox.classList.add('hidden');
 
             if (!email || !password) {
-                errorMsg.innerText = "Please complete all input fields.";
-                errorBox.classList.remove('hidden');
+                if (errorMsg && errorBox) {
+                    errorMsg.innerText = "Please complete all input validation credential fields.";
+                    errorBox.classList.remove('hidden');
+                }
                 return;
             }
 
@@ -98,20 +106,22 @@
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
                     
-                    alert("Registration successful! Check your email inbox to confirm your verification link.");
+                    alert("Registration successful! Check your email inbox to confirm your verification verification link.");
                     currentAuthMode = 'signup';
                     toggleAuthModeLayout();
                 } else {
                     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                     if (error) throw error;
 
-                    // Success bounce back home
+                    // Bounce home seamlessly
                     window.location.href = '/';
                 }
             } catch (err) {
                 console.error("Auth process error:", err);
-                errorMsg.innerText = err.message || "An unexpected error occurred.";
-                errorBox.classList.remove('hidden');
+                if (errorMsg && errorBox) {
+                    errorMsg.innerText = err.message || "An unexpected validation exception happened.";
+                    errorBox.classList.remove('hidden');
+                }
             } finally {
                 document.getElementById('auth-submit-btn').disabled = false;
             }
