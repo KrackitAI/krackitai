@@ -48,7 +48,7 @@
 
         // Initialize connection safely
         let supabase = null;
-        if (SUPABASE_URL !== 'https://zlzprbespegemxnhwnuu.supabase.co' && SUPABASE_ANON_KEY !== 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ') {
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
             supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         }
 
