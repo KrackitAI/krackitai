@@ -61,7 +61,7 @@ Candidate Background Resume: ${resume}
         // We use a high-quality versatile model that can handle changing from text to JSON dynamically
         const chatCompletion = await groq.chat.completions.create({
             messages: apiMessagesPayload,
-            model: "llama-3.3-70b-versatile",
+            model: "llama-3.1-8b-instant",
             temperature: 0.5,
             max_tokens: 1000
         });
