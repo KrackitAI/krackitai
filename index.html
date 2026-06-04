@@ -65,13 +65,74 @@
         </div>
     </nav>
 
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 space-y-6 text-center shadow-2xl">
-            <h3 class="text-2xl font-black text-white">Free Trial Allowance Maxed Out</h3>
-            <p class="text-neutral-400 text-sm">Upgrade to get access to unlimited dynamic real-time adaptive voice interviews.</p>
-            <div class="space-y-3">
-                <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] text-black py-3 rounded-xl font-bold block hover:bg-[#ebd300] transition-colors">Get Pro Plan ($19/mo)</a>
-                <button type="button" onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300">Close</button>
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-2xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
+            
+            <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+
+            <div class="text-center space-y-1">
+                <h3 class="text-2xl font-black tracking-tight text-white">Choose Your Workspace Tier</h3>
+                <p class="text-neutral-400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                
+                <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block">Basic Sandbox</span>
+                            <h4 class="text-xl font-bold text-neutral-300 mt-0.5">Free Account</h4>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-400">
+                            <li class="flex items-center space-x-2">
+                                <span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-[#FFE500]">✓</span> <span>Standard LLM reasoning speeds</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unlimited simulation runtime</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished technical critiques</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">
+                        Continue Practicing
+                    </button>
+                </div>
+
+                <div class="bg-neutral-900 border border-[#FFE500]/30 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.03)]">
+                    <div class="absolute -top-2.5 right-4 bg-[#FFE500] text-black text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full select-none">Recommended</div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
+                            <div class="flex items-baseline space-x-1 mt-0.5">
+                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
+                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-200">
+                            <li class="flex items-center space-x-2">
+                                <span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="text-[#FFE500] font-bold">⚡</span> <span>Detailed deficiency gap logging</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/5">
+                        Upgrade Workspace Now →
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
@@ -133,8 +194,7 @@
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden min-h-[140px] flex flex-col justify-center">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
                 <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
-                <div id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed">
-                    </div>
+                <div id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed"></div>
             </div>
 
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
@@ -198,16 +258,13 @@
     </main>
 
     <script>
+        // IMMUTABLE ENVIRONMENT CONFIGURATION
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
         let supabaseClientInstance = null;
 
         function initializeSecureAccessClient() {
-            if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-                console.warn("🔒 Security Notice: Database variables unassigned. Running layout preview.");
-                return;
-            }
             if (window.supabase) {
                 supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 enforceSecuritySessionWall();
@@ -447,7 +504,6 @@
             incrementSessionCount(); await fetchNextInterviewerTurn();
         }
 
-        // AMBIENT UI UTILITY: Injects a dynamic animated three-dot pulsing chat bubble loader
         function renderAITypingBubble() {
             document.getElementById('sim-active-question-text').innerHTML = `
                 <div class="flex items-center space-x-1.5 py-2 select-none">
@@ -458,7 +514,6 @@
             `;
         }
 
-        // HUD UTILITY: Updates character counters dynamically on human keypress events
         function triggerLiveCounterUpdate(val) {
             const label = document.getElementById('response-char-counter');
             if (label) label.innerText = `${val.length} characters written`;
@@ -467,8 +522,6 @@
         async function fetchNextInterviewerTurn() {
             document.getElementById('sim-status-indicator').innerText = "Interviewer is analyzing profile...";
             document.getElementById('submit-turn-btn').disabled = true;
-            
-            // INJECT: Turn on the dynamic pulsing loader bubble inside the interface container
             renderAITypingBubble();
 
             try {
@@ -516,10 +569,7 @@
 
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
-            
-            // Reset character counter back to baseline
             triggerLiveCounterUpdate('');
-
             await fetchNextInterviewerTurn();
         }
 
@@ -579,16 +629,12 @@
             document.getElementById('overlay-submit-signin-btn').addEventListener('click', () => executeOverlayAuthAction('signin'));
             document.getElementById('overlay-submit-signup-btn').addEventListener('click', () => executeOverlayAuthAction('signup'));
 
-            // HARDWIRED UX INTERCEPTORS: Controls real-time character counting and hotkey submissions
             const responseInputArea = document.getElementById('sim-user-response-box');
             if (responseInputArea) {
-                // Keyup listener drives the live character counter array metrics
                 responseInputArea.addEventListener('keyup', (e) => triggerLiveCounterUpdate(e.target.value));
-
-                // Keydown interceptor captures Ctrl + Enter commands to ship answer packets
                 responseInputArea.addEventListener('keydown', (e) => {
                     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                        e.preventDefault(); // Blocks carriage return line break execution
+                        e.preventDefault();
                         submitCandidateResponseTurn();
                     }
                 });
