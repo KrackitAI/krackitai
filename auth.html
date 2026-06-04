@@ -10,67 +10,53 @@
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased flex items-center justify-center p-4">
 
     <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl">
-        
         <div class="text-center space-y-1 select-none">
             <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
             <p class="text-neutral-400 text-xs">Dynamic Mock Interview Engineering Workspace</p>
         </div>
 
         <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
-            <button id="tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">
-                Sign In
-            </button>
-            <button id="tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">
-                Sign Up / Register
-            </button>
+            <button id="tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">Sign In</button>
+            <button id="tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">Sign Up / Register</button>
         </div>
 
         <div id="auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
-            <span id="auth-error-msg">Error alert string placeholder.</span>
+            <span id="auth-error-msg"></span>
         </div>
 
         <div class="space-y-4">
             <div class="space-y-1.5">
                 <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
-                <input type="email" id="auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+                <input type="email" id="auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500]">
             </div>
             <div class="space-y-1.5">
                 <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
-                <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+                <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500]">
             </div>
 
             <div id="form-action-signin-container" class="block">
-                <button id="submit-signin-btn" type="button" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
-                    Sign In to Account →
-                </button>
+                <button id="submit-signin-btn" type="button" class="w-full bg-[#FFE500] text-black font-black py-3.5 rounded-xl text-sm tracking-wide cursor-pointer">Sign In to Account →</button>
             </div>
-
             <div id="form-action-signup-container" class="hidden">
-                <button id="submit-signup-btn" type="button" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">
-                    Create New Account ⚡
-                </button>
+                <button id="submit-signup-btn" type="button" class="w-full bg-white text-black font-black py-3.5 rounded-xl text-sm tracking-wide cursor-pointer">Create New Account ⚡</button>
             </div>
         </div>
-
     </div>
 
     <script>
-        // CONFIGURATION: Paste your actual Supabase credentials here inside the single quotes
+        // CONFIGURATION: Put keys inside single quotes
         const DB_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const DB_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
 
-        // Direct single-line declaration. No nested if-statements, no variable re-declarations.
-        const supabase = (DB_URL !== 'YOUR_SUPABASE_URL') ? window.supabase.createClient(DB_URL, DB_KEY) : null;
+        // ONLY ONE DECLARATION FOR THE SCRIPT
+        const supabaseClient = (DB_URL !== 'YOUR_SUPABASE_URL') ? window.supabase.createClient(DB_URL, DB_KEY) : null;
 
-        // VISUAL VIEW LAYER ROUTER: Handles sliding layouts smoothly
         function switchAuthViewMode(targetMode) {
             const btnSignIn = document.getElementById('tab-signin-btn');
             const btnSignUp = document.getElementById('tab-signup-btn');
             const formSignIn = document.getElementById('form-action-signin-container');
             const formSignUp = document.getElementById('form-action-signup-container');
-            const errorBox = document.getElementById('auth-error-box');
-
-            if (errorBox) errorBox.classList.add('hidden');
+            if (document.getElementById('auth-error-box')) document.getElementById('auth-error-box').classList.add('hidden');
 
             if (targetMode === 'signin') {
                 if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
@@ -85,70 +71,48 @@
             }
         }
 
-        // DATABASE TRANSIT GATEWAY
         async function executeAuthenticationAction(actionType) {
-            if (!supabase) {
-                alert("Database Client Not Initialized. Make sure you replaced YOUR_SUPABASE_URL and YOUR_SUPABASE_ANON_KEY configuration strings.");
+            if (!supabaseClient) {
+                alert("Database keys missing.");
                 return;
             }
-
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value.trim();
             const errorBox = document.getElementById('auth-error-box');
             const errorMsg = document.getElementById('auth-error-msg');
-            
             if (errorBox) errorBox.classList.add('hidden');
 
             if (!email || !password) {
-                if (errorMsg && errorBox) {
-                    errorMsg.innerText = "Please complete both your email and password fields.";
-                    errorBox.classList.remove('hidden');
-                }
+                if (errorMsg && errorBox) { errorMsg.innerText = "Please fill out all fields."; errorBox.classList.remove('hidden'); }
                 return;
             }
 
             try {
                 if (actionType === 'signup') {
-                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    const { data, error } = await supabaseClient.auth.signUp({ email, password });
                     if (error) throw error;
-                    
-                    alert("Registration Successful!\n\nSwitching to Sign In tab. You can now log in directly.");
+                    alert("Registration Successful! Try logging in.");
                     switchAuthViewMode('signin');
                 } else {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (error) throw error;
-
                     window.location.href = '/';
                 }
             } catch (err) {
-                console.error("Authentication Process Error:", err);
-                if (errorMsg && errorBox) {
-                    errorMsg.innerText = err.message || "Network request failed.";
-                    errorBox.classList.remove('hidden');
-                }
+                console.error(err);
+                if (errorMsg && errorBox) { errorMsg.innerText = err.message || "Error."; errorBox.classList.remove('hidden'); }
             }
         }
 
-        // HARDWIRED EVENT REGISTRATIONS
         window.addEventListener('DOMContentLoaded', async () => {
-            const btnSignIn = document.getElementById('tab-signin-btn');
-            const btnSignUp = document.getElementById('tab-signup-btn');
-            
-            if (btnSignIn) btnSignIn.addEventListener('click', () => switchAuthViewMode('signin'));
-            if (btnSignUp) btnSignUp.addEventListener('click', () => switchAuthViewMode('signup'));
+            document.getElementById('tab-signin-btn').addEventListener('click', () => switchAuthViewMode('signin'));
+            document.getElementById('tab-signup-btn').addEventListener('click', () => switchAuthViewMode('signup'));
+            document.getElementById('submit-signin-btn').addEventListener('click', () => executeAuthenticationAction('signin'));
+            document.getElementById('submit-signup-btn').addEventListener('click', () => executeAuthenticationAction('signup'));
 
-            const submitSignIn = document.getElementById('submit-signin-btn');
-            const submitSignUp = document.getElementById('submit-signup-btn');
-
-            if (submitSignIn) submitSignIn.addEventListener('click', () => executeAuthenticationAction('signin'));
-            if (submitSignUp) submitSignUp.addEventListener('click', () => executeAuthenticationAction('signup'));
-
-            // Auto-redirect tracking session logic
-            if (!supabase) return;
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                window.location.href = '/';
-            }
+            if (!supabaseClient) return;
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) window.location.href = '/';
         });
     </script>
 </body>
