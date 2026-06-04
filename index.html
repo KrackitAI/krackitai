@@ -18,12 +18,11 @@
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
 
-    <!-- INLINE AUTH WALL GATING CONTAINER: Blurs and covers workspace if user is anonymous -->
+    <!-- INLINE AUTH WALL GATING CONTAINER: Stays hidden by default until a nav item is clicked -->
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
-        <!-- Added relative class to handle positioning of the absolute close action -->
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
             
-            <!-- CLOSE ACTION BUTTON: Allows visitors to dismiss the interface layout and view your app preview -->
+            <!-- CLOSE ACTION BUTTON -->
             <button type="button" onclick="closeInlineAuthWall()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1 select-none">
@@ -206,7 +205,7 @@
     </main>
 
     <script>
-        // CONFIGURATION: Mirror your exact Supabase Dashboard credential properties here
+        // CONFIGURATION: Replace with your actual Supabase metrics here inside single quotes
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
@@ -231,8 +230,8 @@
                 const profileHolder = document.getElementById('navbar-user-profile-holder');
 
                 if (!session) {
-                    // Reveal overlay blur wall on default land
-                    if (overlayWall) overlayWall.classList.remove('hidden');
+                    // FIXED: Removed the forced classList.remove('hidden') on default page land.
+                    // The platform now opens completely clean.
                     if (profileHolder) {
                         profileHolder.innerHTML = `
                             <button onclick="triggerInlineAuthWall('signin')" class="text-neutral-400 hover:text-white font-bold px-3 py-1.5 transition-colors cursor-pointer">Login</button>
@@ -254,14 +253,14 @@
             }
         }
 
-        // TRIGGER CONTROL LAYER: Opens modal screen from top navbar selectors smoothly
+        // TRIGGER CONTROL LAYER: Explicitly called by navbar selectors
         function triggerInlineAuthWall(mode) {
             const overlayWall = document.getElementById('homepage-secure-overlay-wall');
             if (overlayWall) overlayWall.classList.remove('hidden');
             switchOverlayAuthViewMode(mode);
         }
 
-        // CLOSE INTERFACE: Dismisses overlay display frame allowing raw interface layout evaluation
+        // CLOSE INTERFACE: Dismisses overlay display frame
         function closeInlineAuthWall() {
             const overlayWall = document.getElementById('homepage-secure-overlay-wall');
             if (overlayWall) overlayWall.classList.add('hidden');
@@ -442,14 +441,13 @@
         }
 
         async function startLiveSimulation() {
-            // Safety block to prevent access if database session client instance is empty/unauthenticated
-            if (!supabaseClientInstance || !supabaseClientInstance.auth.session) {
-                 const overlayWall = document.getElementById('homepage-secure-overlay-wall');
-                 if (overlayWall) {
-                     overlayWall.classList.remove('hidden');
-                     switchOverlayAuthViewMode('signin');
-                     return;
-                 }
+            // Safety guard to intercept button action if user is unauthenticated
+            if (supabaseClientInstance) {
+                const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                if (!session) {
+                    triggerInlineAuthWall('signin');
+                    return;
+                }
             }
             if (getSessionCount() >= 3) { openPaywallModal(); return; }
             globalJobDescContext = document.getElementById('job-desc-input').value.trim();
