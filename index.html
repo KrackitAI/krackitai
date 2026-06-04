@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <!-- FIXED GLOBAL NAVIGATION BAR -->
+    <!-- GLOBAL APP TOP NAVIGATION BAR -->
     <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50 select-none">
         <!-- Left Side: Brand & Workspace Toggles -->
         <div class="flex items-center space-x-8">
@@ -71,11 +71,11 @@
             </div>
         </div>
         
-        <!-- Right Side: Explicitly Splitting the Targets to Avoid JavaScript Crashes -->
+        <!-- Right Side: Split Asset Mounting Anchors -->
         <div class="flex items-center space-x-6">
             <div id="navbar-session-status-target" class="flex items-center"></div>
             <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs">
-                <!-- Fallback triggers rendered by initializeSecureAccessClient logic -->
+                <!-- Profile elements painted directly via auth session queries -->
             </div>
         </div>
     </nav>
@@ -131,22 +131,24 @@
             </div>
         </div>
     </div>
-    <!-- PAST SESSIONS HISTORY DRAWER OVERLAY -->
+
+    <!-- WIDENED COMPREHENSIVE PAST SESSIONS SLIDING OVERLAY DRAWER -->
     <div id="history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-end">
-        <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-lg h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between">
+        <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between">
             <div class="space-y-6">
                 <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
                     <div>
                         <h3 class="text-xl font-black text-white">Your Practice History</h3>
-                        <p class="text-neutral-500 text-xs">Review past architectural critiques and scores.</p>
+                        <p class="text-neutral-500 text-xs">Review past architectural critiques and performance logs.</p>
                     </div>
                     <button type="button" onclick="closeHistoryModal()" class="text-neutral-500 hover:text-white font-mono text-sm font-bold cursor-pointer select-none">✕ Close</button>
                 </div>
-                <!-- Dynamic Target Element for History Rows -->
+                <!-- Interactive Accordion Append Target -->
                 <div id="history-rows-container" class="space-y-3"></div>
             </div>
         </div>
     </div>
+
     <!-- Main Dynamic Content Workspace Wrapper -->
     <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
 
@@ -496,82 +498,7 @@
             }
             return text.trim();
         }
-        // Open the History Modal and trigger the database fetch request
-        async function revealPastSessionsModal() {
-            if (!supabaseClientInstance) return;
-            const { data: { session } } = await supabaseClientInstance.auth.getSession();
-            if (!session) { triggerInlineAuthWall('signin'); return; }
 
-            document.getElementById('history-modal').classList.remove('hidden');
-            const container = document.getElementById('history-rows-container');
-            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Querying session ledger rows...</p>`;
-
-            try {
-                const { data, error } = await supabaseClientInstance
-                    .from('interview_sessions')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    container.innerHTML = `<p class="text-xs text-neutral-600 font-medium italic">No past simulation logs found on profile.</p>`;
-                    return;
-                }
-
-                container.innerHTML = '';
-                data.forEach(row => {
-                    const dateStr = new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-                    const passed = row.verdict.toUpperCase().includes('PASS');
-                    
-                    container.innerHTML += `
-                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl p-4 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-mono font-bold text-neutral-500">${dateStr}</span>
-                                <span class="text-[10px] font-black px-2 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/50' : 'bg-rose-950/60 text-rose-400 border border-rose-900/50'}">${row.verdict}</span>
-                            </div>
-                            <div class="flex items-baseline justify-between">
-                                <h4 class="text-sm font-bold text-neutral-200 truncate pr-4 max-w-[280px]">Job Description Profile Context</h4>
-                                <span class="text-lg font-black text-white font-mono">${row.score}<span class="text-[10px] text-neutral-500 font-normal">/100</span></span>
-                            </div>
-                            <p class="text-xs text-neutral-400 line-clamp-2 italic font-medium">"${row.brutallyHonestReview}"</p>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                container.innerHTML = `<p class="text-xs text-rose-400 font-mono">Error querying data: ${err.message}</p>`;
-            }
-        }
-
-        function closeHistoryModal() {
-            document.getElementById('history-modal').classList.add('hidden');
-        }
-
-        // Save session record straight to Supabase when evaluation payload returns
-        async function commitSessionToDatabaseHistory(reportPayload) {
-            if (!supabaseClientInstance || !reportPayload) return;
-            try {
-                const { data: { session } } = await supabaseClientInstance.auth.getSession();
-                if (!session) return;
-
-                const { error } = await supabaseClientInstance
-                    .from('interview_sessions')
-                    .insert([{
-                        user_id: session.user.id,
-                        job_description: globalJobDescContext,
-                        resume_context: globalResumeContext,
-                        score: reportPayload.score || 0,
-                        verdict: reportPayload.verdict || "REJECTED",
-                        brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
-                        gaps_to_fix: reportPayload.gapsToFix || [],
-                        transcript: runningChatHistoryLedger || []
-                    }]);
-
-                if (error) console.error("Database persistence fault:", error.message);
-            } catch (err) {
-                console.error("Exception handling history sync:", err);
-            }
-        }
         function switchUploadMode(mode) {
             currentUploadMode = mode;
             document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
@@ -621,6 +548,143 @@
                     alert("Engine failed processing PDF context structure: " + err.message);
                     resetFileSelectionState();
                 });
+            }
+        }
+
+        // ================= NEW WORKSPACE HISTORY AND ACCORDION ENGINE MIGRATIONS =================
+        async function revealPastSessionsModal() {
+            if (!supabaseClientInstance) return;
+            const { data: { session } } = await supabaseClientInstance.auth.getSession();
+            if (!session) { triggerInlineAuthWall('signin'); return; }
+
+            document.getElementById('history-modal').classList.remove('hidden');
+            const container = document.getElementById('history-rows-container');
+            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Querying comprehensive session logs...</p>`;
+
+            try {
+                const { data, error } = await supabaseClientInstance
+                    .from('interview_sessions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `<p class="text-xs text-neutral-600 font-medium italic">No past simulation logs found on profile.</p>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach((row, idx) => {
+                    const dateStr = new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                    const verdictStr = (row.verdict || "REJECTED").toUpperCase();
+                    const passed = verdictStr.includes('PASS');
+                    
+                    const gaps = Array.isArray(row.gaps_to_fix) ? row.gaps_to_fix : [];
+                    const transcriptDeck = Array.isArray(row.transcript) ? row.transcript : [];
+
+                    let gapsHtml = '';
+                    if (gaps.length > 0) {
+                        gaps.forEach(g => { gapsHtml += `<li class="flex items-start space-x-1.5"><span class="text-rose-500 font-bold">✕</span><span>${g}</span></li>`; });
+                    } else { gapsHtml = `<li class="text-neutral-500 italic">No structural gaps recorded.</li>`; }
+
+                    let transcriptHtml = '';
+                    let questionBuffer = '';
+                    transcriptDeck.forEach(msg => {
+                        if (msg.role === 'assistant') { questionBuffer = msg.content; }
+                        else if (msg.role === 'user' && questionBuffer) {
+                            transcriptHtml += `
+                                <div class="bg-neutral-950 p-3 rounded-lg border border-neutral-900 space-y-2">
+                                    <p class="text-[10px] font-mono text-neutral-500 font-bold uppercase">Parameter Asked:</p>
+                                    <p class="text-xs text-neutral-300 font-bold leading-relaxed">${questionBuffer}</p>
+                                    <div class="bg-neutral-900/50 p-2.5 rounded border border-neutral-800">
+                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Registered Input:</p>
+                                        <p class="text-xs text-neutral-400 font-normal leading-relaxed mt-0.5">${msg.content}</p>
+                                    </div>
+                                </div>`;
+                        }
+                    });
+
+                    container.innerHTML += `
+                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl transition-all overflow-hidden">
+                            <div onclick="toggleHistoryItemAccordion(${idx})" class="p-4 flex items-center justify-between cursor-pointer hover:bg-neutral-900/80 transition-colors select-none">
+                                <div class="space-y-1 min-w-0 pr-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-[10px] font-mono font-bold text-neutral-500">${dateStr}</span>
+                                        <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/30' : 'bg-rose-950/60 text-rose-400 border border-rose-900/30'}">${verdictStr}</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]">Job Simulation Record</h4>
+                                </div>
+                                <div class="flex items-center space-x-3 font-mono">
+                                    <span class="text-base font-black text-white">${row.score}<span class="text-[10px] text-neutral-500 font-normal">/100</span></span>
+                                    <span id="history-arrow-${idx}" class="text-neutral-500 text-xs transition-transform duration-200">▼</span>
+                                </div>
+                            </div>
+
+                            <div id="history-body-${idx}" class="hidden border-t border-neutral-900 p-4 bg-neutral-950/50 space-y-4 text-xs">
+                                <div class="space-y-1 relative pl-3 border-l-2 ${passed ? 'border-emerald-500' : 'border-rose-500'}">
+                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Unvarnished AI Critique:</h5>
+                                    <p class="text-neutral-300 font-medium italic leading-relaxed">"${row.brutally_honest_review}"</p>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Deficiencies To Remediate:</h5>
+                                    <ul class="space-y-1 text-neutral-400">${gapsHtml}</ul>
+                                </div>
+
+                                <div class="space-y-2 pt-2 border-t border-neutral-900">
+                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Interaction Timeline:</h5>
+                                    <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">${transcriptHtml || '<p class="text-neutral-600 italic">No timeline entries generated.</p>'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                container.innerHTML = `<p class="text-xs text-rose-400 font-mono">Error querying data: ${err.message}</p>`;
+            }
+        }
+
+        function toggleHistoryItemAccordion(index) {
+            const body = document.getElementById(`history-body-${index}`);
+            const arrow = document.getElementById(`history-arrow-${index}`);
+            if (!body || !arrow) return;
+
+            if (body.classList.contains('hidden')) {
+                body.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+                arrow.style.color = '#fff';
+            } else {
+                body.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                arrow.style.color = '#737373';
+            }
+        }
+
+        function closeHistoryModal() { document.getElementById('history-modal').classList.add('hidden'); }
+
+        async function commitSessionToDatabaseHistory(reportPayload) {
+            if (!supabaseClientInstance || !reportPayload) return;
+            try {
+                const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                if (!session) return;
+
+                const { error } = await supabaseClientInstance
+                    .from('interview_sessions')
+                    .insert([{
+                        user_id: session.user.id,
+                        job_description: globalJobDescContext,
+                        resume_context: globalResumeContext,
+                        score: reportPayload.score || 0,
+                        verdict: reportPayload.verdict || "REJECTED",
+                        brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
+                        gaps_to_fix: reportPayload.gapsToFix || [],
+                        transcript: runningChatHistoryLedger || []
+                    }]);
+
+                if (error) console.error("Database persistence fault:", error.message);
+            } catch (err) {
+                console.error("Exception handling history sync:", err);
             }
         }
 
@@ -716,6 +780,7 @@
         function finishAndWrapInterview() {
             if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
+            
             if (latestEvaluationReportCache) {
                 const report = latestEvaluationReportCache;
                 document.getElementById('report-score-target').innerText = report.score || 0;
