@@ -156,7 +156,7 @@
     </main>
 
     <script>
-        // CONFIGURATION: Replace these values with your actual keys from the Supabase Dashboard
+        // CONFIGURATION: Mirror your exact Supabase Dashboard credential properties here
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
@@ -258,6 +258,7 @@
             }
         }
 
+        // High-Quality Client Hardware Voice-Synthesis Utterance Picker Fallback Matrix
         function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
             window.speechSynthesis.cancel();
@@ -274,6 +275,10 @@
             if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
             speech.rate = 0.96;
             window.speechSynthesis.speak(speech);
+        }
+
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
         }
 
         async function extractTextFromPDF(file) {
@@ -441,13 +446,13 @@
             showScreen('results-screen');
         }
 
-        // Global Event Wireup execution
+        // Global Event Wireup execution on page instantiation load
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
             initializeSecureAccessClient();
 
-            // Drag and drop setup handles
+            // Drag and drop event tracking attachments
             const zone = document.getElementById('resume-upload-zone');
             if(zone) {
                 zone.addEventListener('click', () => document.getElementById('pdf-input').click());
