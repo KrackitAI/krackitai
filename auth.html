@@ -59,13 +59,13 @@
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
 
-        // Initialize secure connectivity client channels safely
+        // FIXED INITIALIZATION: Removed duplicate 'let' or 'const' declarations to stop the compiler crash
         let supabase = null;
         if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
             supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         }
 
-        // VISUAL VIEW LAYER ROUTER: Swaps layouts directly using CSS classes
+        // VISUAL VIEW LAYER ROUTER: Swaps layout states smoothly
         function switchAuthViewMode(targetMode) {
             const btnSignIn = document.getElementById('tab-signin-btn');
             const btnSignUp = document.getElementById('tab-signup-btn');
