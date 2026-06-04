@@ -612,9 +612,11 @@
                 if (alertBox) alertBox.classList.remove('hidden');
 
             } catch (err) {
-                console.error(err);
-                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
-            }
+               console.error(err);
+                // FORCE THE BROWSER TO TELL US THE EXACT PROBLEM
+                alert("CRITICAL DETECTED FAULT: " + err.message);
+                
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`; }
         }
 
         async function revealPastSessionsModal() {
