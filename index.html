@@ -156,10 +156,9 @@
                         </div>
                     </div>
 
-                    <!-- NEW DYNAMIC DOCUMENT METADATA PREVIEW CARD (Hidden by default) -->
+                    <!-- DYNAMIC DOCUMENT METADATA PREVIEW CARD -->
                     <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex items-center justify-between shadow-inner">
                         <div class="flex items-center space-x-3 min-w-0">
-                            <!-- Minimalist Document Vector Icon -->
                             <div class="bg-neutral-900 text-[#FFE500] p-2.5 rounded-lg border border-neutral-800 select-none">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             </div>
@@ -481,7 +480,6 @@
             document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
             
             if (mode === 'upload') {
-                // Return to dropzone or custom card block state based on string presence
                 if (extractedPdfTextState) {
                     document.getElementById('resume-file-card-preview').classList.remove('hidden');
                     document.getElementById('resume-upload-zone').classList.add('hidden');
@@ -497,13 +495,11 @@
             }
         }
 
-        // DISMISS ENGINE RESET: Safely clears the memory array states and returns to default upload box
         function resetFileSelectionState() {
             extractedPdfTextState = '';
-            document.getElementById('pdf-input').value = ''; // Empty raw element value
+            document.getElementById('pdf-input').value = '';
             document.getElementById('resume-file-card-preview').classList.add('hidden');
             
-            // Restore default dashboard drag container metrics
             const zone = document.getElementById('resume-upload-zone');
             zone.className = "w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all";
             document.getElementById('upload-zone-status').innerHTML = `
@@ -516,13 +512,10 @@
         function handleFileSelection(e) {
             const f = e.target.files[0];
             if(f) {
-                // Ingest process animation block trigger
                 document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning context vectors...</p>`;
                 
                 extractTextFromPDF(f).then(txt => {
                     extractedPdfTextState = txt;
-                    
-                    // Reveal high-end Document Metadata pill and collapse raw drop zone
                     document.getElementById('preview-file-title').innerText = f.name;
                     document.getElementById('resume-upload-zone').classList.add('hidden');
                     document.getElementById('resume-file-card-preview').classList.remove('hidden');
@@ -697,7 +690,6 @@
                 zone.addEventListener('drop', (ev) => {
                     ev.preventDefault(); const f = ev.dataTransfer.files[0];
                     if (f && f.type === "application/pdf") {
-                        // Display vector scanning indicator inside default container state bounds
                         document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning drop matrices...</p>`;
                         
                         extractTextFromPDF(f).then(txt => {
