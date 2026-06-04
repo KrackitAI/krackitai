@@ -3,333 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krackit - Adaptive AI Interview Coach</title>
+    <title>Krackit - Secure Access Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
+<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased flex items-center justify-center p-4">
 
-    <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
-        <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer select-none">
-            <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl">
+        <div class="text-center space-y-1 select-none">
+            <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
+            <p class="text-neutral-400 text-xs">Dynamic Mock Interview Engineering Workspace</p>
         </div>
-        
-        <div class="flex items-center space-x-4">
-            <div id="navbar-session-status-target"></div>
-            
-            <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs">
-                </div>
-        </div>
-    </nav>
 
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 space-y-6 text-center shadow-2xl">
-            <h3 class="text-2xl font-black text-white">Free Trial Allowance Maxed Out</h3>
-            <p class="text-neutral-400 text-sm">Upgrade to get access to unlimited dynamic real-time adaptive voice interviews.</p>
-            <div class="space-y-3">
-                <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] text-black py-3 rounded-xl font-bold block hover:bg-[#ebd300] transition-colors">Get Pro Plan ($19/mo)</a>
-                <button onclick="closePaywallModal()" class="text-xs text-neutral-500 hover:text-neutral-300">Close</button>
+        <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
+            <button id="tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">Sign In</button>
+            <button id="tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">Sign Up / Register</button>
+        </div>
+
+        <div id="auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
+            <span id="auth-error-msg"></span>
+        </div>
+
+        <div class="space-y-4">
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
+                <input type="email" id="auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500]">
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
+                <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500]">
+            </div>
+
+            <div id="form-action-signin-container" class="block">
+                <button id="submit-signin-btn" type="button" class="w-full bg-[#FFE500] text-black font-black py-3.5 rounded-xl text-sm tracking-wide cursor-pointer">Sign In to Account →</button>
+            </div>
+            <div id="form-action-signup-container" class="hidden">
+                <button id="submit-signup-btn" type="button" class="w-full bg-white text-black font-black py-3.5 rounded-xl text-sm tracking-wide cursor-pointer">Create New Account ⚡</button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
-
-        <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
-            <div class="text-center space-y-2">
-                <h2 class="text-4xl font-black tracking-tight">Setup Interview Environment</h2>
-                <p class="text-neutral-400 text-sm">Provide your target job context to initialize an adaptive premium voice or text session.</p>
-            </div>
-
-            <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
-                    <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description details here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
-                </div>
-
-                <div class="space-y-2.5">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Your Background Profile</label>
-                    <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
-                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">📁 Upload PDF</button>
-                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
-                    </div>
-
-                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all">
-                        <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
-                        <div id="upload-zone-status" class="space-y-1">
-                            <p class="text-sm font-bold text-neutral-200">Drop resume PDF file here</p>
-                            <p class="text-xs text-neutral-500">or click to browse local files (Max 5MB)</p>
-                        </div>
-                    </div>
-
-                    <div id="resume-paste-zone" class="hidden">
-                        <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
-                    </div>
-                </div>
-
-                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 flex items-center justify-between">
-                    <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
-                    <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
-                </div>
-
-                <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">
-                    Start Dynamic Mock Interview ⚡
-                </button>
-            </div>
-        </div>
-
-        <div id="simulator-screen" class="hidden space-y-6">
-            <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
-                <div>
-                    <h3 class="text-2xl font-black text-white">Live AI Interview Panel</h3>
-                    <p class="text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is gathering data matrices...</p>
-                </div>
-                <button onclick="finishAndWrapInterview()" class="text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-2 rounded-xl font-bold transition-all">
-                    🏁 Cancel Session
-                </button>
-            </div>
-
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
-                <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
-                <h4 id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed">
-                    Initializing digital handshake channels...
-                </h4>
-            </div>
-
-            <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Your Response Turn</label>
-                    <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
-                        <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
-                        <span id="mic-action-label">🎤 Speak Answer</span>
-                    </button>
-                </div>
-
-                <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or click 'Speak Answer' to speak out loud..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
-
-                <div class="flex justify-end">
-                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md transition-all">
-                        Submit Answer →
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="results-screen" class="hidden space-y-8">
-            <div class="border-b border-neutral-900 pb-5 text-center">
-                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
-                <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Overall Rating</span>
-                    <h3 class="text-5xl font-black text-white" id="report-score-target">0</h3>
-                    <span class="text-xs font-medium text-neutral-400 block">out of 100 points</span>
-                </div>
-                <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center flex flex-col justify-center items-center space-y-2 col-span-2">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Decision Verdict</span>
-                    <div id="report-verdict-badge" class="px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide">PENDING</div>
-                </div>
-            </div>
-
-            <div class="bg-neutral-900/20 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-red-500" id="report-accent-bar"></div>
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Unvarnished Technical Critique:</h4>
-                <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">Analyzing response logs...</blockquote>
-            </div>
-
-            <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
-                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
-            </div>
-            
-            <div class="border-t border-neutral-900 pt-6">
-                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
-                <div class="space-y-4" id="transcript-deck-target"></div>
-            </div>
-            
-            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">Return to Entry Screen</button>
-        </div>
-
-    </main>
-
     <script>
-        // CONFIGURATION: Replace with your actual Supabase credentials inside the single quotes
-        const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
-        
-        let supabaseClientInstance = null;
+        // CONFIGURATION: Put keys inside single quotes
+        const DB_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
+        const DB_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
 
-        function initializeSecureAccessClient() {
-            if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-                console.warn("🔒 Running local bypass mode without active keys.");
+        // ONLY ONE DECLARATION FOR THE SCRIPT
+        const supabaseClient = (DB_URL !== 'YOUR_SUPABASE_URL') ? window.supabase.createClient(DB_URL, DB_KEY) : null;
+
+        function switchAuthViewMode(targetMode) {
+            const btnSignIn = document.getElementById('tab-signin-btn');
+            const btnSignUp = document.getElementById('tab-signup-btn');
+            const formSignIn = document.getElementById('form-action-signin-container');
+            const formSignUp = document.getElementById('form-action-signup-container');
+            if (document.getElementById('auth-error-box')) document.getElementById('auth-error-box').classList.add('hidden');
+
+            if (targetMode === 'signin') {
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignIn) formSignIn.className = "block";
+                if (formSignUp) formSignUp.className = "hidden";
+            } else {
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (formSignUp) formSignUp.className = "block";
+                if (formSignIn) formSignIn.className = "hidden";
+            }
+        }
+
+        async function executeAuthenticationAction(actionType) {
+            if (!supabaseClient) {
+                alert("Database keys missing.");
                 return;
             }
-            if (window.supabase) {
-                supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                enforceSecuritySessionWall();
-            }
-        }
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const errorBox = document.getElementById('auth-error-box');
+            const errorMsg = document.getElementById('auth-error-msg');
+            if (errorBox) errorBox.classList.add('hidden');
 
-        async function enforceSecuritySessionWall() {
-            if (!supabaseClientInstance) return;
+            if (!email || !password) {
+                if (errorMsg && errorBox) { errorMsg.innerText = "Please fill out all fields."; errorBox.classList.remove('hidden'); }
+                return;
+            }
+
             try {
-                const { data: { session } } = await supabaseClientInstance.auth.getSession();
-                if (!session) {
-                    window.location.href = '/auth.html';
+                if (actionType === 'signup') {
+                    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                    if (error) throw error;
+                    alert("Registration Successful! Try logging in.");
+                    switchAuthViewMode('signin');
                 } else {
-                    // Injecting user profile elements natively into the Header
-                    const email = session.user.email;
-                    const profileHolder = document.getElementById('navbar-user-profile-holder');
-                    if (profileHolder) {
-                        profileHolder.innerHTML = `
-                            <span class="text-neutral-400 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-xl font-mono select-none">${email}</span>
-                            <button onclick="triggerUserLogoutPipeline()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer transition-colors">Logout</button>
-                        `;
-                    }
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    window.location.href = '/';
                 }
             } catch (err) {
-                console.error("Auth layout sync failure:", err);
+                console.error(err);
+                if (errorMsg && errorBox) { errorMsg.innerText = err.message || "Error."; errorBox.classList.remove('hidden'); }
             }
         }
 
-        // LOGOUT SERVICE PIPELINE CHANNEL
-        async function triggerUserLogoutPipeline() {
-            if (!supabaseClientInstance) return;
-            try {
-                const { error } = await supabaseClientInstance.auth.signOut();
-                if (error) throw error;
-                window.location.href = '/auth.html';
-            } catch (err) {
-                alert("Error during sign out execution: " + err.message);
-            }
-        }
+        window.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('tab-signin-btn').addEventListener('click', () => switchAuthViewMode('signin'));
+            document.getElementById('tab-signup-btn').addEventListener('click', () => switchAuthViewMode('signup'));
+            document.getElementById('submit-signin-btn').addEventListener('click', () => executeAuthenticationAction('signin'));
+            document.getElementById('submit-signup-btn').addEventListener('click', () => executeAuthenticationAction('signup'));
 
-        let currentUploadMode = 'upload';
-        let extractedPdfTextState = '';
-        
-        let runningChatHistoryLedger = [];
-        let globalJobDescContext = '';
-        let globalResumeContext = '';
-
-        let speechRecognitionEngine = null;
-        let isMicrophoneListening = false;
-        let latestEvaluationReportCache = null;
-
-        function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
-        function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
-        
-        function updateNavbarSessionBadge() {
-            const rem = Math.max(0, 3 - getSessionCount());
-            const target = document.getElementById('navbar-session-status-target');
-            if (!target) return;
-            
-            target.innerHTML = rem === 0 
-                ? `<button onclick="openPaywallModal()" class="text-xs bg-rose-600 px-3 py-1.5 rounded-lg text-white font-bold">🔒 Paywall Active</button>`
-                : `<div class="text-[11px] text-neutral-400 font-mono bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800">⚡ ${rem} free sessions left</div>`;
-        }
-        function openPaywallModal() { document.getElementById('upgrade-modal').classList.remove('hidden'); }
-        function closePaywallModal() { document.getElementById('upgrade-modal').classList.add('hidden'); }
-
-        function initSpeechFramework() {
-            const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SpeechObj) return null;
-            
-            const instance = new SpeechObj();
-            instance.continuous = true;
-            instance.interimResults = true;
-            instance.lang = 'en-US';
-
-            instance.onstart = () => {
-                isMicrophoneListening = true;
-                const btn = document.getElementById('mic-toggle-btn');
-                const lbl = document.getElementById('mic-action-label');
-                if (btn && lbl) {
-                    btn.className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
-                    lbl.innerText = "Listening... Click to Pause";
-                }
-            };
-
-            instance.onend = () => {
-                isMicrophoneListening = false;
-                const btn = document.getElementById('mic-toggle-btn');
-                const lbl = document.getElementById('mic-action-label');
-                if (btn && lbl) {
-                    btn.className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
-                    lbl.innerText = "🎤 Speak Answer";
-                }
-            };
-
-            instance.onresult = (e) => {
-                let textBuffer = '';
-                for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) textBuffer += e.results[i][0].transcript;
-                }
-                if(textBuffer) {
-                    document.getElementById('sim-user-response-box').value += (document.getElementById('sim-user-response-box').value ? ' ' : '') + textBuffer;
-                }
-            };
-            return instance;
-        }
-
-        function toggleVoiceSpeechInput() {
-            if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
-            if(!isMicrophoneListening) {
-                try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); }
-            } else {
-                speechRecognitionEngine.stop();
-            }
-        }
-
-        function speakTextAloud(str) {
-            if (!document.getElementById('voice-synthesis-toggle').checked) return;
-            window.speechSynthesis.cancel();
-            
-            const speech = new SpeechSynthesisUtterance(str);
-            const availableVoices = window.speechSynthesis.getVoices();
-
-            const premiumVoiceFallback = availableVoices.find(voice => 
-                (voice.name.includes('Google') && voice.lang.startsWith('en')) || 
-                (voice.name.includes('Natural') && voice.lang.startsWith('en')) ||
-                (voice.name.includes('Siri') && voice.lang.startsWith('en'))
-            );
-
-            if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
-            speech.rate = 0.96;
-            window.speechSynthesis.speak(speech);
-        }
-
-        async function extractTextFromPDF(file) {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            let text = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                text += content.items.map(it => it.str).join(' ') + '\n';
-            }
-            return text.trim();
-        }
-
-        function switchUploadMode(mode) {
-            currentUploadMode = mode;
-            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
-            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
-            if (mode === 'upload') { document.getElementById('resume-upload-zone').classList.remove('hidden'); document.getElementById('resume-paste-zone').classList.add('hidden'); }
-            else { document.getElementById('resume-paste-zone').classList.remove('hidden'); document.getElementById('resume-upload-zone').classList.add('hidden'); }
-        }
-
-        function handleFileSelection(e) {
-            const f = e.target.files[0];
-            if(f) {
-                extractTextFromPDF(f).then(txt => {
-                    extractedPdfTextState = txt;
-                    document.getElementById('resume-
+            if (!supabaseClient) return;
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
