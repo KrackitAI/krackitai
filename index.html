@@ -173,7 +173,7 @@
                         </div>
                     </div>
 
-                    <!-- RE-ENGINEERED DYNAMIC DOCUMENT METADATA & PRE-FLIGHT ATS AUDIT BADGE -->
+                    <!-- DYNAMIC DOCUMENT METADATA & PRE-FLIGHT ATS AUDIT BADGE -->
                     <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex flex-col space-y-4 shadow-inner">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3 min-w-0">
@@ -263,15 +263,26 @@
                 <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
             </div>
 
+            <!-- EVALUATION METRICS DASHBOARD GRID -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Overall Rating</span>
-                    <h3 class="text-5xl font-black text-white" id="report-score-target">0</h3>
-                    <span class="text-xs font-medium text-neutral-400 block">out of 100 points</span>
+                <!-- Live Interview Performance Card -->
+                <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Interview Score</span>
+                    <h3 class="text-4xl font-black text-white" id="report-score-target">0</h3>
+                    <span class="text-[10px] font-medium text-neutral-500 block">live communication metrics</span>
                 </div>
-                <div class="bg-neutral-900/40 border border-neutral-800 p-6 rounded-2xl text-center flex flex-col justify-center items-center space-y-2 col-span-2">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Decision Verdict</span>
-                    <div id="report-verdict-badge" class="px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide">PENDING</div>
+
+                <!-- Pre-Flight Resume Screening Card -->
+                <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Resume ATS Score</span>
+                    <h3 class="text-4xl font-black text-white" id="report-resume-score-target">0</h3>
+                    <span class="text-[10px] font-medium text-neutral-500 block">pre-flight baseline screening</span>
+                </div>
+
+                <!-- Consolidated Hiring Verdict Card -->
+                <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center flex flex-col justify-center items-center space-y-2">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Verdict</span>
+                    <div id="report-verdict-badge" class="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide">PENDING</div>
                 </div>
             </div>
 
@@ -418,7 +429,7 @@
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
         let latestEvaluationReportCache = null;
-        let cachedResumePreflightScore = 0; // State variable capturing top-funnel metrics
+        let cachedResumePreflightScore = 0; 
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
@@ -551,8 +562,6 @@
                     document.getElementById('preview-file-title').innerText = f.name;
                     document.getElementById('resume-upload-zone').classList.add('hidden');
                     document.getElementById('resume-file-card-preview').classList.remove('hidden');
-                    
-                    // Fire background pre-flight ATS analysis instantly
                     executePreflightResumeScreening(txt);
                 }).catch(err => {
                     alert("Engine failed processing PDF context structure: " + err.message);
@@ -561,7 +570,6 @@
             }
         }
 
-        // ASYNCHRONOUS PRE-FLIGHT ANALYSIS ENGINE ROUTING
         async function executePreflightResumeScreening(rawText) {
             const statusIndicator = document.getElementById('resume-preflight-status-indicator');
             const alertBox = document.getElementById('preflight-audit-alert-box');
@@ -577,31 +585,35 @@
 
                 cachedResumePreflightScore = data.score || 0;
                 
-                // Paint the score badge using severity coloring
                 const scoreBadge = document.getElementById('preflight-audit-score-badge');
-                scoreBadge.innerText = cachedResumePreflightScore;
-                if (cachedResumePreflightScore >= 75) {
-                    scoreBadge.className = "text-xl font-black block mt-0.5 text-emerald-400";
-                    statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">ATS Score Passed</span>`;
-                } else {
-                    scoreBadge.className = "text-xl font-black block mt-0.5 text-rose-400";
-                    statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">ATS Flaws Detected</span>`;
+                if (scoreBadge) {
+                    scoreBadge.innerText = cachedResumePreflightScore;
+                    if (cachedResumePreflightScore >= 75) {
+                        scoreBadge.className = "text-xl font-black block mt-0.5 text-emerald-400";
+                        if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">ATS Score Passed</span>`;
+                    } else {
+                        scoreBadge.className = "text-xl font-black block mt-0.5 text-rose-400";
+                        if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">ATS Flaws Detected</span>`;
+                    }
                 }
 
-                document.getElementById('preflight-audit-critique-msg').innerText = data.critique || "Formatting optimization advised.";
+                const critiqueMsg = document.getElementById('preflight-audit-critique-msg');
+                if (critiqueMsg) critiqueMsg.innerText = data.critique || "Formatting optimization advised.";
                 
                 const keywordsHolder = document.getElementById('preflight-missing-keywords-holder');
-                keywordsHolder.innerHTML = '';
-                if (data.missingKeywords && data.missingKeywords.length > 0) {
-                    data.missingKeywords.forEach(word => {
-                        keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
-                    });
+                if (keywordsHolder) {
+                    keywordsHolder.innerHTML = '';
+                    if (data.missingKeywords && data.missingKeywords.length > 0) {
+                        data.missingKeywords.forEach(word => {
+                            keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
+                        });
+                    }
                 }
-                alertBox.classList.remove('hidden');
+                if (alertBox) alertBox.classList.remove('hidden');
 
             } catch (err) {
                 console.error(err);
-                statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
             }
         }
 
@@ -735,7 +747,7 @@
                         brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
                         gaps_to_fix: reportPayload.gapsToFix || [],
                         transcript: runningChatHistoryLedger || [],
-                        resume_screening_score: cachedResumePreflightScore // Committing top-funnel analytical grade
+                        resume_screening_score: cachedResumePreflightScore 
                     }]);
 
                 if (error) console.error("Database persistence fault:", error.message);
@@ -839,44 +851,64 @@
             
             if (latestEvaluationReportCache) {
                 const report = latestEvaluationReportCache;
-                document.getElementById('report-score-target').innerText = report.score || 0;
-                document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
+                
+                const interviewScoreElement = document.getElementById('report-score-target');
+                const resumeScoreElement = document.getElementById('report-resume-score-target');
+                const critiqueElement = document.getElementById('report-critique-target');
+
+                if (interviewScoreElement) interviewScoreElement.innerText = report.score || 0;
+                if (resumeScoreElement) resumeScoreElement.innerText = cachedResumePreflightScore || 0;
+                if (critiqueElement) critiqueElement.innerText = report.brutallyHonestReview || "No review generated.";
+
                 const badge = document.getElementById('report-verdict-badge');
                 const accentBar = document.getElementById('report-accent-bar');
                 const verdictStr = (report.verdict || "REJECTED").toUpperCase();
-                badge.innerText = verdictStr;
-
-                if (verdictStr.includes('PASS')) {
-                    badge.className = "px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
-                    accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
-                } else {
-                    badge.className = "px-5 py-2 rounded-xl text-sm font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
-                    accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                
+                if (badge) {
+                    badge.innerText = verdictStr;
+                    if (verdictStr.includes('PASS')) {
+                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
+                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
+                    } else {
+                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
+                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                    }
                 }
 
-                const gapsList = document.getElementById('report-gaps-list-target'); gapsList.innerHTML = '';
-                if (report.gapsToFix && report.gapsToFix.length > 0) {
-                    report.gapsToFix.forEach(gap => { gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; });
-                } else { gapsList.innerHTML = `<li class="text-neutral-500 italic">No structural deficiencies found.</li>`; }
+                const gapsList = document.getElementById('report-gaps-list-target'); 
+                if (gapsList) {
+                    gapsList.innerHTML = '';
+                    if (report.gapsToFix && report.gapsToFix.length > 0) {
+                        report.gapsToFix.forEach(gap => { gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; });
+                    } else { gapsList.innerHTML = `<li class="text-neutral-500 italic">No structural deficiencies found.</li>`; }
+                }
             }
 
-            const targetDeck = document.getElementById('transcript-deck-target'); targetDeck.innerHTML = '';
-            let questionBufferText = '';
-            runningChatHistoryLedger.forEach((msg) => {
-                if (msg.role === 'assistant') { questionBufferText = msg.content; } 
-                else if (msg.role === 'user' && questionBufferText) {
-                    targetDeck.innerHTML += `
-                        <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-3">
-                            <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
-                            <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
-                            <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
-                                <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
-                                <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
-                            </div>
-                        </div>`;
-                }
-            });
-            document.getElementById('submit-turn-btn').style.display = 'block'; document.getElementById('mic-toggle-btn').style.display = 'block';
+            const targetDeck = document.getElementById('transcript-deck-target'); 
+            if (targetDeck) {
+                targetDeck.innerHTML = '';
+                let questionBufferText = '';
+                runningChatHistoryLedger.forEach((msg) => {
+                    if (msg.role === 'assistant') { questionBufferText = msg.content; } 
+                    else if (msg.role === 'user' && questionBufferText) {
+                        targetDeck.innerHTML += `
+                            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-3">
+                                <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
+                                <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
+                                <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
+                                    <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
+                                    <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
+                                </div>
+                            </div>`;
+                    }
+                });
+            }
+            
+            const submitTurnBtn = document.getElementById('submit-turn-btn');
+            const micToggleBtn = document.getElementById('mic-toggle-btn');
+            if (submitTurnBtn) submitTurnBtn.style.display = 'block'; 
+            if (micToggleBtn) micToggleBtn.style.display = 'block';
+            
             showScreen('results-screen');
         }
 
