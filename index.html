@@ -947,6 +947,16 @@
         }
 
         function finishAndWrapInterview() {
+            // NEW: SAFETY INTERACTION CONFIRMATION GATE
+            // Only trigger the warning if the interview is actually ongoing (not already concluded by AI)
+            if (!latestEvaluationReportCache) {
+                const userConfirmsCancellation = confirm("Are you sure you want to cancel? Your current interview progress will be permanently lost and no report card will be generated.");
+                if (!userConfirmsCancellation) {
+                    // User changed their mind, return to the live interview panel safely
+                    return; 
+                }
+            }
+
             if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             
