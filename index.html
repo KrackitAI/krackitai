@@ -562,7 +562,7 @@
 
         function toggleVoiceSpeechInput() {
             if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
-            if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err { speechRecognitionEngine.stop(); } } 
+            if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); } } 
             else { speechRecognitionEngine.stop(); }
         }
 
