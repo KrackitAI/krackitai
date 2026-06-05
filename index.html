@@ -1098,5 +1098,19 @@
             }
         });
     </script>
+    <!-- CUSTOM CUSTOMIZABLE CANCELLATION OVERLAY DIALOG -->
+    <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
+            <div class="space-y-2">
+                <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-lg font-black animate-pulse">⚠️</div>
+                <h4 class="text-lg font-black text-white tracking-tight">Abort Active Session?</h4>
+                <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost and no diagnostic report card data matrices will be compiled.</p>
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">Keep Practicing</button>
+                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, Abort 🏁</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
