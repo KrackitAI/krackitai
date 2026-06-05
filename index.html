@@ -947,16 +947,33 @@
         }
 
         function finishAndWrapInterview() {
-            // NEW: SAFETY INTERACTION CONFIRMATION GATE
-            // Only trigger the warning if the interview is actually ongoing (not already concluded by AI)
+            // NEW: CUSTOM INLINE MODAL SAFETY GATE
+            // Only trigger warning if the user clicked cancel explicitly mid-session
             if (!latestEvaluationReportCache) {
-                const userConfirmsCancellation = confirm("Are you sure you want to cancel? Your current interview progress will be permanently lost and no report card will be generated.");
-                if (!userConfirmsCancellation) {
-                    // User changed their mind, return to the live interview panel safely
-                    return; 
+                const overlayModal = document.getElementById('cancel-confirmation-overlay');
+                if (overlayModal) {
+                    overlayModal.classList.remove('hidden');
+                    return; // Hold operational execution here until user picks a track
                 }
             }
 
+            executeFinalReportCompilation();
+        }
+
+        function dismissCancellationModal() {
+            // Dismiss panel view if they click 'Keep Practicing'
+            const overlayModal = document.getElementById('cancel-confirmation-overlay');
+            if (overlayModal) overlayModal.classList.add('hidden');
+        }
+
+        function confirmAbruptSessionExit() {
+            // Hide custom gate modal and route straight into core reset pipelines
+            dismissCancellationModal();
+            executeFinalReportCompilation();
+        }
+
+        // We isolated the original UI rendering logic here so it can be called seamlessly by both choices
+        function executeFinalReportCompilation() {
             if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             
