@@ -1126,7 +1126,6 @@
                 let genuineInterviewerMessage = data.aiMessage;
 
                 // ANTI-LEAK SAFETY SHIELD
-                // Catch backend engine accidents before they can touch the DOM display layout
                 if (!genuineInterviewerMessage || genuineInterviewerMessage.includes("SYSTEM NOTE:")) {
                     console.warn("Intercepted raw background instruction leak from backend engine.");
                     genuineInterviewerMessage = "💡 Conceptual Nudge: Consider the underlying data patterns of the question. Think about how your local application states sync up with your system components, and focus your answer on that data pipeline.";
@@ -1142,7 +1141,7 @@
                 console.error(err);
                 alert("Failed fetching lifeline hint data: " + err.message);
                 document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
-            } canvas {
+            } finally {
                 if (submitBtn) submitBtn.disabled = false;
                 if (hintBtn) hintBtn.disabled = false;
             }
@@ -1172,10 +1171,22 @@
         }
 
         function executeFinalReportCompilation() {
-            clearInterval(countdownTimerIntervalInstance); 
-            if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
-            window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
+            clearInterval(countdownTimerIntervalInstance); // General safety catch block clear
+            window.speechSynthesis.cancel(); 
+            if(isMicrophoneListening) toggleVoiceSpeechInput();
             window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            // Re-verify context links right before database serialization to prevent empty row updates
+            if (!globalJobDescContext) {
+                globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+            }
+            if (!globalResumeContext) {
+                globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+            }
+
+            if (latestEvaluationReportCache) { 
+                commitSessionToDatabaseHistory(latestEvaluationReportCache); 
+            }
             
             if (latestEvaluationReportCache) {
                 const report = latestEvaluationReportCache;
