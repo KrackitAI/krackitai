@@ -827,6 +827,25 @@
                     `;
                 });
             } catch (err) {
+                // ─── AUTOMATIC SESSION REFRESH FIX ───────────────────────────
+                // Detect if the database failure is due to an expired auth token
+                if (err.message && err.message.includes('JWT expired')) {
+                    console.warn("User auth session expired. Forcing login refresh alignment.");
+                    
+                    // Close the history modal view so it doesn't stay stuck open
+                    closeHistoryModal();
+                    
+                    // Force a clean sign out on the client client instance
+                    if (supabaseClientInstance) {
+                        await supabaseClientInstance.auth.signOut();
+                    }
+                    
+                    // Re-route the user cleanly by launching the sign-in overlay container
+                    triggerInlineAuthWall('signin');
+                    return;
+                }
+                // ──────────────────────────────────────────────────────────────
+
                 container.innerHTML = `<p class="text-xs text-rose-400 font-mono">Error querying data: ${err.message}</p>`;
             }
         }
