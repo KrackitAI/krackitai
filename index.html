@@ -929,15 +929,36 @@
             window.speechSynthesis.cancel();
             if(isMicrophoneListening) toggleVoiceSpeechInput();
             
+            // Build the standard failure record payload matrix
             latestEvaluationReportCache = {
                 score: 30, 
                 verdict: "REJECTED (TIMEOUT)",
-                brutallyHonestReview: "The interview was abruptly terminated because you failed to present your technical competencies or form concise answers within your allocated 5-minute cognitive stamina energy threshold.",
+                brutallyHonestReview: "The interview was abruptly terminated because you failed to present your technical competencies or form concise answers within your allocated 5-minute cognitive stamina energy threshold. Engineering roles demand concise, high-impact communication under precise time windows.",
                 gapsToFix: ["Failed overall technical time management guidelines.", "Shortage of concise structural signal responses.", "Exceeded operational communication time envelope limits."]
             };
 
-            alert("🚨 INTERVIEW ABORTED: You ran completely out of interviewer capacity stamina time! Moving straight to evaluation report card diagnostics.");
-            executeFinalReportCompilation();
+            // 1. Reveal the high-end takeover wrapper screen elements
+            const timeoutOverlay = document.getElementById('stamina-timeout-overlay');
+            if (timeoutOverlay) timeoutOverlay.classList.remove('hidden');
+
+            // 2. Fire a ticking redirection cadence tracker to simulate analytics building
+            let redirectDelaySeconds = 3;
+            const countdownBadge = document.getElementById('timeout-redirect-countdown');
+            
+            const redirectIntervalInstance = setInterval(() => {
+                redirectDelaySeconds--;
+                if (countdownBadge) countdownBadge.innerText = redirectDelaySeconds;
+                
+                if (redirectDelaySeconds <= 0) {
+                    clearInterval(redirectIntervalInstance);
+                    
+                    // Hide the modal cleanly right before showing the results layout
+                    if (timeoutOverlay) timeoutOverlay.classList.add('hidden');
+                    
+                    // Route user straight into your report compilation views
+                    executeFinalReportCompilation();
+                }
+            }, 1000);
         }
 
         async function startLiveSimulation() {
@@ -1276,5 +1297,29 @@
             }
         });
     </script>
+    <!-- PREMIUM TIMEOUT SHUTDOWN OVERLAY -->
+    <div id="stamina-timeout-overlay" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
+        <div class="max-w-md w-full text-center space-y-6">
+            <!-- Pulsing Alarm Ring -->
+            <div class="w-20 h-20 bg-rose-950/30 border border-rose-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(244,63,94,0.1)] relative">
+                <span class="absolute inset-0 rounded-full bg-rose-500/10 animate-ping"></span>
+                <span class="text-3xl animate-pulse">🚨</span>
+            </div>
+            
+            <div class="space-y-2">
+                <h3 class="text-2xl font-black tracking-tight text-white uppercase font-mono">Cognitive Capacity Blown</h3>
+                <p class="text-rose-400 text-xs font-bold font-mono tracking-wider uppercase">Stamina Clock Severed • Session Terminated</p>
+                <p class="text-neutral-400 text-sm max-w-xs mx-auto pt-1 leading-relaxed">
+                    You failed to present concise technical signal within the allocated time boundary context.
+                </p>
+            </div>
+
+            <!-- Auto-routing progress state ticker -->
+            <div class="inline-flex items-center space-x-2 bg-neutral-950 border border-neutral-900 px-4 py-2 rounded-xl text-xs font-mono text-neutral-500">
+                <span>Compiling diagnostic metrics panel in</span>
+                <span id="timeout-redirect-countdown" class="text-white font-black">3</span>s
+            </div>
+        </div>
+    </div>
 </body>
 </html>
