@@ -1123,26 +1123,26 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.details || data.error || "Hint network sync failed.");
 
-                // ─── THE CORRECTION FIX ───────────────────────────────────────
-                // Pull the real compiled question or hint message explicitly from 
-                // the structured data object token sent back by your backend JSON compiler.
                 let genuineInterviewerMessage = data.aiMessage;
+
+                // ANTI-LEAK SAFETY SHIELD
+                // Catch backend engine accidents before they can touch the DOM display layout
+                if (!genuineInterviewerMessage || genuineInterviewerMessage.includes("SYSTEM NOTE:")) {
+                    console.warn("Intercepted raw background instruction leak from backend engine.");
+                    genuineInterviewerMessage = "💡 Conceptual Nudge: Consider the underlying data patterns of the question. Think about how your local application states sync up with your system components, and focus your answer on that data pipeline.";
+                }
                 
-                // Push the REAL assistant message to your local array ledger history, 
-                // NOT the dirty background string
                 runningChatHistoryLedger.push({ role: "assistant", content: genuineInterviewerMessage });
                 
-                // Inject the actual wording directly onto the display layout screen element
                 document.getElementById('sim-active-question-text').innerText = genuineInterviewerMessage;
                 document.getElementById('sim-status-indicator').innerText = "Active Connection Live (Hint Applied)";
                 speakTextAloud(genuineInterviewerMessage);
-                // ──────────────────────────────────────────────────────────────
 
             } catch (err) {
                 console.error(err);
                 alert("Failed fetching lifeline hint data: " + err.message);
                 document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
-            } finally {
+            } canvas {
                 if (submitBtn) submitBtn.disabled = false;
                 if (hintBtn) hintBtn.disabled = false;
             }
