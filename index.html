@@ -16,7 +16,7 @@
     <!-- Import the official Supabase Client JS Library from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black">
+<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth">
 
     <!-- INLINE AUTH WALL GATING CONTAINER -->
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
@@ -59,13 +59,13 @@
     </div>
 
     <!-- GLOBAL APP TOP NAVIGATION BAR -->
-    <nav class="border-b border-neutral-900 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50 select-none">
+    <nav class="border-b border-neutral-950 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50 select-none">
         <div class="flex items-center space-x-8">
-            <div onclick="window.location.reload()" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer">
+            <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer">
                 <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
             </div>
             <div class="hidden md:flex items-center space-x-6 text-xs font-bold tracking-wide uppercase text-neutral-400">
-                <button onclick="window.location.reload()" class="hover:text-white transition-colors cursor-pointer">Workspace</button>
+                <button onclick="scrollToWorkspaceSetup()" class="hover:text-white transition-colors cursor-pointer">Workspace</button>
                 <button onclick="revealPastSessionsModal()" class="hover:text-white transition-colors cursor-pointer">Past Sessions</button>
             </div>
         </div>
@@ -142,13 +142,56 @@
         </div>
     </div>
 
+    <!-- ================= PREMIUM LANDING PAGE HERO HEADER ================= -->
+    <header id="marketing-hero-section" class="max-w-4xl mx-auto px-4 pt-20 pb-16 text-center space-y-8 select-none">
+        <div class="space-y-4">
+            <span class="mx-auto bg-neutral-900 border border-neutral-800 text-[10px] text-neutral-400 font-mono tracking-widest uppercase px-3 py-1.5 rounded-full block w-max shadow-inner">
+                ⚡ Adaptive Technical Simulation Engine
+            </span>
+            <h1 class="text-5xl md:text-6xl font-black tracking-tight text-white max-w-3xl mx-auto leading-[1.1]">
+                Technical interviews are <span class="text-[#FFE500]">passed</span>, not just studied.
+            </h1>
+            <p class="text-neutral-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium">
+                Stop guessing if you are prepared. Upload your engineering background profile and let an aggressive, adaptive AI agent uncover structural gaps before real managers do.
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button onclick="scrollToWorkspaceSetup()" class="w-full sm:w-auto bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-4 rounded-xl text-sm tracking-wide shadow-xl shadow-[#FFE500]/5 transition-all cursor-pointer">
+                Initialize Free Simulator →
+            </button>
+            <button onclick="revealPastSessionsModal()" class="w-full sm:w-auto bg-neutral-900/60 hover:bg-neutral-800/80 border border-neutral-800 text-neutral-300 font-bold px-7 py-4 rounded-xl text-sm transition-all cursor-pointer">
+                Review Performance Records
+            </button>
+        </div>
+
+        <!-- METRIC FEATURE VALUE PILL ROW -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left max-w-3xl mx-auto">
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
+                <span class="text-sm font-bold text-white block">🧠 Adaptive Conversational Drilling</span>
+                <p class="text-neutral-500 text-xs leading-normal">Evaluates data matrices dynamically. Challenges vague responses with deeper technical follow-ups.</p>
+            </div>
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
+                <span class="text-sm font-bold text-white block">📊 Real-Time ATS Screening</span>
+                <p class="text-neutral-500 text-xs leading-normal">Scans profile layers to flag critical missing keywords and compute alignment ratings instantly.</p>
+            </div>
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
+                <span class="text-sm font-bold text-white block">🎙️ Native Audio Agent Synthesis</span>
+                <p class="text-neutral-500 text-xs leading-normal">Toggle hyper-realistic voice workflows for realistic, conversational engineering pressure simulations.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Visual Page Transition Divider Line -->
+    <hr class="border-neutral-950 max-w-3xl mx-auto">
+
     <!-- Main Dynamic Content Workspace Wrapper -->
-    <main class="max-w-3xl mx-auto px-4 pt-12 pb-24 w-full">
+    <main class="max-w-3xl mx-auto px-4 pt-16 pb-24 w-full">
 
         <!-- ================= STAGE 1: INPUT ENVIRONMENT SETUP SCREEN ================= -->
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
-                <h2 class="text-4xl font-black tracking-tight">Setup Interview Environment</h2>
+                <h2 class="text-3xl font-black tracking-tight">Setup Interview Workspace</h2>
                 <p class="text-neutral-400 text-sm">Provide your target job context to initialize an adaptive premium voice or text session.</p>
             </div>
 
@@ -316,6 +359,21 @@
 
     </main>
 
+    <!-- CUSTOM INLINE CANCELLATION OVERLAY DIALOG -->
+    <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
+            <div class="space-y-2">
+                <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-lg font-black animate-pulse">⚠️</div>
+                <h4 class="text-lg font-black text-white tracking-tight">Abort Active Session?</h4>
+                <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost and no diagnostic report card data matrices will be compiled.</p>
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">Keep Practicing</button>
+                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, Abort 🏁</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
@@ -443,6 +501,14 @@
         // LIFELINE RUNTIME tracking metrics
         let remainingFreeHintsCount = 1;
         let runningSessionHintsUsedTotal = 0;
+
+        // MARKETING HUB INTERACTION LINK
+        function scrollToWorkspaceSetup() {
+            const workspace = document.getElementById('input-screen');
+            if (workspace) {
+                workspace.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
@@ -787,6 +853,13 @@
         function showScreen(id) {
             ['input-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
+            
+            // Auto hide or reveal the top marketing landing deck based on operational app state
+            const heroSection = document.getElementById('marketing-hero-section');
+            if (heroSection) {
+                if (id === 'input-screen') heroSection.classList.remove('hidden');
+                else heroSection.classList.add('hidden');
+            }
         }
 
         async function startLiveSimulation() {
@@ -800,7 +873,8 @@
 
             if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
             runningChatHistoryLedger = []; latestEvaluationReportCache = null; showScreen('simulator-screen');
-            
+            window.scrollTo({top: 0, behavior: 'instant'});
+
             // Clear out prior execution lifelines matrix parameters
             remainingFreeHintsCount = 1;
             runningSessionHintsUsedTotal = 0;
@@ -961,21 +1035,19 @@
         }
 
         function dismissCancellationModal() {
-            // Dismiss panel view if they click 'Keep Practicing'
             const overlayModal = document.getElementById('cancel-confirmation-overlay');
             if (overlayModal) overlayModal.classList.add('hidden');
         }
 
         function confirmAbruptSessionExit() {
-            // Hide custom gate modal and route straight into core reset pipelines
             dismissCancellationModal();
             executeFinalReportCompilation();
         }
 
-        // We isolated the original UI rendering logic here so it can be called seamlessly by both choices
         function executeFinalReportCompilation() {
             if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
+            window.scrollTo({top: 0, behavior: 'smooth'});
             
             if (latestEvaluationReportCache) {
                 const report = latestEvaluationReportCache;
@@ -1020,7 +1092,7 @@
                     if (msg.role === 'assistant') { questionBufferText = msg.content; } 
                     else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST")) {
                         targetDeck.innerHTML += `
-                            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-3">
+                            <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
                                 <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
                                 <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
                                 <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
@@ -1064,7 +1136,7 @@
                 });
             }
 
-            // ================= NEW PASTE TEXT SCREENING DETECTOR =================
+            // ================= PASTE TEXT SCREENING DETECTOR =================
             const pasteInputArea = document.getElementById('resume-paste-input');
             let pasteDebounceTimer = null;
 
@@ -1115,19 +1187,5 @@
             }
         });
     </script>
-    <!-- CUSTOM CUSTOMIZABLE CANCELLATION OVERLAY DIALOG -->
-    <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
-            <div class="space-y-2">
-                <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-lg font-black animate-pulse">⚠️</div>
-                <h4 class="text-lg font-black text-white tracking-tight">Abort Active Session?</h4>
-                <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost and no diagnostic report card data matrices will be compiled.</p>
-            </div>
-            <div class="flex gap-3">
-                <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">Keep Practicing</button>
-                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, Abort 🏁</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
