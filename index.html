@@ -4,21 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Adaptive AI Interview Coach</title>
-    <!-- Tailwind CSS for high-end styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- PDF.js Core Client Engines -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
-    <!-- Import the official Supabase Client JS Library from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth">
 
-    <!-- INLINE AUTH WALL GATING CONTAINER -->
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
             <button type="button" onclick="closeInlineAuthWall()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
@@ -28,7 +24,6 @@
                 <p class="text-neutral-400 text-xs">Unlock your adaptive engineering interview simulator</p>
             </div>
 
-            <!-- Visual inline Navigation Tab Switcher -->
             <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
                 <button id="overlay-tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">Sign In</button>
                 <button id="overlay-tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">Sign Up</button>
@@ -58,7 +53,6 @@
         </div>
     </div>
 
-    <!-- GLOBAL APP TOP NAVIGATION BAR -->
     <nav class="border-b border-neutral-950 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50 select-none">
         <div class="flex items-center space-x-8">
             <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer">
@@ -76,7 +70,6 @@
         </div>
     </nav>
 
-    <!-- HIGH-CONVERTING PRICING & UPGRADE MODAL -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-2xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
             <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
@@ -126,7 +119,6 @@
         </div>
     </div>
 
-    <!-- SESSIONS SLIDING OVERLAY DRAWER -->
     <div id="history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-end">
         <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between">
             <div class="space-y-6">
@@ -142,10 +134,9 @@
         </div>
     </div>
 
-    <!-- ================= PREMIUM LANDING PAGE HERO HEADER ================= -->
     <header id="marketing-hero-section" class="max-w-4xl mx-auto px-4 pt-20 pb-16 text-center space-y-8 select-none">
         <div class="space-y-4">
-            <span class="mx-auto bg-neutral-900 border border-neutral-800 text-[10px] text-neutral-400 font-mono tracking-widest uppercase px-3 py-1.5 rounded-full block w-max shadow-inner">
+            <span class="mx-auto bg-neutral-900 border border-neutral-800 elegance text-[10px] text-neutral-400 font-mono tracking-widest uppercase px-3 py-1.5 rounded-full block w-max shadow-inner">
                 ⚡ Adaptive Technical Simulation Engine
             </span>
             <h1 class="text-5xl md:text-6xl font-black tracking-tight text-white max-w-3xl mx-auto leading-[1.1]">
@@ -165,7 +156,6 @@
             </button>
         </div>
 
-        <!-- METRIC FEATURE VALUE PILL ROW -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left max-w-3xl mx-auto">
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
                 <span class="text-sm font-bold text-white block">🧠 Adaptive Conversational Drilling</span>
@@ -182,13 +172,10 @@
         </div>
     </header>
 
-    <!-- Visual Page Transition Divider Line -->
     <hr class="border-neutral-950 max-w-3xl mx-auto">
 
-    <!-- Main Dynamic Content Workspace Wrapper -->
     <main class="max-w-3xl mx-auto px-4 pt-16 pb-24 w-full">
 
-        <!-- ================= STAGE 1: INPUT ENVIRONMENT SETUP SCREEN ================= -->
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
                 <h2 class="text-3xl font-black tracking-tight">Setup Interview Workspace</h2>
@@ -208,7 +195,6 @@
                         <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
                     </div>
 
-                    <!-- DROPZONE PLATFORM COMPONENT -->
                     <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
                         <div id="upload-zone-status" class="space-y-1">
@@ -217,7 +203,6 @@
                         </div>
                     </div>
 
-                    <!-- FILE PREVIEW CARD (ONLY SHOWS FILENAME & REMOVE BUTTON) -->
                     <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex items-center justify-between shadow-inner">
                         <div class="flex items-center space-x-3 min-w-0">
                             <div class="bg-neutral-900 text-[#FFE500] p-2.5 rounded-lg border border-neutral-800 select-none">
@@ -230,15 +215,12 @@
                         <button type="button" onclick="resetFileSelectionState()" class="text-xs bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-rose-400 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer select-none">Remove</button>
                     </div>
 
-                    <!-- TEXT PASTE AREA -->
                     <div id="resume-paste-zone" class="hidden">
                         <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                     </div>
 
-                    <!-- GLOBAL REUSABLE STATUS INDICATOR -->
                     <div class="flex items-center space-x-1.5 px-1" id="resume-preflight-status-indicator"></div>
 
-                    <!-- THE PRE-FLIGHT ALERT BOX (REUSABLE BY BOTH INPUT OPTIONS) -->
                     <div id="preflight-audit-alert-box" class="hidden w-full bg-neutral-900/60 border border-neutral-800 rounded-xl p-3.5 flex items-start justify-between gap-4">
                         <div class="space-y-1">
                             <span class="text-[9px] font-mono font-black uppercase text-neutral-500 tracking-widest block">Immediate ATS Screening Audit:</span>
@@ -257,12 +239,28 @@
                     <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
                 </div>
 
-                <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview ⚡</button>
+                <div class="space-y-1">
+                    <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview ⚡</button>
+                    <span class="text-[10px] text-neutral-500 tracking-wide block text-center font-medium select-none">Adaptive free sessions run on a strict 5:00 minute cognitive stamina window limit.</span>
+                </div>
             </div>
         </div>
 
-        <!-- ================= STAGE 2: ADAPTIVE RUNTIME SIMULATOR OVERLAY PANEL ================= -->
         <div id="simulator-screen" class="hidden space-y-6">
+            
+            <div class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 flex items-center justify-between gap-4 font-mono select-none">
+                <div class="flex items-center space-x-2 shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Interviewer Capacity:</span>
+                </div>
+                <div class="w-full bg-neutral-950 h-2 border border-neutral-800/80 rounded-full overflow-hidden">
+                    <div id="stamina-timer-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000" style="width: 100%"></div>
+                </div>
+                <div id="stamina-digital-clock" class="text-xs font-black text-[#FFE500] tracking-widest shrink-0 bg-neutral-950 px-2.5 py-1 rounded-md border border-neutral-800/60">
+                    05:00
+                </div>
+            </div>
+
             <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
                 <div>
                     <h3 class="text-2xl font-black text-white">Live AI Interview Panel</h3>
@@ -284,9 +282,7 @@
                         <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> to submit response instantly</span>
                     </div>
                     
-                    <!-- ACTION INTERACTION ROW -->
                     <div class="flex items-center space-x-2">
-                        <!-- HINT REQUEST SYSTEM LINK -->
                         <button id="hint-request-btn" onclick="executeCandidateHintRetrieval()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 hover:border-amber-500/50 text-xs text-amber-400 px-3.5 py-2 rounded-xl flex items-center space-x-1.5 transition-all cursor-pointer font-medium select-none">
                             <span>💡 Hint</span>
                             <span id="hint-tracker-badge" class="bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold">Free: 1</span>
@@ -308,30 +304,25 @@
             </div>
         </div>
 
-        <!-- ================= STAGE 3: INTERACTIVE DIAGNOSTIC REPORT CARD VIEW ================= -->
         <div id="results-screen" class="hidden space-y-8">
             <div class="border-b border-neutral-900 pb-5 text-center">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
                 <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
             </div>
 
-            <!-- EVALUATION METRICS DASHBOARD GRID -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Live Interview Performance Card -->
                 <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
                     <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Interview Score</span>
                     <h3 class="text-4xl font-black text-white" id="report-score-target">0</h3>
                     <span class="text-[10px] font-medium text-neutral-500 block">live communication metrics</span>
                 </div>
 
-                <!-- Pre-Flight Resume Screening Card -->
                 <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
                     <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Resume ATS Score</span>
                     <h3 class="text-4xl font-black text-white" id="report-resume-score-target">0</h3>
                     <span class="text-[10px] font-medium text-neutral-500 block">pre-flight baseline screening</span>
                 </div>
 
-                <!-- Consolidated Hiring Verdict Card -->
                 <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center flex flex-col justify-center items-center space-y-2">
                     <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Verdict</span>
                     <div id="report-verdict-badge" class="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide">PENDING</div>
@@ -359,7 +350,6 @@
 
     </main>
 
-    <!-- CUSTOM INLINE CANCELLATION OVERLAY DIALOG -->
     <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
             <div class="space-y-2">
@@ -502,6 +492,11 @@
         let remainingFreeHintsCount = 1;
         let runningSessionHintsUsedTotal = 0;
 
+        // TIMING METRICS PLATFORM TRACKERS
+        let countdownTimerIntervalInstance = null;
+        let remainingInterviewSecondsBalance = 300; // Free sandbox cap allocated: 5 minutes exact (300 seconds)
+        const TOTAL_ALLOCATED_SECONDS_MAX = 300;
+
         // MARKETING HUB INTERACTION LINK
         function scrollToWorkspaceSetup() {
             const workspace = document.getElementById('input-screen');
@@ -567,7 +562,7 @@
 
         function toggleVoiceSpeechInput() {
             if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
-            if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); } } 
+            if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err { speechRecognitionEngine.stop(); } } 
             else { speechRecognitionEngine.stop(); }
         }
 
@@ -854,12 +849,71 @@
             ['input-screen', 'simulator-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             
-            // Auto hide or reveal the top marketing landing deck based on operational app state
             const heroSection = document.getElementById('marketing-hero-section');
             if (heroSection) {
                 if (id === 'input-screen') heroSection.classList.remove('hidden');
                 else heroSection.classList.add('hidden');
             }
+        }
+
+        // NEW: PROGRAMMATIC REAL-TIME STAMINA COUNTDOWN ENGINE
+        function initializeActiveStaminaCountdownClock() {
+            clearInterval(countdownTimerIntervalInstance);
+            remainingInterviewSecondsBalance = TOTAL_ALLOCATED_SECONDS_MAX;
+            
+            const clockDisplay = document.getElementById('stamina-digital-clock');
+            const progressFill = document.getElementById('stamina-timer-progress-bar');
+            
+            if (clockDisplay) clockDisplay.innerText = "05:00";
+            if (progressFill) {
+                progressFill.style.width = "100%";
+                progressFill.className = "h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000";
+            }
+
+            countdownTimerIntervalInstance = setInterval(() => {
+                remainingInterviewSecondsBalance--;
+                
+                // Calculate percentage balance remaining for width injection
+                const currentPercentage = (remainingInterviewSecondsBalance / TOTAL_ALLOCATED_SECONDS_MAX) * 100;
+                
+                // Update text representation layout variables
+                const mins = Math.floor(remainingInterviewSecondsBalance / 60);
+                const secs = remainingInterviewSecondsBalance % 60;
+                const paddedSecs = secs < 10 ? '0' + secs : secs;
+                
+                if (clockDisplay) clockDisplay.innerText = `0${mins}:${paddedSecs}`;
+                if (progressFill) {
+                    progressFill.style.width = `${currentPercentage}%`;
+                    
+                    // High-stakes warning threshold changes: drop to red under 60 seconds
+                    if (remainingInterviewSecondsBalance <= 60) {
+                        progressFill.className = "h-full bg-gradient-to-r from-rose-600 to-red-500 transition-all duration-1000";
+                        if (clockDisplay) clockDisplay.className = "text-xs font-black text-rose-500 tracking-widest shrink-0 bg-neutral-950 px-2.5 py-1 rounded-md border border-rose-900 animate-pulse";
+                    }
+                }
+
+                // TIME OUT DISCONNECT VALVE TRIGGER
+                if (remainingInterviewSecondsBalance <= 0) {
+                    clearInterval(countdownTimerIntervalInstance);
+                    executeAbruptTimeExhaustionShutdown();
+                }
+            }, 1000);
+        }
+
+        function executeAbruptTimeExhaustionShutdown() {
+            window.speechSynthesis.cancel();
+            if(isMicrophoneListening) toggleVoiceSpeechInput();
+            
+            // Build a synthesized timeout failure response object cache
+            latestEvaluationReportCache = {
+                score: 30, // Automatic time failure score penalty
+                verdict: "REJECTED (TIMEOUT)",
+                brutallyHonestReview: "The interview was abruptly terminated because you failed to present your technical competencies or form concise answers within your allocated 5-minute cognitive stamina energy threshold. Engineering roles demand concise, high-impact communication under precise time windows.",
+                gapsToFix: ["Failed overall technical time management guidelines.", "Shortage of concise structural signal responses.", "Exceeded operational communication time envelope limits."]
+            };
+
+            alert("🚨 INTERVIEW ABORTED: You ran completely out of interviewer capacity stamina time! Moving straight to evaluation report card diagnostics.");
+            executeFinalReportCompilation();
         }
 
         async function startLiveSimulation() {
@@ -883,6 +937,9 @@
                 badgeElement.innerText = "Free: 1";
                 badgeElement.className = "bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
             }
+
+            // Launch the ticking clock loop
+            initializeActiveStaminaCountdownClock();
 
             runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
             incrementSessionCount(); await fetchNextInterviewerTurn();
@@ -919,6 +976,7 @@
                 if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
 
                 if (data.isConcluded) {
+                    clearInterval(countdownTimerIntervalInstance); // Stop clock immediately
                     latestEvaluationReportCache = data;
                     const goodbyeText = data.aiMessage;
                     runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
@@ -1021,13 +1079,12 @@
         }
 
         function finishAndWrapInterview() {
-            // NEW: CUSTOM INLINE MODAL SAFETY GATE
-            // Only trigger warning if the user clicked cancel explicitly mid-session
+            // Safety confirmation check if they intentionally abort manually mid-game
             if (!latestEvaluationReportCache) {
                 const overlayModal = document.getElementById('cancel-confirmation-overlay');
                 if (overlayModal) {
                     overlayModal.classList.remove('hidden');
-                    return; // Hold operational execution here until user picks a track
+                    return; 
                 }
             }
 
@@ -1040,11 +1097,13 @@
         }
 
         function confirmAbruptSessionExit() {
+            clearInterval(countdownTimerIntervalInstance); // Ensure the interval halts if aborted
             dismissCancellationModal();
             executeFinalReportCompilation();
         }
 
         function executeFinalReportCompilation() {
+            clearInterval(countdownTimerIntervalInstance); // General safety catch block clear
             if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             window.scrollTo({top: 0, behavior: 'smooth'});
@@ -1107,6 +1166,7 @@
             const submitTurnBtn = document.getElementById('submit-turn-btn');
             const micToggleBtn = document.getElementById('mic-toggle-btn');
             const hintRequestBtn = document.getElementById('hint-request-btn');
+            
             if (submitTurnBtn) submitTurnBtn.style.display = 'block'; 
             if (micToggleBtn) micToggleBtn.style.display = 'block';
             if (hintRequestBtn) hintRequestBtn.style.display = 'block';
