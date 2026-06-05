@@ -1083,12 +1083,20 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.details || data.error || "Hint network sync failed.");
 
-                let aiHintMessage = data.aiMessage;
-                runningChatHistoryLedger.push({ role: "assistant", content: aiHintMessage });
+                // ─── THE CORRECTION FIX ───────────────────────────────────────
+                // Pull the real compiled question or hint message explicitly from 
+                // the structured data object token sent back by your backend JSON compiler.
+                let genuineInterviewerMessage = data.aiMessage;
                 
-                document.getElementById('sim-active-question-text').innerText = aiHintMessage;
+                // Push the REAL assistant message to your local array ledger history, 
+                // NOT the dirty background string
+                runningChatHistoryLedger.push({ role: "assistant", content: genuineInterviewerMessage });
+                
+                // Inject the actual wording directly onto the display layout screen element
+                document.getElementById('sim-active-question-text').innerText = genuineInterviewerMessage;
                 document.getElementById('sim-status-indicator').innerText = "Active Connection Live (Hint Applied)";
-                speakTextAloud(aiHintMessage);
+                speakTextAloud(genuineInterviewerMessage);
+                // ──────────────────────────────────────────────────────────────
 
             } catch (err) {
                 console.error(err);
