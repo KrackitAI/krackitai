@@ -2,6 +2,16 @@ import Groq from "groq-sdk";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+// A curated pool of premium recruiter and engineering manager persona profiles
+const INTERVIEWER_POOL = [
+    { name: "Rohan Khanna", title: "Elite Technical Interviewer" },
+    { name: "Sarah Jenkins", title: "Principal Backend Architect" },
+    { name: "Vikram Malhotra", title: "VP of Engineering" },
+    { name: "Elena Rostova", title: "Staff Systems Engineer" },
+    { name: "Marcus Vance", title: "Director of Core Infrastructure" },
+    { name: "Aisha Rahman", title: "Senior Engineering Manager" }
+];
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -13,7 +23,24 @@ export default async function handler(req, res) {
         // Count base turns to monitor token usage and enforce the safety ceiling
         const ongoingTurnsCount = chatHistory.filter(msg => msg.role === "user" && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST")).length;
 
-        const systemPrompt = `You are Rohan Khanna, a senior elite technical interviewer conducting a realistic, adaptive mock simulation.
+        // ================= DYNAMIC NAME SELECTION LOGIC =================
+        // We look through the history to see if the AI has already introduced itself.
+        // If it hasn't, we pick a completely random identity from our pool for this session!
+        let activeInterviewer = INTERVIEWER_POOL[0]; // Fallback default
+        
+        const initialSystemGreeting = chatHistory.find(msg => msg.role === "assistant");
+        if (initialSystemGreeting) {
+            // If the interview is already underway, find which name was used so the AI doesn't switch identities mid-interview
+            const matchedIdentity = INTERVIEWER_POOL.find(persona => initialSystemGreeting.content.includes(persona.name));
+            if (matchedIdentity) activeInterviewer = matchedIdentity;
+        } else {
+            // Brand new session turn 0: grab a truly random name from the pool
+            const randomIndex = Math.floor(Math.random() * INTERVIEWER_POOL.length);
+            activeInterviewer = INTERVIEWER_POOL[randomIndex];
+        }
+        // =================================================================
+
+        const systemPrompt = `You are ${activeInterviewer.name}, a ${activeInterviewer.title} conducting a realistic, adaptive mock simulation.
         
         Target Role Context: ${jobDescription}
         Candidate Resume Profile: ${resume}
