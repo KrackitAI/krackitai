@@ -898,7 +898,8 @@
                     brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
                     gaps_to_fix: Array.isArray(reportPayload.gapsToFix) ? reportPayload.gapsToFix : [],
                     transcript: Array.isArray(runningChatHistoryLedger) ? runningChatHistoryLedger : [],
-                    resume_screening_score: parseInt(cachedResumePreflightScore) || 0
+                    // REMOVE OR COMMENT OUT THIS LINE TO FIX THE CRASH IN image_c795a6.png:
+                    // resume_screening_score: parseInt(cachedResumePreflightScore) || 0
                 };
 
                 const { data, error } = await supabaseClientInstance
@@ -1153,7 +1154,7 @@
             // polluting the main state container.
             const temporaryPayloadHistory = [...runningChatHistoryLedger];
             temporaryPayloadHistory.push({
-                role: "user",
+                role: "system",
                 content: "SYSTEM NOTE: HUB_HINT_REQUEST. The candidate is stuck and has explicitly requested a conceptual hint for your previous question. Do not give away the direct answer or write code solutions. Provide a subtle, guiding nudge or frame an alternative perspective to unblock them."
             });
             // ──────────────────────────────────────────────────────────────
