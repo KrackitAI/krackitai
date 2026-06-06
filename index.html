@@ -869,28 +869,52 @@
         function closeHistoryModal() { document.getElementById('history-modal').classList.add('hidden'); }
 
         async function commitSessionToDatabaseHistory(reportPayload) {
-            if (!supabaseClientInstance || !reportPayload) return;
+            if (!supabaseClientInstance || !reportPayload) {
+                console.error("Database sync aborted: Supabase instance or report payload is missing.");
+                return;
+            }
+            
             try {
-                const { data: { session } } = await supabaseClientInstance.auth.getSession();
-                if (!session) return;
+                // Get the current session immediately from the client cache rather than awaiting an external call
+                const { data: { session }, error: sessionError } = await supabaseClientInstance.auth.getSession();
+                
+                if (sessionError || !session) {
+                    console.error("Database sync failed: No active authenticated user session found.", sessionError);
+                    return;
+                }
 
-                const { error } = await supabaseClientInstance
+                // Hard fallback check: Ensure strings are pulled directly from the DOM fields to prevent null schema rejections
+                const finalJobDesc = globalJobDescContext || document.getElementById('job-desc-input').value.trim();
+                const finalResume = globalResumeContext || (currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim());
+
+                console.log("Attempting database row commit for user:", session.user.email);
+
+                const payload = {
+                    user_id: session.user.id,
+                    job_description: finalJobDesc || "No job description provided.",
+                    resume_context: finalResume || "No resume profile context provided.",
+                    score: parseInt(reportPayload.score) || 0,
+                    verdict: reportPayload.verdict || "REJECTED",
+                    brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
+                    gaps_to_fix: Array.isArray(reportPayload.gapsToFix) ? reportPayload.gapsToFix : [],
+                    transcript: Array.isArray(runningChatHistoryLedger) ? runningChatHistoryLedger : [],
+                    resume_screening_score: parseInt(cachedResumePreflightScore) || 0
+                };
+
+                const { data, error } = await supabaseClientInstance
                     .from('interview_sessions')
-                    .insert([{
-                        user_id: session.user.id,
-                        job_description: globalJobDescContext,
-                        resume_context: globalResumeContext,
-                        score: reportPayload.score || 0,
-                        verdict: reportPayload.verdict || "REJECTED",
-                        brutally_honest_review: reportPayload.brutallyHonestReview || "No feedback logged.",
-                        gaps_to_fix: reportPayload.gapsToFix || [],
-                        transcript: runningChatHistoryLedger || [],
-                        resume_screening_score: cachedResumePreflightScore 
-                    }]);
+                    .insert([payload])
+                    .select(); // Requesting data return forces confirmation verification
 
-                if (error) console.error("Database persistence fault:", error.message);
+                if (error) {
+                    console.error("🚨 SUPABASE DATABASE REJECTION CRASH:", error.message);
+                    console.error("Rejected Payload Blueprint:", payload);
+                    alert("Database Save Error: " + error.message);
+                } else {
+                    console.log("🚀 DATABASE TRANSACTION SUCCESSFUL: Row persisted.", data);
+                }
             } catch (err) {
-                console.error("Exception handling history sync:", err);
+                console.error("Unhandled exception inside history serialization pipeline:", err);
             }
         }
 
@@ -1124,10 +1148,15 @@
                 badge.className = "bg-neutral-950 text-neutral-500 border border-neutral-800 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
             }
 
-            runningChatHistoryLedger.push({
+            // ─── THE CORRECTION FIX ───────────────────────────────────────
+            // Clone the history ledger to a temporary variable instead of 
+            // polluting the main state container.
+            const temporaryPayloadHistory = [...runningChatHistoryLedger];
+            temporaryPayloadHistory.push({
                 role: "user",
                 content: "SYSTEM NOTE: HUB_HINT_REQUEST. The candidate is stuck and has explicitly requested a conceptual hint for your previous question. Do not give away the direct answer or write code solutions. Provide a subtle, guiding nudge or frame an alternative perspective to unblock them."
             });
+            // ──────────────────────────────────────────────────────────────
 
             try {
                 const response = await fetch('/api/interview', {
@@ -1136,7 +1165,7 @@
                     body: JSON.stringify({
                         jobDescription: globalJobDescContext,
                         resume: globalResumeContext,
-                        chatHistory: runningChatHistoryLedger
+                        chatHistory: temporaryPayloadHistory // Send the temporary array package
                     })
                 });
 
@@ -1145,12 +1174,12 @@
 
                 let genuineInterviewerMessage = data.aiMessage;
 
-                // ANTI-LEAK SAFETY SHIELD
-                if (!genuineInterviewerMessage || genuineInterviewerMessage.includes("SYSTEM NOTE:")) {
-                    console.warn("Intercepted raw background instruction leak from backend engine.");
-                    genuineInterviewerMessage = "💡 Conceptual Nudge: Consider the underlying data patterns of the question. Think about how your local application states sync up with your system components, and focus your answer on that data pipeline.";
+                // Strip out any trailing remnants if the model still echoes it
+                if (genuineInterviewerMessage.includes("SYSTEM NOTE:")) {
+                    genuineInterviewerMessage = genuineInterviewerMessage.split("SYSTEM NOTE:")[0].trim();
                 }
                 
+                // Save the clean assistant response to your actual ledger
                 runningChatHistoryLedger.push({ role: "assistant", content: genuineInterviewerMessage });
                 
                 document.getElementById('sim-active-question-text').innerText = genuineInterviewerMessage;
@@ -1204,6 +1233,7 @@
                 globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
             }
 
+            // FIRING THE OVERHAULED WRITER
             if (latestEvaluationReportCache) { 
                 commitSessionToDatabaseHistory(latestEvaluationReportCache); 
             }
@@ -1249,12 +1279,12 @@
                 let questionBufferText = '';
                 runningChatHistoryLedger.forEach((msg) => {
                     if (msg.role === 'assistant') { questionBufferText = msg.content; } 
-                    else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST")) {
+                    else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST") && !msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED")) {
                         targetDeck.innerHTML += `
                             <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
                                 <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
                                 <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
-                                <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
+                                <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
                                     <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
                                     <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
                                 </div>
