@@ -944,40 +944,60 @@
             }, 1000);
         }
 
-        function executeAbruptTimeExhaustionShutdown() {
+        async function executeAbruptTimeExhaustionShutdown() {
             window.speechSynthesis.cancel();
             if(isMicrophoneListening) toggleVoiceSpeechInput();
             
-            // Build the standard failure record payload matrix
-            latestEvaluationReportCache = {
-                score: 30, 
-                verdict: "REJECTED (TIMEOUT)",
-                brutallyHonestReview: "The interview was abruptly terminated because you failed to present your technical competencies or form concise answers within your allocated 5-minute cognitive stamina energy threshold. Engineering roles demand concise, high-impact communication under precise time windows.",
-                gapsToFix: ["Failed overall technical time management guidelines.", "Shortage of concise structural signal responses.", "Exceeded operational communication time envelope limits."]
-            };
-
-            // 1. Reveal the high-end takeover wrapper screen elements
-            const timeoutOverlay = document.getElementById('stamina-timeout-overlay');
-            if (timeoutOverlay) timeoutOverlay.classList.remove('hidden');
-
-            // 2. Fire a ticking redirection cadence tracker to simulate analytics building
-            let redirectDelaySeconds = 3;
-            const countdownBadge = document.getElementById('timeout-redirect-countdown');
+            document.getElementById('sim-status-indicator').innerText = "⏱️ Time limit reached! Forcing sudden death compilation...";
+            renderAITypingBubble();
             
-            const redirectIntervalInstance = setInterval(() => {
-                redirectDelaySeconds--;
-                if (countdownBadge) countdownBadge.innerText = redirectDelaySeconds;
+            // Lock the interface inputs immediately
+            document.getElementById('sim-user-response-box').disabled = true;
+            document.getElementById('submit-turn-btn').disabled = true;
+            document.getElementById('hint-request-btn').disabled = true;
+
+            // Push a hidden system injection flag telling the LLM to wrap up immediately right now
+            runningChatHistoryLedger.push({
+                role: "user",
+                content: "SYSTEM NOTE: TIME_CEILING_REACHED. The 5-minute session timer has expired. Do not ask any more questions. Immediately conclude the interview, evaluate the candidate's performance based ONLY on the turns completed so far, and return the final JSON object with isConcluded set to true."
+            });
+
+            try {
+                const response = await fetch('/api/interview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        jobDescription: globalJobDescContext, 
+                        resume: globalResumeContext, 
+                        chatHistory: runningChatHistoryLedger 
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Wrap up sync loss.");
+
+                // Cache the real calculated metrics returned by the AI engine
+                latestEvaluationReportCache = data;
                 
-                if (redirectDelaySeconds <= 0) {
-                    clearInterval(redirectIntervalInstance);
-                    
-                    // Hide the modal cleanly right before showing the results layout
-                    if (timeoutOverlay) timeoutOverlay.classList.add('hidden');
-                    
-                    // Route user straight into your report compilation views
-                    executeFinalReportCompilation();
+                // Overwrite the review header text to make it clear it was a partial evaluation
+                if (latestEvaluationReportCache.brutallyHonestReview) {
+                    latestEvaluationReportCache.brutallyHonestReview = "⚠️ PARTIAL STAMINA EVALUATION: " + latestEvaluationReportCache.brutallyHonestReview;
                 }
-            }, 1000);
+
+                // Push straight to the final report card screen smoothly!
+                executeFinalReportCompilation();
+
+            } catch (err) {
+                console.error("Failed compiling sudden death metrics:", err);
+                // Fallback safe rendering if the API drops under pressure
+                latestEvaluationReportCache = {
+                    score: 45,
+                    verdict: "STAMINA TIMEOUT",
+                    brutallyHonestReview: "The interview was stopped due to the free tier time limit. Upgrade to Pro to complete deep technical evaluation tracks.",
+                    gapsToFix: ["Exceeded free tier time boundaries."]
+                };
+                executeFinalReportCompilation();
+            }
         }
 
         async function startLiveSimulation() {
