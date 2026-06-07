@@ -75,22 +75,17 @@
     <!-- ========================================== -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-sm items-center justify-center p-4 overflow-y-auto">
         
-        <!-- Modal Content Container -->
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
             
-            <!-- Close Button -->
             <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
-            <!-- Header -->
             <div class="text-center space-y-1">
                 <h3 class="text-2xl font-black tracking-tight text-white">Choose Your Workspace Tier</h3>
                 <p class="text-neutral-400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
             </div>
 
-            <!-- 3-Column Pricing Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
                 
-                <!-- 1. FREE TIER -->
                 <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <div>
@@ -108,7 +103,6 @@
                     <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
                 </div>
 
-                <!-- 2. PRO TIER (Desktop: Scaled up, Mobile: Standard size) -->
                 <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] lg:scale-105 z-10">
                     <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
                     <div class="space-y-4">
@@ -127,15 +121,11 @@
                             <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
                         </ul>
                     </div>
-                    <!-- Triggers the Lemon Squeezy Checkout passing 'pro' -->
                     <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10 cursor-pointer">Upgrade to Pro →</button>
                 </div>
 
-                <!-- 3. ELITE TIER -->
                 <div class="bg-neutral-950 border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
-                    <!-- Subtle glare effect for Elite -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                    
                     <div class="space-y-4 relative z-10">
                         <div>
                             <span class="text-[10px] font-mono font-bold text-neutral-300 uppercase tracking-widest block">Power User</span>
@@ -152,14 +142,12 @@
                             <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
                         </ul>
                     </div>
-                    <!-- Triggers the Lemon Squeezy Checkout passing 'elite' -->
                     <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10 cursor-pointer">Upgrade to Elite ⚡</button>
                 </div>
 
             </div>
         </div>
     </div>
-    <!-- ========================================== -->
 
                 <!-- TIER 2: PRO (Highlighted) -->
                 <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] scale-105 z-10 hidden lg:flex">
@@ -664,14 +652,15 @@
     const modal = document.getElementById('upgrade-modal');
     if(modal) {
         modal.classList.remove('hidden');
-        modal.classList.add('flex'); // This forces the modal to center the box
+        modal.classList.add('flex');
     }
 }
-        function closePaywallModal() {
+
+function closePaywallModal() {
     const modal = document.getElementById('upgrade-modal');
     if(modal) {
         modal.classList.add('hidden');
-        modal.classList.remove('flex'); // This hides it completely
+        modal.classList.remove('flex');
     }
 }
 
