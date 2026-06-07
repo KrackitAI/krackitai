@@ -23,26 +23,22 @@ export default async function handler(req, res) {
 
         const activeInterviewer = INTERVIEWERS[interviewerId] || INTERVIEWERS.rohan;
 
-        // ─── CRITICAL HARDCODED CONNECTIONS ───────────────────────────────
-        // Count EXACTLY how many times the assistant has spoken total.
-        // This is a programmatic constant that the LLM text cannot mess with.
-        const totalAssistantTurns = chatHistory.filter(msg => msg.role === "assistant").length;
-        
-        // Turn 1 = Intro
-        // Turn 2 = Question 1
-        // Turn 3 = Question 2
-        // Turn 4 = Question 3
-        // Turn 5 = Question 4
-        // Turn 6 = Question 5
-        const currentQuestionNumber = totalAssistantTurns; 
+        // ─── STRICT TECHNICAL QUESTION LIFECYCLE TRACKER ────────────────
+        // We only increment the count if the assistant message contains an actual question mark.
+        // This ensures conversational fluff blocks never count against the 5-question quota.
+        const totalTechnicalQuestionsAsked = chatHistory.filter(msg => 
+            msg.role === "assistant" && 
+            msg.content.includes("?") &&
+            !msg.content.includes(activeInterviewer.title)
+        ).length;
 
         const isTimeCeilingReached = chatHistory.some(msg => msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED"));
         
-        // Force wrap-up immediately if they answered 5 questions OR ran out of time
-        const forceSessionConclusion = currentQuestionNumber >= 6 || isTimeCeilingReached;
+        // Final evaluation triggers exactly after the candidate answers the 5th question
+        const forceSessionConclusion = totalTechnicalQuestionsAsked >= 5 || isTimeCeilingReached;
         // ──────────────────────────────────────────────────────────────────
 
-        const systemPrompt = `You are ${activeInterviewer.name}, a ${activeInterviewer.title} conducting a high-stakes engineering technical mock interview.
+        const systemPrompt = `You are ${activeInterviewer.name}, a ${activeInterviewer.title} conducting a highly critical technical mock interview.
 
 Target Role Requirements:
 ${jobDescription}
@@ -50,26 +46,25 @@ ${jobDescription}
 Candidate Resume Profile:
 ${resume}
 
-STRICT OPERATIONAL PACING CONTRACT:
-1. You are running a strict 5-Question technical interview script.
-2. Current Question Tracker State: [ ${currentQuestionNumber} / 5 ].
-3. If currentQuestionNumber is between 1 and 5, you MUST generate an aggressive, core engineering question testing technical trade-offs. Never say goodbye, never summarize performance, and never skip asking a concrete question ending with a "?".
-4. If currentQuestionNumber >= 6 OR forced conclusion is active, you are completely forbidden from asking more questions. You must immediately shut down the interview process, say goodbye cleanly in "aiMessage", and run the full grading assessment.
+STRICT PACING AND CONVERSATIONAL CONTRACT:
+1. You must deliver exactly 5 comprehensive technical questions throughout this mock session.
+2. Current Pacing State: [ Technical Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
+3. CRITICAL: Never deploy a transitional message or remark (e.g., "Great job, let's move to the next question") as a standalone message. You MUST append the actual technical scenario question directly inside that very same turn. Every single response you send while isConcluded is false MUST end with a clear technical question mark "?".
+4. Once totalTechnicalQuestionsAsked reaches 5, or if a timeout occurs, you must immediately set "isConcluded" to true, write a brief sign-off statement in "aiMessage", and generate the final grade.
 
-DATA OUTPUT ENFORCEMENT SCHEMA:
-You must output a raw JSON object matching this schema exactly. Do not use markdown backticks or block wrappers:
+DATA OUTPUT SCHEMA:
+You must output a raw JSON object matching this schema exactly. Do not use markdown backticks wrappers:
 {
-    "aiMessage": "Your next technical question ending with a '?'. If concluding, write a concise goodbye message.",
+    "aiMessage": "Your next technical engineering problem ending with a '?'. If concluding, write your final goodbye wrap-up text.",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
-    "score": ${forceSessionConclusion ? "An absolute integer between 1 and 100. Never use decimals or fractions." : "0"},
-    "verdict": "${forceSessionConclusion ? "MUST BE EXACTLY 'OFFER EXTENDED (PROVISIONAL)' OR 'REJECTED' BASED ON SCORE. NO OTHER STRINGS ALLOWED." : "PENDING"}",
-    "brutallyHonestReview": "${forceSessionConclusion ? "Your unvarnished, direct, peer-level engineering critique. Boldly expose gaps." : "Active session live."}",
-    "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific engineering conceptual failures or architectural weak spots." : "[]"}
+    "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on their performance." : "0"},
+    "verdict": "${forceSessionConclusion ? "Set to 'OFFER EXTENDED (PROVISIONAL)' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
+    "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level technical evaluation review." : "Active session live."}",
+    "gapsToFix": ${forceSessionConclusion ? "A flat string array of architectural or knowledge deficiencies found across their answers." : "[]"}
 }
 
 CRITICAL RULES:
-- If isConcluded is false, score MUST be 0, verdict MUST be "PENDING", and gapsToFix MUST be [].
-- Never mimic or copy user instructions. Generate only the requested database fields.`;
+- If isConcluded is false, score MUST be 0, verdict MUST be "PENDING", and gapsToFix MUST be [].`;
 
         const cleanPayloadArray = [
             { role: "system", content: systemPrompt },
@@ -79,7 +74,7 @@ CRITICAL RULES:
         const groqCompletionResponse = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: cleanPayloadArray,
-            temperature: 0.2, // Dropped to 0.2 to slam the door on creative hallucinations
+            temperature: 0.2, 
             max_tokens: 1200,
             response_format: { type: "json_object" }
         });
@@ -87,20 +82,22 @@ CRITICAL RULES:
         const rawJsonStringOutput = groqCompletionResponse.choices[0].message.content;
         const parsedReportObjectPayload = JSON.parse(rawJsonStringOutput);
 
-        // ─── FRONTEND PROTECTION DEFENSIVE SHIELD ────────────────────────
-        // Even if the LLM hallucinated, this hard-corrects the data before it returns
+        // ─── DEFENSIVE VERIFICATION LAYER ─────────────────────────────────
+        // Clean up data formatting before returning the payload to the frontend
         if (parsedReportObjectPayload.isConcluded) {
-            // Force decimal scores like 9.5 into standard 100-scale integers
-            let rawScore = parseFloat(parsedReportObjectPayload.score);
-            if (rawScore <= 10) rawScore = rawScore * 10; 
-            parsedReportObjectPayload.score = Math.round(rawScore) || 50;
+            let finalCalculatedScore = parseInt(parsedReportObjectPayload.score) || 0;
+            
+            // Handle decimal score conversions
+            if (finalCalculatedScore <= 10 && finalCalculatedScore > 0) {
+                finalCalculatedScore = finalCalculatedScore * 10;
+            }
+            parsedReportObjectPayload.score = finalCalculatedScore;
 
-            // Strict verdict compliance alignment
-            const finalCleanVerdict = String(parsedReportObjectPayload.verdict).toUpperCase();
-            if (!finalCleanVerdict.includes("OFFER") && !finalCleanVerdict.includes("PASS")) {
-                parsedReportObjectPayload.verdict = "REJECTED";
-            } else {
+            // Standardize output verdicts based on score thresholds
+            if (finalCalculatedScore >= 70) {
                 parsedReportObjectPayload.verdict = "OFFER EXTENDED (PROVISIONAL)";
+            } else {
+                parsedReportObjectPayload.verdict = "REJECTED";
             }
         }
         // ──────────────────────────────────────────────────────────────────
