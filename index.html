@@ -1033,50 +1033,67 @@
             if (label) label.innerText = `${val.length} characters written`;
         }
 
-        async function fetchNextInterviewerTurn() {
-            document.getElementById('sim-status-indicator').innerText = "Interviewer is analyzing profile...";
-            document.getElementById('submit-turn-btn').disabled = true;
-            renderAITypingBubble();
+        // 1. UPDATE THE FETCH CALL TO PASS THE JWT TOKEN
+async function fetchNextInterviewerTurn() {
+    document.getElementById('sim-status-indicator').innerText = "Interviewer is analyzing profile...";
+    document.getElementById('submit-turn-btn').disabled = true;
+    renderAITypingBubble();
 
-            try {
-                const response = await fetch('/api/interview', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
-
-                if (data.isConcluded) {
-                    clearInterval(countdownTimerIntervalInstance); 
-                    latestEvaluationReportCache = data;
-                    const goodbyeText = data.aiMessage;
-                    runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
-                    document.getElementById('sim-active-question-text').innerText = goodbyeText;
-                    speakTextAloud(goodbyeText);
-
-                    document.getElementById('sim-status-indicator').innerText = "Concluding session...";
-                    document.getElementById('submit-turn-btn').style.display = 'none';
-                    document.getElementById('mic-toggle-btn').style.display = 'none';
-                    document.getElementById('hint-request-btn').style.display = 'none';
-
-                    setTimeout(() => { finishAndWrapInterview(); }, 5000); 
-                    return;
-                }
-
-                let aiMsgText = data.aiMessage;
-                runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
-                document.getElementById('sim-active-question-text').innerText = aiMsgText;
-                document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
-                speakTextAloud(aiMsgText);
-
-            } catch (err) {
-                console.error(err); alert("Sync drop: " + err.message);
-            } finally {
-                document.getElementById('submit-turn-btn').disabled = false;
+    try {
+        // Securely retrieve the JWT token from the active session
+        let headers = { 'Content-Type': 'application/json' };
+        if (supabaseClientInstance) {
+            const { data: { session } } = await supabaseClientInstance.auth.getSession();
+            if (session) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
             }
         }
+
+        const response = await fetch('/api/interview', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
+        });
+
+        const data = await response.json();
+        
+        // Intercept backend paywall alerts (e.g., asking for too many hints)
+        if (response.status === 403 && data.error === "PAYWALL_TRIGGERED") {
+            openPaywallModal();
+            return;
+        }
+        
+        if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
+
+        if (data.isConcluded) {
+            clearInterval(countdownTimerIntervalInstance); 
+            latestEvaluationReportCache = data;
+            const goodbyeText = data.aiMessage;
+            runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
+            document.getElementById('sim-active-question-text').innerText = goodbyeText;
+            speakTextAloud(goodbyeText);
+
+            document.getElementById('sim-status-indicator').innerText = "Concluding session...";
+            document.getElementById('submit-turn-btn').style.display = 'none';
+            document.getElementById('mic-toggle-btn').style.display = 'none';
+            document.getElementById('hint-request-btn').style.display = 'none';
+
+            setTimeout(() => { finishAndWrapInterview(); }, 5000); 
+            return;
+        }
+
+        let aiMsgText = data.aiMessage;
+        runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
+        document.getElementById('sim-active-question-text').innerText = aiMsgText;
+        document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
+        speakTextAloud(aiMsgText);
+
+    } catch (err) {
+        console.error(err); alert("Sync drop: " + err.message);
+    } finally {
+        document.getElementById('submit-turn-btn').disabled = false;
+    }
+}
 
         async function submitCandidateResponseTurn() {
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
@@ -1180,89 +1197,74 @@
             executeFinalReportCompilation();
         }
 
-        function executeFinalReportCompilation() {
-            clearInterval(countdownTimerIntervalInstance);
-            window.speechSynthesis.cancel(); 
-            if(isMicrophoneListening) toggleVoiceSpeechInput();
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            
-            if (!globalJobDescContext) {
-                globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+        // 2. UPDATE THE REPORT COMPILATION TO APPLY THE CSS BLUR PAYWALL
+function executeFinalReportCompilation() {
+    clearInterval(countdownTimerIntervalInstance);
+    window.speechSynthesis.cancel(); 
+    if(isMicrophoneListening) toggleVoiceSpeechInput();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    
+    if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+    if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+
+    if (latestEvaluationReportCache) { 
+        commitSessionToDatabaseHistory(latestEvaluationReportCache); 
+    }
+    
+    if (latestEvaluationReportCache) {
+        const report = latestEvaluationReportCache;
+        
+        document.getElementById('report-score-target').innerText = report.score || 0;
+        document.getElementById('report-resume-score-target').innerText = cachedResumePreflightScore || 0;
+        document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
+
+        const badge = document.getElementById('report-verdict-badge');
+        const accentBar = document.getElementById('report-accent-bar');
+        const verdictStr = (report.verdict || "REJECTED").toUpperCase();
+        
+        if (badge) {
+            badge.innerText = verdictStr;
+            if (verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER')) {
+                badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
+                if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
+            } else {
+                badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
+                if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
             }
-            if (!globalResumeContext) {
-                globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
-            }
+        }
 
-            if (latestEvaluationReportCache) { 
-                commitSessionToDatabaseHistory(latestEvaluationReportCache); 
-            }
-            
-            if (latestEvaluationReportCache) {
-                const report = latestEvaluationReportCache;
-                
-                const interviewScoreElement = document.getElementById('report-score-target');
-                const resumeScoreElement = document.getElementById('report-resume-score-target');
-                const critiqueElement = document.getElementById('report-critique-target');
-
-                if (interviewScoreElement) interviewScoreElement.innerText = report.score || 0;
-                if (resumeScoreElement) resumeScoreElement.innerText = cachedResumePreflightScore || 0;
-                if (critiqueElement) critiqueElement.innerText = report.brutallyHonestReview || "No review generated.";
-
-                const badge = document.getElementById('report-verdict-badge');
-                const accentBar = document.getElementById('report-accent-bar');
-                const verdictStr = (report.verdict || "REJECTED").toUpperCase();
-                
-                // CRITICAL FIX: The final report view now turns green for ALL acceptable status strings
-                if (badge) {
-                    badge.innerText = verdictStr;
-                    if (verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER')) {
-                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
-                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
-                    } else {
-                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
-                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
-                    }
-                }
-
-                const gapsList = document.getElementById('report-gaps-list-target'); 
-                if (gapsList) {
-                    gapsList.innerHTML = '';
-                    if (report.gapsToFix && report.gapsToFix.length > 0) {
-                        report.gapsToFix.forEach(gap => { gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; });
-                    } else { gapsList.innerHTML = `<li class="text-neutral-500 italic">No structural deficiencies found.</li>`; }
-                }
-            }
-
-            const targetDeck = document.getElementById('transcript-deck-target'); 
-            if (targetDeck) {
-                targetDeck.innerHTML = '';
-                let questionBufferText = '';
-                runningChatHistoryLedger.forEach((msg) => {
-                    if (msg.role === 'assistant') { questionBufferText = msg.content; } 
-                    else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST") && !msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED")) {
-                        targetDeck.innerHTML += `
-                            <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
-                                <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
-                                <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
-                                <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
-                                    <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
-                                    <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
-                                </div>
-                            </div>`;
-                    }
+        // --- THE DYNAMIC BLUR ENFORCEMENT ---
+        const gapsList = document.getElementById('report-gaps-list-target'); 
+        if (gapsList) {
+            gapsList.innerHTML = '';
+            // If the backend returned an empty array (Free Tier rule), render the locked teaser
+            if (!report.gapsToFix || report.gapsToFix.length === 0) {
+                gapsList.innerHTML = `
+                    <div class="relative p-4 bg-neutral-950/40 rounded-xl border border-neutral-800/60 overflow-hidden select-none cursor-pointer hover:border-[#FFE500]/50 transition-colors" onclick="openPaywallModal()">
+                        <div class="filter blur-[4px] space-y-2">
+                            <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Detailed optimization vulnerability analysis</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Missing production implementation architecture</span></li>
+                        </div>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+                            <span class="text-xs font-black text-[#FFE500] bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-xl shadow-2xl">
+                                🔒 Unlock Deficiency Diagnostic Roadmap
+                            </span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                report.gapsToFix.forEach(gap => { 
+                    gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; 
                 });
             }
-            
-            const submitTurnBtn = document.getElementById('submit-turn-btn');
-            const micToggleBtn = document.getElementById('mic-toggle-btn');
-            const hintRequestBtn = document.getElementById('hint-request-btn');
-            
-            if (submitTurnBtn) submitTurnBtn.style.display = 'block'; 
-            if (micToggleBtn) micToggleBtn.style.display = 'block';
-            if (hintRequestBtn) hintRequestBtn.style.display = 'block';
-            
-            showScreen('results-screen');
         }
+    }
+
+    const targetDeck = document.getElementById('transcript-deck-target'); 
+    if (targetDeck) { /* KEEP YOUR EXISTING TRANSCRIPT LOOP HERE */ }
+    
+    showScreen('results-screen');
+}
 
         // DOM CORE ROUTING INITIALIZATIONS
         window.addEventListener('DOMContentLoaded', () => {
