@@ -16,15 +16,18 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: "Missing required profile parameters." });
         }
 
-        // ─── STAGE 1: DYNAMIC LIFECYCLE PROGRESS TRACKER ────────────────
-        const totalTechnicalQuestionsAsked = chatHistory.filter((msg, idx) => 
-            msg.role === "assistant" && 
-            msg.content.includes("?") &&
-            idx > 0 
-        ).length;
+        // ─── STAGE 1: BULLETPROOF MATH COUNTER ──────────────────────────
+        // Count total times the AI has spoken, minus 1 for the introduction greeting.
+        // This is mathematically absolute and cannot be broken by missing '?' marks.
+        const assistantMessageCount = chatHistory.filter(msg => msg.role === "assistant").length;
+        const totalTechnicalQuestionsAsked = Math.max(0, assistantMessageCount - 1);
 
         const isTimeCeilingReached = chatHistory.some(msg => msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED"));
         const forceSessionConclusion = totalTechnicalQuestionsAsked >= 5 || isTimeCeilingReached;
+        
+        let conclusionReason = "N/A";
+        if (isTimeCeilingReached) conclusionReason = "TIME_EXPIRED";
+        else if (totalTechnicalQuestionsAsked >= 5) conclusionReason = "ALL_QUESTIONS_ANSWERED";
 
         // ─── STAGE 2: ADAPTIVE DOMAIN SYSTEM PROMPT ─────────────────────
         const systemPrompt = `You are an expert corporate interviewer tailored precisely to the domain of the provided Job Description.
@@ -36,28 +39,28 @@ Candidate Resume Profile:
 ${resume}
 
 YOUR PERSONA MANDATE:
-- If this is the very first turn of the interview, dynamically invent a highly realistic name, an industry-accurate corporate title, and a fictitious target company that perfectly fits the job description.
-- Maintain this exact persona consistently across the entire chat log.
+- Dynamically invent a highly realistic name, an industry-accurate corporate title, and a fictitious company matching the job description on turn 1. Maintain it consistently.
 
 STRICT PACING AND CONVERSATIONAL CONTRACT:
 1. You must deliver exactly 5 comprehensive domain-specific interview questions throughout this session.
 2. Current Progress State: [ Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
-3. CRITICAL: Never deploy a transitional message or remark as a standalone message. You MUST append the actual scenario question directly inside that very same turn. Every single response you send while isConcluded is false MUST end with a clear question mark "?".
-4. Once totalTechnicalQuestionsAsked reaches 5, or if a timeout occurs, you must immediately set "isConcluded" to true, write a brief sign-off statement in "aiMessage", and generate the final grade.
+3. CRITICAL: Never deploy a transitional remark as a standalone message. Append the actual scenario question directly inside that very same turn ending with a "?".
+4. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
+${forceSessionConclusion ? "" : "CRITICAL RULE: You are FORBIDDEN from ending the interview early. You MUST output isConcluded: false and ask a technical question."}
+
+GRADING OBJECTIVE DIRECTIVE:
+${forceSessionConclusion ? `The interview has ended. Evaluate the candidate's answers. If their technical depth was weak, you MUST give a low score, set the verdict to REJECTED, and write a critical review. Do NOT compliment a failing candidate.` : `The interview is active. Do not generate final grades, scores, or reviews yet.`}
 
 DATA OUTPUT SCHEMA:
-You must output a raw JSON object matching this schema exactly. Do not use markdown backticks wrappers:
+You must output a raw JSON object matching this schema exactly:
 {
-    "aiMessage": "Your next tailored interview question ending with a '?'. If concluding, write your final goodbye wrap-up text.",
+    "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'Write a brief goodbye stating time expired.' : 'Write a brief goodbye stating they have completed all 5 questions.') : 'Your next tailored interview question ending with a ?.'}",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'OFFER EXTENDED (PROVISIONAL)' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
-    "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level evaluation review tailored to this role's domain." : "Active session live."}",
-    "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific constructive areas to remediate. CRITICAL RULE: If your brutallyHonestReview text mentions ANY soft skill issues, lack of depth, communication flaws, or technical holes, you MUST list them as short separate strings in this array. Never leave this array empty if there is room for improvement." : "[]"}
-}
-
-CRITICAL RULES:
-- If isConcluded is false, score MUST be 0, verdict MUST be "PENDING", and gapsToFix MUST be [].`;
+    "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level evaluation review. If the candidate failed, focus entirely on their mistakes. Do not praise them." : "Active session live."}",
+    "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific constructive areas to remediate." : "[]"}
+}`;
 
         // ─── STAGE 3: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
         const cleanPayloadArray = [
@@ -68,7 +71,7 @@ CRITICAL RULES:
         const groqCompletionResponse = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: cleanPayloadArray,
-            temperature: 0.2, 
+            temperature: 0.1, 
             max_tokens: 1200,
             response_format: { type: "json_object" }
         });
@@ -76,7 +79,25 @@ CRITICAL RULES:
         const rawJsonStringOutput = groqCompletionResponse.choices[0].message.content;
         const parsedReportObjectPayload = JSON.parse(rawJsonStringOutput);
 
-        // ─── DEFENSIVE VERIFICATION SHIELD ──────────────────────────────
+        // ─── DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ───────────────
+        
+        // THE HANDCUFFS: If the AI illegally hallucinates an early ending, intercept it and force it back open.
+        if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {
+            parsedReportObjectPayload.isConcluded = false;
+            parsedReportObjectPayload.score = 0;
+            parsedReportObjectPayload.verdict = "PENDING";
+            parsedReportObjectPayload.gapsToFix = [];
+            
+            // If the AI tried to say goodbye, erase its message and inject a hardcoded fallback question.
+            const msgLower = (parsedReportObjectPayload.aiMessage || "").toLowerCase();
+            if (msgLower.includes("5 questions") || msgLower.includes("conclude") || msgLower.includes("goodbye") || msgLower.includes("thank you")) {
+                parsedReportObjectPayload.aiMessage = "Let's pivot slightly and dive a bit deeper. Based on our discussion so far, what specific structural trade-offs would you consider if we scaled this system's architecture by 10x?";
+            }
+        }
+
+        // ────────────────────────────────────────────────────────────────
+
+        // Grading Normalization Block
         if (parsedReportObjectPayload.isConcluded) {
             let finalCalculatedScore = parseInt(parsedReportObjectPayload.score) || 0;
             
@@ -88,7 +109,6 @@ CRITICAL RULES:
             if (finalCalculatedScore >= 70) {
                 parsedReportObjectPayload.verdict = "OFFER EXTENDED (PROVISIONAL)";
                 
-                // Safety net: Check if the text critique hints at flaws while the array was left empty
                 const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
                 if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
                     const fallbackGaps = [];
@@ -98,17 +118,20 @@ CRITICAL RULES:
                     if (reviewText.includes("deeper") || reviewText.includes("depth")) {
                         fallbackGaps.push("Elaborate on fine-grained architectural trade-offs.");
                     }
-                    
-                    // If no specific text patterns matched but score is under 100, provide a general refinement gap
                     if (fallbackGaps.length === 0 && finalCalculatedScore < 100) {
                         fallbackGaps.push("Polish contextual explanation speed and structural precision.");
                     }
-                    
                     parsedReportObjectPayload.gapsToFix = fallbackGaps;
                 }
             } else {
                 parsedReportObjectPayload.verdict = "REJECTED";
                 
+                // If the score is failing (< 70) but the AI hallucinates a positive review text, overwrite it!
+                const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
+                if (reviewText.includes("fit for our") || reviewText.includes("impressive") || reviewText.includes("aced") || reviewText.includes("great fit")) {
+                    parsedReportObjectPayload.brutallyHonestReview = "The technical depth provided across your interview answers fell significantly short of our production engineering requirements. Core architectural trade-offs lacked standard structural precision and critical optimizations.";
+                }
+
                 if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
                     parsedReportObjectPayload.gapsToFix = [
                         "Domain depth fell short of the required role threshold.",
