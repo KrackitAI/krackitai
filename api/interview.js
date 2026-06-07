@@ -1,8 +1,13 @@
 import { Groq } from "groq-sdk";
+import { createClient } from "@supabase/supabase-js";
 
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Initialize Supabase admin auto-verify instance to securely check user tiers on the backend
+const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zlzprbespegemxnhwnuu.supabase.co',
+    process.env.SUPABASE_SERVICE_ROLE_KEY // Use service role to bypass RLS for quick profile lookups
+);
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -10,33 +15,77 @@ export default async function handler(req, res) {
     }
 
     try {
-        // ─── STAGE 1: PAYLOAD EXTRACTION & HINT DETECTION ───────────────
+        // ─── STAGE 1: PAYLOAD EXTRACTION & SECURE TIER VERIFICATION ───────
         const { jobDescription, resume, chatHistory, isHintRequest } = req.body;
 
         if (!jobDescription || !resume || !chatHistory) {
             return res.status(400).json({ error: "Missing required profile parameters." });
         }
 
-        // Smart Hint Detection: Checks if the frontend sent a flag OR if the user literally typed "hint"
+        // Extract the user token from Authorization header to check their real subscription tier
+        const authHeader = req.headers.authorization;
+        let userTier = 'free'; // Default fallback
+        let userId = null;
+
+        if (authHeader) {
+            const token = authHeader.replace("Bearer ", "");
+            const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+            if (!authError && user) {
+                userId = user.id;
+                // Query your profiles table (synced via Lemon Squeezy webhooks)
+                const { data: profile } = await supabaseAdmin
+                    .from('profiles')
+                    .select('tier')
+                    .eq('id', userId)
+                    .single();
+                
+                if (profile && profile.tier) {
+                    userTier = profile.tier.toLowerCase(); // 'free', 'pro', or 'elite'
+                }
+            }
+        }
+
+        // ─── STAGE 2: DYNAMIC TIER ENFORCEMENT CONFIG ─────────────────────
+        let maxQuestions = 5;
+        let timeCeilingSeconds = 300; // 5 mins free
+        let groqModel = "llama-3.1-8b-instant"; // Standard model
+        let maxHintsAllowed = 1;
+
+        if (userTier === 'pro') {
+            timeCeilingSeconds = 1200; // 20 mins pro
+            maxHintsAllowed = 5;
+        } else if (userTier === 'elite') {
+            timeCeilingSeconds = 2700; // 45 mins elite
+            groqModel = "llama-3.3-70b-versatile"; // Smart model routing for architecture depth
+            maxHintsAllowed = 999; // Essentially unlimited
+        }
+
+        // Smart Hint Detection
         const lastUserMessage = chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === "user" 
             ? chatHistory[chatHistory.length - 1].content.toLowerCase() 
             : "";
         const isHintMode = isHintRequest === true || lastUserMessage.includes("hint") || lastUserMessage.includes("help");
 
-        // ─── STAGE 2: BULLETPROOF MATH COUNTER ──────────────────────────
-        // We filter out any past AI messages that contained the "[HINT]" tag so they don't consume the 5-question limit.
+        // Calculate hint count and question limits
+        const totalHintsUsed = chatHistory.filter(msg => msg.role === "assistant" && msg.content.includes("[HINT]")).length;
         const assistantMessageCount = chatHistory.filter(msg => msg.role === "assistant" && !msg.content.includes("[HINT]")).length;
         const totalTechnicalQuestionsAsked = Math.max(0, assistantMessageCount - 1);
 
         const isTimeCeilingReached = chatHistory.some(msg => msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED"));
-        const forceSessionConclusion = totalTechnicalQuestionsAsked >= 5 || isTimeCeilingReached;
+        const forceSessionConclusion = totalTechnicalQuestionsAsked >= maxQuestions || isTimeCeilingReached;
         
         let conclusionReason = "N/A";
         if (isTimeCeilingReached) conclusionReason = "TIME_EXPIRED";
-        else if (totalTechnicalQuestionsAsked >= 5) conclusionReason = "ALL_QUESTIONS_ANSWERED";
+        else if (totalTechnicalQuestionsAsked >= maxQuestions) conclusionReason = "ALL_QUESTIONS_ANSWERED";
+
+        // Paywall block if a free user manually bypasses frontend hints
+        if (isHintMode && totalHintsUsed >= maxHintsAllowed) {
+            return res.status(403).json({ error: "PAYWALL_TRIGGERED", message: "Hint capacity exhausted for your tier." });
+        }
 
         // ─── STAGE 3: ADAPTIVE DOMAIN SYSTEM PROMPT ─────────────────────
         const systemPrompt = `You are an expert corporate interviewer tailored precisely to the domain of the provided Job Description.
+${userTier === 'elite' ? "You are interviewing a high-level candidate. Drill deep into fine-grained distributed systems architecture, race conditions, edge-case failure modes, and micro-optimizations. Be rigorous." : ""}
 
 Target Role Context:
 ${jobDescription}
@@ -49,20 +98,17 @@ YOUR PERSONA MANDATE:
 - CRITICAL TURN 1 RULE: On your very first message, you MUST introduce yourself AND immediately ask the first technical scenario question. Do not wait for the candidate to say hello.
 
 STRICT PACING AND CONVERSATIONAL CONTRACT:
-1. You must deliver exactly 5 comprehensive domain-specific interview questions. This is a standalone 5-question sprint. There are NO coding rounds, NO debugging rounds, and NO subsequent interviews. 
+1. You must deliver exactly 5 comprehensive domain-specific interview questions. This is a standalone 5-question sprint.
 2. Current Progress State: [ Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
-3. CRITICAL: NEVER promise or suggest future rounds, coding tests, or next steps to the candidate.
-4. ${isHintMode ? 
-    "HINT DIRECTIVE ACTIVE: The candidate is asking for a hint or help. You MUST start your response exactly with '[HINT]'. Provide a brief, conceptual clue or guidance. DO NOT ask a new question. DO NOT answer the current question entirely for them. Wait for their actual response." : 
-    "THE HUMAN ELEMENT: You must sound like a real human engineer. For questions 2 through 5, you MUST briefly react to the candidate's previous answer before asking the next question. Validate their good points or correct their mistakes."}
-5. ${isHintMode ? 
-    "NO QUESTION MARK ALLOWED: Because this is a hint turn, you are just providing a clue. Do not end your message with a question mark." : 
-    "THE QUESTION MARK RULE: After your conversational feedback, seamlessly transition into your next technical question. Every single active response MUST end with a clear technical question mark '?'."}
-6. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
-${forceSessionConclusion ? "" : "CRITICAL RULE: You are FORBIDDEN from ending the interview early. You MUST output isConcluded: false."}
+3. ${isHintMode ? 
+    "HINT DIRECTIVE ACTIVE: The candidate is asking for a hint. You MUST start your response exactly with '[HINT]'. Provide a brief, conceptual clue. DO NOT ask a new question. DO NOT answer the current question entirely." : 
+    "THE HUMAN ELEMENT: Briefly react to the candidate's previous answer before asking the next question. Validate good points or critique technical flaws."}
+4. ${isHintMode ? "NO QUESTION MARK ALLOWED: You are just providing a clue. Do not end your message with a question mark." : "THE QUESTION MARK RULE: Every single active response MUST end with a clear technical question mark '?'."}
+5. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
 
 GRADING OBJECTIVE DIRECTIVE:
-${forceSessionConclusion ? `The interview has ended. Evaluate the candidate's answers. If their technical depth was weak, you MUST give a low score, set the verdict to REJECTED, and write a critical review. Do NOT compliment a failing candidate.` : `The interview is active. Do not generate final grades, scores, or reviews yet.`}
+${forceSessionConclusion ? `The interview has ended. Evaluate performance.
+${userTier === 'free' ? "TIER PRIVILEGE: This user is on the FREE sandbox. You MUST write a brief, vague 1-2 sentence high-level summary for the 'brutallyHonestReview' and leave 'gapsToFix' completely empty. Do not provide diagnostic secrets." : "TIER PRIVILEGE: This user is PRO/ELITE. Provide a piercing, unvarnished peer-level technical review focusing completely on their gaps."}` : `The interview is active. Do not generate final grades yet.`}
 
 DATA OUTPUT SCHEMA:
 You must output a raw JSON object matching this schema exactly:
@@ -71,109 +117,38 @@ You must output a raw JSON object matching this schema exactly:
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
-    "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level evaluation review. If the candidate failed, focus entirely on their mistakes. Do not praise them." : "Active session live."}",
+    "brutallyHonestReview": "${forceSessionConclusion ? "Your review string context based on Tier rules." : "Active session live."}",
     "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific constructive areas to remediate." : "[]"}
 }`;
 
         // ─── STAGE 4: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
-        const cleanPayloadArray = [
-            { role: "system", content: systemPrompt },
-            ...chatHistory
-        ];
-
         const groqCompletionResponse = await groq.chat.completions.create({
-            model: "llama-3.1-8b-instant",
-            messages: cleanPayloadArray,
+            model: groqModel, // Dynamic routing based on tier (8B vs 70B)
+            messages: [{ role: "system", content: systemPrompt }, ...chatHistory],
             temperature: 0.15, 
             max_tokens: 1200,
             response_format: { type: "json_object" }
         });
 
-        const rawJsonStringOutput = groqCompletionResponse.choices[0].message.content;
-        const parsedReportObjectPayload = JSON.parse(rawJsonStringOutput);
+        const parsedReportObjectPayload = JSON.parse(groqCompletionResponse.choices[0].message.content);
 
         // ─── STAGE 5: DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ──────
-        
-        // Stop Illegal Early Terminations
         if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {
             parsedReportObjectPayload.isConcluded = false;
             parsedReportObjectPayload.score = 0;
             parsedReportObjectPayload.verdict = "PENDING";
             parsedReportObjectPayload.gapsToFix = [];
-            
-            const msgLower = (parsedReportObjectPayload.aiMessage || "").toLowerCase();
-            if (msgLower.includes("5 questions") || msgLower.includes("conclude") || msgLower.includes("goodbye") || msgLower.includes("thank you")) {
-                parsedReportObjectPayload.aiMessage = "Good points. Let's pivot slightly and dive a bit deeper. Based on our discussion so far, what specific structural trade-offs would you consider if we scaled this architecture by 10x?";
-            }
         }
 
-        // The Smart Question Mark Enforcer (Bypassed if user is just asking for a hint)
-        if (parsedReportObjectPayload.isConcluded === false && !isHintMode) {
-            let aiMsg = parsedReportObjectPayload.aiMessage || "";
-            aiMsg = aiMsg.replace(/let's simulate.*next/ig, "").replace(/in the next round.*/ig, "").trim();
-            
-            if (!aiMsg.includes("?")) {
-                if (totalTechnicalQuestionsAsked === 0) {
-                    aiMsg += " To get started, what would be your initial approach to designing the core architecture for this role's primary system?";
-                } else {
-                    aiMsg += " Given these constraints, how would you approach the next critical component of this design?";
-                }
-            }
-            parsedReportObjectPayload.aiMessage = aiMsg;
-        }
-
-        // ─── STAGE 6: GRADING NORMALIZATION BLOCK ───────────────────────
-        if (parsedReportObjectPayload.isConcluded) {
-            let finalCalculatedScore = parseInt(parsedReportObjectPayload.score) || 0;
-            
-            if (finalCalculatedScore <= 10 && finalCalculatedScore > 0) {
-                finalCalculatedScore = finalCalculatedScore * 10;
-            }
-            parsedReportObjectPayload.score = finalCalculatedScore;
-
-            if (finalCalculatedScore >= 70) {
-                // FIXED VERDICT STRING: Now explicitly says ACCEPTED instead of Offer Extended
-                parsedReportObjectPayload.verdict = "STRONG HIRE"; 
-                
-                const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
-                if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
-                    const fallbackGaps = [];
-                    if (reviewText.includes("communication") || reviewText.includes("refining")) {
-                        fallbackGaps.push("Refine behavioral articulation and communication delivery.");
-                    }
-                    if (reviewText.includes("deeper") || reviewText.includes("depth")) {
-                        fallbackGaps.push("Elaborate on fine-grained architectural trade-offs.");
-                    }
-                    if (fallbackGaps.length === 0 && finalCalculatedScore < 100) {
-                        fallbackGaps.push("Polish contextual explanation speed and structural precision.");
-                    }
-                    parsedReportObjectPayload.gapsToFix = fallbackGaps;
-                }
-            } else {
-                parsedReportObjectPayload.verdict = "REJECTED";
-                
-                const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
-                if (reviewText.includes("fit for our") || reviewText.includes("impressive") || reviewText.includes("aced") || reviewText.includes("great fit")) {
-                    parsedReportObjectPayload.brutallyHonestReview = "The technical depth provided across your interview answers fell significantly short of our production engineering requirements. Core architectural trade-offs lacked standard structural precision and critical optimizations.";
-                }
-
-                if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
-                    parsedReportObjectPayload.gapsToFix = [
-                        "Domain depth fell short of the required role threshold.",
-                        "Core situational answers lacked optimal structural precision.",
-                        "Review the unvarnished critique block for detailed concepts to study."
-                    ];
-                }
-            }
+        // Clean missing parameters if model hallucinated free constraints
+        if (userTier === 'free' && forceSessionConclusion) {
+            parsedReportObjectPayload.gapsToFix = []; // Hard lock data gaps for free users
         }
 
         return res.status(200).json(parsedReportObjectPayload);
 
     } catch (error) {
         console.error("🚨 API ROUTE CRASH ERROR:", error);
-        return res.status(500).json({ 
-            error: "Internal server processing failure.", 
-            details: error.message 
-        });
+        return res.status(500).json({ error: "Internal server processing failure.", details: error.message });
     }
 }
