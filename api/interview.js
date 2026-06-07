@@ -133,7 +133,7 @@ You must output a raw JSON object matching this schema exactly:
 
             if (finalCalculatedScore >= 70) {
                 // FIXED VERDICT STRING: Now explicitly says ACCEPTED instead of Offer Extended
-                parsedReportObjectPayload.verdict = "ACCEPTED"; 
+                parsedReportObjectPayload.verdict = "STRONG HIRE"; 
                 
                 const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
                 if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
