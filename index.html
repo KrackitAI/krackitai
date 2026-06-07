@@ -733,99 +733,18 @@
                     const dateStr = new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                     const verdictStr = (row.verdict || "REJECTED").toUpperCase();
                     
+                    // CRITICAL FIX: The UI history panel now turns green for ALL acceptable variations
                     const passed = verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER');
                     
                     const gaps = Array.isArray(row.gaps_to_fix) ? row.gaps_to_fix : [];
                     const transcriptDeck = Array.isArray(row.transcript) ? row.transcript : [];
                     const atsScore = row.resume_screening_score || 0;
 
-                    // ─── NEW: DYNAMIC JOB TITLE EXTRACTOR ─────────────────────
+                    // ─── NEW: SMART DYNAMIC JOB TITLE EXTRACTOR ─────────────────────
                     let displayTitle = "Job Simulation Record";
                     if (row.job_description) {
-                        // Grab the very first line of the pasted job description
                         const cleanLines = row.job_description.split('\n').filter(line => line.trim().length > 0);
-                        if (cleanLines.length > 0) {
-                            displayTitle = cleanLines[0].trim();
-                            // If the first line is a massive paragraph, cut it off cleanly
-                            if (displayTitle.length > 45) {
-                                displayTitle = displayTitle.substring(0, 45) + "...";
-                            }
-                        }
-                    }
-                    // ──────────────────────────────────────────────────────────
-
-                    let gapsHtml = '';
-                    if (gaps.length > 0) {
-                        gaps.forEach(g => { gapsHtml += `<li class="flex items-start space-x-1.5"><span class="text-rose-500 font-bold">✕</span><span>${g}</span></li>`; });
-                    } else { gapsHtml = `<li class="text-neutral-500 italic">No structural gaps recorded.</li>`; }
-
-                    let transcriptHtml = '';
-                    let questionBuffer = '';
-                    transcriptDeck.forEach(msg => {
-                        if (msg.role === 'assistant') { questionBuffer = msg.content; }
-                        else if (msg.role === 'user' && questionBuffer) {
-                            transcriptHtml += `
-                                <div class="bg-neutral-950 p-3 rounded-lg border border-neutral-900 space-y-2">
-                                    <p class="text-[10px] font-mono text-neutral-500 font-bold uppercase">Parameter Asked:</p>
-                                    <p class="text-xs text-neutral-300 font-bold leading-relaxed">${questionBuffer}</p>
-                                    <div class="bg-neutral-900/50 p-2.5 rounded border border-neutral-800">
-                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Registered Input:</p>
-                                        <p class="text-xs text-neutral-400 font-normal leading-relaxed mt-0.5">${msg.content}</p>
-                                    </div>
-                                </div>`;
-                        }
-                    });
-
-                    container.innerHTML += `
-                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl transition-all overflow-hidden">
-                            <div onclick="toggleHistoryItemAccordion(${idx})" class="p-4 flex items-center justify-between cursor-pointer hover:bg-neutral-900/80 transition-colors select-none">
-                                <div class="space-y-1 min-w-0 pr-2">
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-[10px] font-mono font-bold text-neutral-500">${dateStr}</span>
-                                        <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/30' : 'bg-rose-950/60 text-rose-400 border border-rose-900/30'}">${verdictStr}</span>
-                                        ${atsScore > 0 ? `<span class="text-[9px] font-mono bg-neutral-950 border border-neutral-800 text-neutral-400 px-1.5 rounded">ATS: ${atsScore}</span>` : ''}
-                                    </div>
-                                    <!-- Dynamic Title injected here with hover tooltips! -->
-                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]" title="${displayTitle}">${displayTitle}</h4>
-                                </div>
-                                <div class="flex items-center space-x-3 font-mono">
-                                    <span class="text-base font-black text-white">${row.score}<span class="text-[10px] text-neutral-500 font-normal">/100</span></span>
-                                    <span id="history-arrow-${idx}" class="text-neutral-500 text-xs transition-transform duration-200">▼</span>
-                                </div>
-                            </div>
-
-                            <div id="history-body-${idx}" class="hidden border-t border-neutral-900 p-4 bg-neutral-950/50 space-y-4 text-xs">
-                                <div class="space-y-1 relative pl-3 border-l-2 ${passed ? 'border-emerald-500' : 'border-rose-500'}">
-                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Unvarnished AI Critique:</h5>
-                                    <p class="text-neutral-300 font-medium italic leading-relaxed">"${row.brutally_honest_review}"</p>
-                                </div>
-
-                                <div class="space-y-1.5">
-                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Deficiencies To Remediate:</h5>
-                                    <ul class="space-y-1 text-neutral-400">${gapsHtml}</ul>
-                                </div>
-
-                                <div class="space-y-2 pt-2 border-t border-neutral-900">
-                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Interaction Timeline:</h5>
-                                    <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">${transcriptHtml || '<p class="text-neutral-600 italic">No timeline entries generated.</p>'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                if (err.message && err.message.includes('JWT expired')) {
-                    console.warn("User auth session expired. Forcing login refresh alignment.");
-                    closeHistoryModal();
-                    if (supabaseClientInstance) {
-                        await supabaseClientInstance.auth.signOut();
-                    }
-                    triggerInlineAuthWall('signin');
-                    return;
-                }
-                container.innerHTML = `<p class="text-xs text-rose-400 font-mono">Error querying data: ${err.message}</p>`;
-            }
-        }
+                        if (cleanLines.
 
         function toggleHistoryItemAccordion(index) {
             const body = document.getElementById(`history-body-${index}`);
