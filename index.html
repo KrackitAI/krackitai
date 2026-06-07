@@ -71,7 +71,8 @@
     </nav>
 
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-2xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
+        <!-- Increased max-w-2xl to max-w-5xl to comfortably fit 3 columns -->
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
             <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1">
@@ -79,7 +80,10 @@
                 <p class="text-neutral-400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <!-- Changed to lg:grid-cols-3 for a 3-column layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
+                
+                <!-- TIER 1: FREE -->
                 <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <div>
@@ -88,13 +92,86 @@
                         </div>
                         <ul class="space-y-2.5 text-xs text-neutral-400">
                             <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>Standard LLM reasoning speeds</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unlimited simulation runtime</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished technical critiques</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>5-minute session limit</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>Standard ATS screening</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Audio voice synthesis</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished deficiency audits</span></li>
                         </ul>
                     </div>
                     <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
                 </div>
+
+                <!-- TIER 2: PRO (Highlighted) -->
+                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] scale-105 z-10 hidden lg:flex">
+                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
+                            <div class="flex items-baseline space-x-1 mt-0.5">
+                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
+                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-200">
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10">Upgrade to Pro →</button>
+                </div>
+                
+                <!-- Mobile fallback for Pro to remove scale effect on small screens -->
+                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] lg:hidden">
+                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
+                            <div class="flex items-baseline space-x-1 mt-0.5">
+                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
+                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-200">
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10">Upgrade to Pro →</button>
+                </div>
+
+                <!-- TIER 3: ELITE -->
+                <div class="bg-neutral-950 border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
+                    <!-- Subtle glare effect for Elite -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                    
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-neutral-300 uppercase tracking-widest block">Power User</span>
+                            <div class="flex items-baseline space-x-1 mt-0.5">
+                                <h4 class="text-xl font-black text-white">Krackit Elite</h4>
+                                <span class="text-xs text-neutral-400 font-medium">/ $39 monthly</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-300">
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Advanced 70B AI Reasoning Engine</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Company Personas</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
+                            <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10">Upgrade to Elite ⚡</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
                 <div class="bg-neutral-900 border border-[#FFE500]/30 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.03)]">
                     <div class="absolute -top-2.5 right-4 bg-[#FFE500] text-black text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full select-none">Recommended</div>
