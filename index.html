@@ -113,7 +113,11 @@
                             <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Detailed deficiency gap logging</span></li>
                         </ul>
                     </div>
-                    <a href="YOUR_LEMON_SQUEEZY_PRO_MONTHLY_URL" target="_blank" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/5">Upgrade Workspace Now →</a>
+                    <!-- The Pro Tier Button -->
+<button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/5">Upgrade to Pro →</button>
+
+<!-- The Elite Tier Button (Add this to your UI) -->
+<button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/5">Upgrade to Elite ⚡</button>
                 </div>
             </div>
         </div>
@@ -1338,6 +1342,42 @@ function executeFinalReportCompilation() {
                 });
             }
         });
+
+        // Add this to your index.html <script> block
+async function initiatePremiumCheckout(tier) {
+    if (!supabaseClientInstance) return;
+    
+    try {
+        // 1. Get the active user session
+        const { data: { session } } = await supabaseClientInstance.auth.getSession();
+        
+        if (!session) {
+            triggerInlineAuthWall('signin');
+            return;
+        }
+
+        const userId = session.user.id;
+        const userEmail = session.user.email;
+        
+        // 2. Define your Lemon Squeezy Store Checkout URLs
+        // Replace these with your actual checkout links from the Lemon Squeezy dashboard
+        const PRO_CHECKOUT_URL = "https://your-store.lemonsqueezy.com/checkout/buy/123456";
+        const ELITE_CHECKOUT_URL = "https://your-store.lemonsqueezy.com/checkout/buy/789012";
+        
+        const baseCheckoutUrl = tier === 'elite' ? ELITE_CHECKOUT_URL : PRO_CHECKOUT_URL;
+        
+        // 3. Append the custom user_id so the webhook knows who paid
+        // We also pre-fill their email for a smoother checkout experience
+        const finalUrl = `${baseCheckoutUrl}?checkout[email]=${encodeURIComponent(userEmail)}&checkout[custom][user_id]=${userId}`;
+        
+        // 4. Redirect them to the secure checkout
+        window.open(finalUrl, '_blank');
+        
+    } catch (err) {
+        console.error("Checkout initialization failed:", err);
+        alert("Failed to initialize secure checkout. Please ensure you are logged in.");
+    }
+}
     </script>
     <div id="stamina-timeout-overlay" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
         <div class="max-w-md w-full text-center space-y-6">
