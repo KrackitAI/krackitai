@@ -733,12 +733,26 @@
                     const dateStr = new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                     const verdictStr = (row.verdict || "REJECTED").toUpperCase();
                     
-                    // CRITICAL FIX: The UI history panel now turns green for ALL acceptable variations
                     const passed = verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER');
                     
                     const gaps = Array.isArray(row.gaps_to_fix) ? row.gaps_to_fix : [];
                     const transcriptDeck = Array.isArray(row.transcript) ? row.transcript : [];
                     const atsScore = row.resume_screening_score || 0;
+
+                    // ─── NEW: DYNAMIC JOB TITLE EXTRACTOR ─────────────────────
+                    let displayTitle = "Job Simulation Record";
+                    if (row.job_description) {
+                        // Grab the very first line of the pasted job description
+                        const cleanLines = row.job_description.split('\n').filter(line => line.trim().length > 0);
+                        if (cleanLines.length > 0) {
+                            displayTitle = cleanLines[0].trim();
+                            // If the first line is a massive paragraph, cut it off cleanly
+                            if (displayTitle.length > 45) {
+                                displayTitle = displayTitle.substring(0, 45) + "...";
+                            }
+                        }
+                    }
+                    // ──────────────────────────────────────────────────────────
 
                     let gapsHtml = '';
                     if (gaps.length > 0) {
@@ -771,7 +785,8 @@
                                         <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/30' : 'bg-rose-950/60 text-rose-400 border border-rose-900/30'}">${verdictStr}</span>
                                         ${atsScore > 0 ? `<span class="text-[9px] font-mono bg-neutral-950 border border-neutral-800 text-neutral-400 px-1.5 rounded">ATS: ${atsScore}</span>` : ''}
                                     </div>
-                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]">Job Simulation Record</h4>
+                                    <!-- Dynamic Title injected here with hover tooltips! -->
+                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]" title="${displayTitle}">${displayTitle}</h4>
                                 </div>
                                 <div class="flex items-center space-x-3 font-mono">
                                     <span class="text-base font-black text-white">${row.score}<span class="text-[10px] text-neutral-500 font-normal">/100</span></span>
@@ -799,7 +814,6 @@
                     `;
                 });
             } catch (err) {
-                // ─── AUTOMATIC SESSION REFRESH FIX ───────────────────────────
                 if (err.message && err.message.includes('JWT expired')) {
                     console.warn("User auth session expired. Forcing login refresh alignment.");
                     closeHistoryModal();
@@ -809,7 +823,6 @@
                     triggerInlineAuthWall('signin');
                     return;
                 }
-                // ──────────────────────────────────────────────────────────────
                 container.innerHTML = `<p class="text-xs text-rose-400 font-mono">Error querying data: ${err.message}</p>`;
             }
         }
