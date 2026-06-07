@@ -17,8 +17,6 @@ export default async function handler(req, res) {
         }
 
         // ─── STAGE 1: BULLETPROOF MATH COUNTER ──────────────────────────
-        // Count total times the AI has spoken, minus 1 for the introduction greeting.
-        // This is mathematically absolute and cannot be broken by missing '?' marks.
         const assistantMessageCount = chatHistory.filter(msg => msg.role === "assistant").length;
         const totalTechnicalQuestionsAsked = Math.max(0, assistantMessageCount - 1);
 
@@ -42,10 +40,11 @@ YOUR PERSONA MANDATE:
 - Dynamically invent a highly realistic name, an industry-accurate corporate title, and a fictitious company matching the job description on turn 1. Maintain it consistently.
 
 STRICT PACING AND CONVERSATIONAL CONTRACT:
-1. You must deliver exactly 5 comprehensive domain-specific interview questions throughout this session.
+1. You must deliver exactly 5 comprehensive domain-specific interview questions. This is a standalone 5-question sprint. There are NO coding rounds, NO debugging rounds, and NO subsequent interviews. 
 2. Current Progress State: [ Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
-3. CRITICAL: Never deploy a transitional remark as a standalone message. Append the actual scenario question directly inside that very same turn ending with a "?".
-4. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
+3. CRITICAL: NEVER promise or suggest future rounds, coding tests, or next steps to the candidate.
+4. CRITICAL: Never deploy a transitional remark as a standalone message. Every single response you send while the interview is active MUST end with a clear technical question mark "?".
+5. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
 ${forceSessionConclusion ? "" : "CRITICAL RULE: You are FORBIDDEN from ending the interview early. You MUST output isConcluded: false and ask a technical question."}
 
 GRADING OBJECTIVE DIRECTIVE:
@@ -81,18 +80,30 @@ You must output a raw JSON object matching this schema exactly:
 
         // ─── DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ───────────────
         
-        // THE HANDCUFFS: If the AI illegally hallucinates an early ending, intercept it and force it back open.
+        // HANDCUFF 1: Stop Illegal Early Terminations
         if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {
             parsedReportObjectPayload.isConcluded = false;
             parsedReportObjectPayload.score = 0;
             parsedReportObjectPayload.verdict = "PENDING";
             parsedReportObjectPayload.gapsToFix = [];
             
-            // If the AI tried to say goodbye, erase its message and inject a hardcoded fallback question.
             const msgLower = (parsedReportObjectPayload.aiMessage || "").toLowerCase();
             if (msgLower.includes("5 questions") || msgLower.includes("conclude") || msgLower.includes("goodbye") || msgLower.includes("thank you")) {
-                parsedReportObjectPayload.aiMessage = "Let's pivot slightly and dive a bit deeper. Based on our discussion so far, what specific structural trade-offs would you consider if we scaled this system's architecture by 10x?";
+                parsedReportObjectPayload.aiMessage = "Let's pivot slightly and dive a bit deeper. Based on our discussion so far, what specific structural trade-offs would you consider if we scaled this architecture by 10x?";
             }
+        }
+
+        // HANDCUFF 2: The Question Mark Enforcer
+        // If the interview is active, the AI MUST ask a question. If it forgot, we force one in.
+        if (parsedReportObjectPayload.isConcluded === false) {
+            let aiMsg = parsedReportObjectPayload.aiMessage || "";
+            // Strip out any hallucinated promises about coding rounds
+            aiMsg = aiMsg.replace(/let's simulate.*next/ig, "").replace(/in the next round.*/ig, "").trim();
+            
+            if (!aiMsg.includes("?")) {
+                aiMsg += " Given these constraints, how would you approach the next critical component of this design?";
+            }
+            parsedReportObjectPayload.aiMessage = aiMsg;
         }
 
         // ────────────────────────────────────────────────────────────────
@@ -126,7 +137,6 @@ You must output a raw JSON object matching this schema exactly:
             } else {
                 parsedReportObjectPayload.verdict = "REJECTED";
                 
-                // If the score is failing (< 70) but the AI hallucinates a positive review text, overwrite it!
                 const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
                 if (reviewText.includes("fit for our") || reviewText.includes("impressive") || reviewText.includes("aced") || reviewText.includes("great fit")) {
                     parsedReportObjectPayload.brutallyHonestReview = "The technical depth provided across your interview answers fell significantly short of our production engineering requirements. Core architectural trade-offs lacked standard structural precision and critical optimizations.";
