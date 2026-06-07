@@ -17,12 +17,10 @@ export default async function handler(req, res) {
         }
 
         // ─── STAGE 1: DYNAMIC LIFECYCLE PROGRESS TRACKER ────────────────
-        // Count real questions by looking for assistant messages containing "?" 
-        // and excluding the initial greeting turn.
         const totalTechnicalQuestionsAsked = chatHistory.filter((msg, idx) => 
             msg.role === "assistant" && 
             msg.content.includes("?") &&
-            idx > 0 // Ignores the very first greeting block natively
+            idx > 0 
         ).length;
 
         const isTimeCeilingReached = chatHistory.some(msg => msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED"));
@@ -38,7 +36,7 @@ Candidate Resume Profile:
 ${resume}
 
 YOUR PERSONA MANDATE:
-- If this is the very first turn of the interview, dynamically invent a highly realistic name, an industry-accurate corporate title (e.g., Creative Director for design, VP of Sales for business, Principal Engineer for tech), and a fictitious target company that perfectly fits the job description.
+- If this is the very first turn of the interview, dynamically invent a highly realistic name, an industry-accurate corporate title, and a fictitious target company that perfectly fits the job description.
 - Maintain this exact persona consistently across the entire chat log.
 
 STRICT PACING AND CONVERSATIONAL CONTRACT:
@@ -55,7 +53,7 @@ You must output a raw JSON object matching this schema exactly. Do not use markd
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'OFFER EXTENDED (PROVISIONAL)' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
     "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level evaluation review tailored to this role's domain." : "Active session live."}",
-    "gapsToFix": ${forceSessionConclusion ? "A flat string array of conceptual or domain-specific knowledge deficiencies found." : "[]"}
+    "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific constructive areas to remediate. CRITICAL RULE: If your brutallyHonestReview text mentions ANY soft skill issues, lack of depth, communication flaws, or technical holes, you MUST list them as short separate strings in this array. Never leave this array empty if there is room for improvement." : "[]"}
 }
 
 CRITICAL RULES:
@@ -70,7 +68,7 @@ CRITICAL RULES:
         const groqCompletionResponse = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: cleanPayloadArray,
-            temperature: 0.3, 
+            temperature: 0.2, 
             max_tokens: 1200,
             response_format: { type: "json_object" }
         });
@@ -89,6 +87,25 @@ CRITICAL RULES:
 
             if (finalCalculatedScore >= 70) {
                 parsedReportObjectPayload.verdict = "OFFER EXTENDED (PROVISIONAL)";
+                
+                // Safety net: Check if the text critique hints at flaws while the array was left empty
+                const reviewText = (parsedReportObjectPayload.brutallyHonestReview || "").toLowerCase();
+                if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
+                    const fallbackGaps = [];
+                    if (reviewText.includes("communication") || reviewText.includes("refining")) {
+                        fallbackGaps.push("Refine behavioral articulation and communication delivery.");
+                    }
+                    if (reviewText.includes("deeper") || reviewText.includes("depth")) {
+                        fallbackGaps.push("Elaborate on fine-grained architectural trade-offs.");
+                    }
+                    
+                    // If no specific text patterns matched but score is under 100, provide a general refinement gap
+                    if (fallbackGaps.length === 0 && finalCalculatedScore < 100) {
+                        fallbackGaps.push("Polish contextual explanation speed and structural precision.");
+                    }
+                    
+                    parsedReportObjectPayload.gapsToFix = fallbackGaps;
+                }
             } else {
                 parsedReportObjectPayload.verdict = "REJECTED";
                 
