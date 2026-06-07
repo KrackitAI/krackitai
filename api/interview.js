@@ -82,26 +82,30 @@ CRITICAL RULES:
         const rawJsonStringOutput = groqCompletionResponse.choices[0].message.content;
         const parsedReportObjectPayload = JSON.parse(rawJsonStringOutput);
 
-        // ─── DEFENSIVE VERIFICATION LAYER ─────────────────────────────────
-        // Clean up data formatting before returning the payload to the frontend
+        // ─── DEFENSIVE VERIFICATION LAYER (UPDATED) ───────────────────────
         if (parsedReportObjectPayload.isConcluded) {
             let finalCalculatedScore = parseInt(parsedReportObjectPayload.score) || 0;
             
-            // Handle decimal score conversions
             if (finalCalculatedScore <= 10 && finalCalculatedScore > 0) {
                 finalCalculatedScore = finalCalculatedScore * 10;
             }
             parsedReportObjectPayload.score = finalCalculatedScore;
 
-            // Standardize output verdicts based on score thresholds
             if (finalCalculatedScore >= 70) {
                 parsedReportObjectPayload.verdict = "OFFER EXTENDED (PROVISIONAL)";
             } else {
                 parsedReportObjectPayload.verdict = "REJECTED";
+                
+                // CRITICAL PATCH: Force gaps to populate if the LLM left them empty on a fail
+                if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
+                    parsedReportObjectPayload.gapsToFix = [
+                        "Technical depth fell short of the required role threshold.",
+                        "System design trade-offs lacked optimal structural precision.",
+                        "Review the unvarnished critique block for detailed concepts to study."
+                    ];
+                }
             }
         }
-        // ──────────────────────────────────────────────────────────────────
-
         return res.status(200).json(parsedReportObjectPayload);
 
     } catch (error) {
