@@ -4,68 +4,64 @@ const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
 });
 
-const INTERVIEWERS = {
-    rohan: { name: "Rohan Khanna", title: "Principal Systems Architect" },
-    sarah: { name: "Sarah Jenkins", title: "Director of Engineering" }
-};
-
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: "Method not allowed." });
     }
 
     try {
-        const { jobDescription, resume, chatHistory, interviewerId } = req.body;
+        const { jobDescription, resume, chatHistory } = req.body;
 
         if (!jobDescription || !resume || !chatHistory) {
             return res.status(400).json({ error: "Missing required profile parameters." });
         }
 
-        const activeInterviewer = INTERVIEWERS[interviewerId] || INTERVIEWERS.rohan;
-
-        // ─── STRICT TECHNICAL QUESTION LIFECYCLE TRACKER ────────────────
-        // We only increment the count if the assistant message contains an actual question mark.
-        // This ensures conversational fluff blocks never count against the 5-question quota.
-        const totalTechnicalQuestionsAsked = chatHistory.filter(msg => 
+        // ─── STAGE 1: DYNAMIC LIFECYCLE PROGRESS TRACKER ────────────────
+        // Count real questions by looking for assistant messages containing "?" 
+        // and excluding the initial greeting turn.
+        const totalTechnicalQuestionsAsked = chatHistory.filter((msg, idx) => 
             msg.role === "assistant" && 
             msg.content.includes("?") &&
-            !msg.content.includes(activeInterviewer.title)
+            idx > 0 // Ignores the very first greeting block natively
         ).length;
 
         const isTimeCeilingReached = chatHistory.some(msg => msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED"));
-        
-        // Final evaluation triggers exactly after the candidate answers the 5th question
         const forceSessionConclusion = totalTechnicalQuestionsAsked >= 5 || isTimeCeilingReached;
-        // ──────────────────────────────────────────────────────────────────
 
-        const systemPrompt = `You are ${activeInterviewer.name}, a ${activeInterviewer.title} conducting a highly critical technical mock interview.
+        // ─── STAGE 2: ADAPTIVE DOMAIN SYSTEM PROMPT ─────────────────────
+        const systemPrompt = `You are an expert corporate interviewer tailored precisely to the domain of the provided Job Description.
 
-Target Role Requirements:
+Target Role Context:
 ${jobDescription}
 
 Candidate Resume Profile:
 ${resume}
 
+YOUR PERSONA MANDATE:
+- If this is the very first turn of the interview, dynamically invent a highly realistic name, an industry-accurate corporate title (e.g., Creative Director for design, VP of Sales for business, Principal Engineer for tech), and a fictitious target company that perfectly fits the job description.
+- Maintain this exact persona consistently across the entire chat log.
+
 STRICT PACING AND CONVERSATIONAL CONTRACT:
-1. You must deliver exactly 5 comprehensive technical questions throughout this mock session.
-2. Current Pacing State: [ Technical Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
-3. CRITICAL: Never deploy a transitional message or remark (e.g., "Great job, let's move to the next question") as a standalone message. You MUST append the actual technical scenario question directly inside that very same turn. Every single response you send while isConcluded is false MUST end with a clear technical question mark "?".
+1. You must deliver exactly 5 comprehensive domain-specific interview questions throughout this session.
+2. Current Progress State: [ Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
+3. CRITICAL: Never deploy a transitional message or remark as a standalone message. You MUST append the actual scenario question directly inside that very same turn. Every single response you send while isConcluded is false MUST end with a clear question mark "?".
 4. Once totalTechnicalQuestionsAsked reaches 5, or if a timeout occurs, you must immediately set "isConcluded" to true, write a brief sign-off statement in "aiMessage", and generate the final grade.
 
 DATA OUTPUT SCHEMA:
 You must output a raw JSON object matching this schema exactly. Do not use markdown backticks wrappers:
 {
-    "aiMessage": "Your next technical engineering problem ending with a '?'. If concluding, write your final goodbye wrap-up text.",
+    "aiMessage": "Your next tailored interview question ending with a '?'. If concluding, write your final goodbye wrap-up text.",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
-    "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on their performance." : "0"},
+    "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'OFFER EXTENDED (PROVISIONAL)' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
-    "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level technical evaluation review." : "Active session live."}",
-    "gapsToFix": ${forceSessionConclusion ? "A flat string array of architectural or knowledge deficiencies found across their answers." : "[]"}
+    "brutallyHonestReview": "${forceSessionConclusion ? "A piercing, unvarnished peer-level evaluation review tailored to this role's domain." : "Active session live."}",
+    "gapsToFix": ${forceSessionConclusion ? "A flat string array of conceptual or domain-specific knowledge deficiencies found." : "[]"}
 }
 
 CRITICAL RULES:
 - If isConcluded is false, score MUST be 0, verdict MUST be "PENDING", and gapsToFix MUST be [].`;
 
+        // ─── STAGE 3: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
         const cleanPayloadArray = [
             { role: "system", content: systemPrompt },
             ...chatHistory
@@ -74,7 +70,7 @@ CRITICAL RULES:
         const groqCompletionResponse = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: cleanPayloadArray,
-            temperature: 0.2, 
+            temperature: 0.3, 
             max_tokens: 1200,
             response_format: { type: "json_object" }
         });
@@ -82,7 +78,7 @@ CRITICAL RULES:
         const rawJsonStringOutput = groqCompletionResponse.choices[0].message.content;
         const parsedReportObjectPayload = JSON.parse(rawJsonStringOutput);
 
-        // ─── DEFENSIVE VERIFICATION LAYER (UPDATED) ───────────────────────
+        // ─── DEFENSIVE VERIFICATION SHIELD ──────────────────────────────
         if (parsedReportObjectPayload.isConcluded) {
             let finalCalculatedScore = parseInt(parsedReportObjectPayload.score) || 0;
             
@@ -96,16 +92,16 @@ CRITICAL RULES:
             } else {
                 parsedReportObjectPayload.verdict = "REJECTED";
                 
-                // CRITICAL PATCH: Force gaps to populate if the LLM left them empty on a fail
                 if (!parsedReportObjectPayload.gapsToFix || parsedReportObjectPayload.gapsToFix.length === 0) {
                     parsedReportObjectPayload.gapsToFix = [
-                        "Technical depth fell short of the required role threshold.",
-                        "System design trade-offs lacked optimal structural precision.",
+                        "Domain depth fell short of the required role threshold.",
+                        "Core situational answers lacked optimal structural precision.",
                         "Review the unvarnished critique block for detailed concepts to study."
                     ];
                 }
             }
         }
+
         return res.status(200).json(parsedReportObjectPayload);
 
     } catch (error) {
