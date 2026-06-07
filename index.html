@@ -13,7 +13,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth">
+<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth relative">
 
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <nav class="border-b border-neutral-950 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50 select-none">
+    <nav class="border-b border-neutral-950 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-40 select-none">
         <div class="flex items-center space-x-8">
             <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer">
                 <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
@@ -69,181 +69,6 @@
             <div id="navbar-user-profile-holder" class="flex items-center space-x-3 text-xs"></div>
         </div>
     </nav>
-
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md items-center justify-center p-4 overflow-y-auto">
-        
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
-            
-            <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
-
-            <div class="text-center space-y-1">
-                <h3 class="text-2xl font-black tracking-tight text-white">Choose Your Workspace Tier</h3>
-                <p class="text-neutral-400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
-                
-                <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block">Basic Sandbox</span>
-                            <h4 class="text-xl font-bold text-neutral-300 mt-0.5">Free Account</h4>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-400">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>5-minute session limit</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>Standard ATS screening</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Audio voice synthesis</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished deficiency audits</span></li>
-                        </ul>
-                    </div>
-                    <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
-                </div>
-
-                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] lg:scale-105 z-10">
-                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
-                            <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-200">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
-                        </ul>
-                    </div>
-                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10 cursor-pointer">Upgrade to Pro →</button>
-                </div>
-
-                <div class="bg-neutral-950 border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                    <div class="space-y-4 relative z-10">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-neutral-300 uppercase tracking-widest block">Power User</span>
-                            <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Elite</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $39 monthly</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-300">
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Advanced 70B AI Reasoning Engine</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Personas</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
-                            <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
-                        </ul>
-                    </div>
-                    <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10 cursor-pointer">Upgrade to Elite ⚡</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-                <!-- TIER 2: PRO (Highlighted) -->
-                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] scale-105 z-10 hidden lg:flex">
-                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
-                            <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-200">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
-                        </ul>
-                    </div>
-                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10">Upgrade to Pro →</button>
-                </div>
-                
-                <!-- Mobile fallback for Pro to remove scale effect on small screens -->
-                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] lg:hidden">
-                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
-                            <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-200">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
-                        </ul>
-                    </div>
-                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10">Upgrade to Pro →</button>
-                </div>
-
-                <!-- TIER 3: ELITE -->
-                <div class="bg-neutral-950 border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
-                    <!-- Subtle glare effect for Elite -->
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                    
-                    <div class="space-y-4 relative z-10">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-neutral-300 uppercase tracking-widest block">Power User</span>
-                            <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Elite</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $39 monthly</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-300">
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Advanced 70B AI Reasoning Engine</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Company Personas</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
-                            <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
-                        </ul>
-                    </div>
-                    <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10">Upgrade to Elite ⚡</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-                <div class="bg-neutral-900 border border-[#FFE500]/30 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.03)]">
-                    <div class="absolute -top-2.5 right-4 bg-[#FFE500] text-black text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full select-none">Recommended</div>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
-                            <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-200">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Detailed deficiency gap logging</span></li>
-                        </ul>
-                    </div>
-                    <!-- The Pro Tier Button -->
-<button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/5">Upgrade to Pro →</button>
-
-<!-- The Elite Tier Button (Add this to your UI) -->
-<button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/5">Upgrade to Elite ⚡</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-end">
         <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between">
@@ -300,7 +125,7 @@
 
     <hr class="border-neutral-950 max-w-3xl mx-auto">
 
-    <main class="max-w-3xl mx-auto px-4 pt-16 pb-24 w-full">
+    <main class="max-w-3xl mx-auto px-4 pt-16 pb-24 w-full relative z-10">
 
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
@@ -373,7 +198,6 @@
         </div>
 
         <div id="simulator-screen" class="hidden space-y-6">
-            
             <div class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 flex items-center justify-between gap-4 font-mono select-none">
                 <div class="flex items-center space-x-2 shrink-0">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
@@ -405,7 +229,7 @@
                 <div class="flex items-center justify-between">
                     <div class="space-y-0.5">
                         <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Response Turn</label>
-                        <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> to submit response instantly</span>
+                        <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> to submit response</span>
                     </div>
                     
                     <div class="flex items-center space-x-2">
@@ -471,9 +295,8 @@
                 <div class="space-y-4" id="transcript-deck-target"></div>
             </div>
             
-            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors">Return to Entry Screen</button>
+            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer">Return to Entry Screen</button>
         </div>
-
     </main>
 
     <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
@@ -481,7 +304,7 @@
             <div class="space-y-2">
                 <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-lg font-black animate-pulse">⚠️</div>
                 <h4 class="text-lg font-black text-white tracking-tight">Abort Active Session?</h4>
-                <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost and no diagnostic report card data matrices will be compiled.</p>
+                <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost.</p>
             </div>
             <div class="flex gap-3">
                 <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">Keep Practicing</button>
@@ -490,6 +313,99 @@
         </div>
     </div>
 
+    <div id="stamina-timeout-overlay" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
+        <div class="max-w-md w-full text-center space-y-6">
+            <div class="w-20 h-20 bg-rose-950/30 border border-rose-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(244,63,94,0.1)] relative">
+                <span class="absolute inset-0 rounded-full bg-rose-500/10 animate-ping"></span>
+                <span class="text-3xl animate-pulse">🚨</span>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-2xl font-black tracking-tight text-white uppercase font-mono">Cognitive Capacity Blown</h3>
+                <p class="text-rose-400 text-xs font-bold font-mono tracking-wider uppercase">Stamina Clock Severed • Session Terminated</p>
+                <p class="text-neutral-400 text-sm max-w-xs mx-auto pt-1 leading-relaxed">
+                    You failed to present concise technical signal within the allocated time boundary context.
+                </p>
+            </div>
+            <div class="inline-flex items-center space-x-2 bg-neutral-950 border border-neutral-900 px-4 py-2 rounded-xl text-xs font-mono text-neutral-500">
+                <span>Compiling diagnostic metrics panel in</span>
+                <span id="timeout-redirect-countdown" class="text-white font-black">3</span>s
+            </div>
+        </div>
+    </div>
+
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
+            <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+
+            <div class="text-center space-y-1">
+                <h3 class="text-2xl font-black tracking-tight text-white">Choose Your Workspace Tier</h3>
+                <p class="text-neutral-400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
+                
+                <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block">Basic Sandbox</span>
+                            <h4 class="text-xl font-bold text-neutral-300 mt-0.5">Free Account</h4>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-400">
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>5-minute session limit</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>Standard ATS screening</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Audio voice synthesis</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished deficiency audits</span></li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
+                </div>
+
+                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] lg:scale-105 z-10">
+                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
+                            <div class="flex items-baseline space-x-1 mt-0.5">
+                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
+                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-200">
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10 cursor-pointer">Upgrade to Pro →</button>
+                </div>
+
+                <div class="bg-neutral-950 border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <span class="text-[10px] font-mono font-bold text-neutral-300 uppercase tracking-widest block">Power User</span>
+                            <div class="flex items-baseline space-x-1 mt-0.5">
+                                <h4 class="text-xl font-black text-white">Krackit Elite</h4>
+                                <span class="text-xs text-neutral-400 font-medium">/ $39 monthly</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2.5 text-xs text-neutral-300">
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Advanced 70B AI Engine</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Personas</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
+                            <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10 cursor-pointer">Upgrade to Elite ⚡</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <script>
         const SUPABASE_URL = 'https://zlzprbespegemxnhwnuu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
@@ -614,21 +530,15 @@
         let latestEvaluationReportCache = null;
         let cachedResumePreflightScore = 0; 
 
-        // LIFELINE RUNTIME tracking metrics
         let remainingFreeHintsCount = 1;
         let runningSessionHintsUsedTotal = 0;
-
-        // TIMING METRICS PLATFORM TRACKERS
         let countdownTimerIntervalInstance = null;
         let remainingInterviewSecondsBalance = 300; 
         const TOTAL_ALLOCATED_SECONDS_MAX = 300;
 
-        // MARKETING HUB INTERACTION LINK
         function scrollToWorkspaceSetup() {
             const workspace = document.getElementById('input-screen');
-            if (workspace) {
-                workspace.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            if (workspace) { workspace.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
         }
 
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
@@ -645,21 +555,44 @@
                 target.innerHTML = `<button onclick="openPaywallModal()" class="text-sm text-neutral-400 hover:text-neutral-200 font-bold px-3 py-1.5 transition-colors cursor-pointer select-none">Pricing</button>`;
             }
         }
-        function openPaywallModal() {
-    const modal = document.getElementById('upgrade-modal');
-    if(modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex'); // Adds flex dynamically to center the modal
-    }
-}
+        
+        // --- PAYWALL MODAL TOGGLES ---
+        function openPaywallModal() { 
+            const modal = document.getElementById('upgrade-modal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+        function closePaywallModal() { 
+            const modal = document.getElementById('upgrade-modal');
+            if(modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
 
-function closePaywallModal() {
-    const modal = document.getElementById('upgrade-modal');
-    if(modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex'); // Strips flex so it actually hides
-    }
-}
+        // --- LEMON SQUEEZY CHECKOUT TRIGGER ---
+        async function initiatePremiumCheckout(tier) {
+            if (!supabaseClientInstance) return;
+            try {
+                const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                if (!session) { triggerInlineAuthWall('signin'); return; }
+
+                const userId = session.user.id;
+                const userEmail = session.user.email;
+                
+                // Replace with your real Lemon Squeezy Variant URLs
+                const PRO_CHECKOUT_URL = "https://your-store.lemonsqueezy.com/checkout/buy/123456";
+                const ELITE_CHECKOUT_URL = "https://your-store.lemonsqueezy.com/checkout/buy/789012";
+                const baseCheckoutUrl = tier === 'elite' ? ELITE_CHECKOUT_URL : PRO_CHECKOUT_URL;
+                
+                const finalUrl = `${baseCheckoutUrl}?checkout[email]=${encodeURIComponent(userEmail)}&checkout[custom][user_id]=${userId}`;
+                window.open(finalUrl, '_blank');
+            } catch (err) {
+                console.error("Checkout initialization failed:", err);
+            }
+        }
 
         function initSpeechFramework() {
             const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -671,7 +604,7 @@ function closePaywallModal() {
 
             instance.onstart = () => {
                 isMicrophoneListening = true;
-                if (document.getElementById('mic-toggle-btn') && document.getElementById('mic-action-label')) {
+                if (document.getElementById('mic-toggle-btn')) {
                     document.getElementById('mic-toggle-btn').className = "bg-red-950 border border-red-800 text-xs text-red-400 px-4 py-2 rounded-xl flex items-center space-x-2 animate-pulse";
                     document.getElementById('mic-action-label').innerText = "Listening... Click to Pause";
                 }
@@ -679,7 +612,7 @@ function closePaywallModal() {
 
             instance.onend = () => {
                 isMicrophoneListening = false;
-                if (document.getElementById('mic-toggle-btn') && document.getElementById('mic-action-label')) {
+                if (document.getElementById('mic-toggle-btn')) {
                     document.getElementById('mic-toggle-btn').className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
                     document.getElementById('mic-action-label').innerText = "🎤 Speak Answer";
                 }
@@ -871,33 +804,24 @@ function closePaywallModal() {
                 data.forEach((row, idx) => {
                     const dateStr = new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                     const verdictStr = (row.verdict || "REJECTED").toUpperCase();
-                    
-                    // CRITICAL FIX: The UI history panel now turns green for ALL acceptable variations
                     const passed = verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER');
-                    
                     const gaps = Array.isArray(row.gaps_to_fix) ? row.gaps_to_fix : [];
                     const transcriptDeck = Array.isArray(row.transcript) ? row.transcript : [];
                     const atsScore = row.resume_screening_score || 0;
 
-                    // ─── NEW: SMART DYNAMIC JOB TITLE EXTRACTOR ─────────────────────
                     let displayTitle = "Job Simulation Record";
                     if (row.job_description) {
                         const cleanLines = row.job_description.split('\n').filter(line => line.trim().length > 0);
                         if (cleanLines.length > 0) {
                             displayTitle = cleanLines[0].trim();
-                            
-                            // If the first line is short (e.g. just "Google" or "Apple"), append the second line!
                             if (cleanLines.length > 1 && displayTitle.length < 25) {
                                 displayTitle = displayTitle + " - " + cleanLines[1].trim();
                             }
-                            
-                            // If it's a massive paragraph, cut it off cleanly
                             if (displayTitle.length > 45) {
                                 displayTitle = displayTitle.substring(0, 45) + "...";
                             }
                         }
                     }
-                    // ──────────────────────────────────────────────────────────
 
                     let gapsHtml = '';
                     if (gaps.length > 0) {
@@ -959,11 +883,8 @@ function closePaywallModal() {
                 });
             } catch (err) {
                 if (err.message && err.message.includes('JWT expired')) {
-                    console.warn("User auth session expired. Forcing login refresh alignment.");
                     closeHistoryModal();
-                    if (supabaseClientInstance) {
-                        await supabaseClientInstance.auth.signOut();
-                    }
+                    if (supabaseClientInstance) { await supabaseClientInstance.auth.signOut(); }
                     triggerInlineAuthWall('signin');
                     return;
                 }
@@ -990,18 +911,11 @@ function closePaywallModal() {
         function closeHistoryModal() { document.getElementById('history-modal').classList.add('hidden'); }
 
         async function commitSessionToDatabaseHistory(reportPayload) {
-            if (!supabaseClientInstance || !reportPayload) {
-                console.error("Database sync aborted: Supabase instance or report payload is missing.");
-                return;
-            }
+            if (!supabaseClientInstance || !reportPayload) return;
             
             try {
                 const { data: { session }, error: sessionError } = await supabaseClientInstance.auth.getSession();
-                
-                if (sessionError || !session) {
-                    console.error("Database sync failed: No active authenticated user session found.", sessionError);
-                    return;
-                }
+                if (sessionError || !session) return;
 
                 const finalJobDesc = globalJobDescContext || document.getElementById('job-desc-input').value.trim();
                 const finalResume = globalResumeContext || (currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim());
@@ -1022,11 +936,9 @@ function closePaywallModal() {
                     .insert([payload])
                     .select(); 
 
-                if (error) {
-                    console.error("🚨 SUPABASE DATABASE REJECTION CRASH:", error.message);
-                }
+                if (error) { console.error("🚨 DATABASE REJECTION:", error.message); }
             } catch (err) {
-                console.error("Unhandled exception inside history serialization pipeline:", err);
+                console.error("History sync error:", err);
             }
         }
 
@@ -1093,23 +1005,23 @@ function closePaywallModal() {
 
             runningChatHistoryLedger.push({
                 role: "user",
-                content: "SYSTEM NOTE: TIME_CEILING_REACHED. The 5-minute session timer has expired. Do not ask any more questions. Immediately conclude the interview, evaluate the candidate's performance based ONLY on the turns completed so far, and return the final JSON object with isConcluded set to true."
+                content: "SYSTEM NOTE: TIME_CEILING_REACHED. The session timer has expired."
             });
 
             try {
+                let headers = { 'Content-Type': 'application/json' };
+                if (supabaseClientInstance) {
+                    const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                    if (session) { headers['Authorization'] = `Bearer ${session.access_token}`; }
+                }
+
                 const response = await fetch('/api/interview', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        jobDescription: globalJobDescContext, 
-                        resume: globalResumeContext, 
-                        chatHistory: runningChatHistoryLedger 
-                    })
+                    headers: headers,
+                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error || "Wrap up sync loss.");
-
                 latestEvaluationReportCache = data;
                 
                 if (latestEvaluationReportCache.brutallyHonestReview) {
@@ -1117,14 +1029,12 @@ function closePaywallModal() {
                 }
 
                 executeFinalReportCompilation();
-
             } catch (err) {
                 console.error("Failed compiling sudden death metrics:", err);
                 latestEvaluationReportCache = {
-                    score: 45,
-                    verdict: "STAMINA TIMEOUT",
-                    brutallyHonestReview: "The interview was stopped due to the free tier time limit. Upgrade to Pro to complete deep technical evaluation tracks.",
-                    gapsToFix: ["Exceeded free tier time boundaries."]
+                    score: 45, verdict: "STAMINA TIMEOUT",
+                    brutallyHonestReview: "The interview was stopped due to the free tier time limit.",
+                    gapsToFix: []
                 };
                 executeFinalReportCompilation();
             }
@@ -1136,6 +1046,7 @@ function closePaywallModal() {
                 if (!session) { triggerInlineAuthWall('signin'); return; }
             }
             if (getSessionCount() >= 3) { openPaywallModal(); return; }
+
             globalJobDescContext = document.getElementById('job-desc-input').value.trim();
             globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
@@ -1172,67 +1083,62 @@ function closePaywallModal() {
             if (label) label.innerText = `${val.length} characters written`;
         }
 
-        // 1. UPDATE THE FETCH CALL TO PASS THE JWT TOKEN
-async function fetchNextInterviewerTurn() {
-    document.getElementById('sim-status-indicator').innerText = "Interviewer is analyzing profile...";
-    document.getElementById('submit-turn-btn').disabled = true;
-    renderAITypingBubble();
+        async function fetchNextInterviewerTurn() {
+            document.getElementById('sim-status-indicator').innerText = "Interviewer is analyzing profile...";
+            document.getElementById('submit-turn-btn').disabled = true;
+            renderAITypingBubble();
 
-    try {
-        // Securely retrieve the JWT token from the active session
-        let headers = { 'Content-Type': 'application/json' };
-        if (supabaseClientInstance) {
-            const { data: { session } } = await supabaseClientInstance.auth.getSession();
-            if (session) {
-                headers['Authorization'] = `Bearer ${session.access_token}`;
+            try {
+                let headers = { 'Content-Type': 'application/json' };
+                if (supabaseClientInstance) {
+                    const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                    if (session) { headers['Authorization'] = `Bearer ${session.access_token}`; }
+                }
+
+                const response = await fetch('/api/interview', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 403 && data.error === "PAYWALL_TRIGGERED") {
+                    openPaywallModal();
+                    return;
+                }
+                
+                if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
+
+                if (data.isConcluded) {
+                    clearInterval(countdownTimerIntervalInstance); 
+                    latestEvaluationReportCache = data;
+                    const goodbyeText = data.aiMessage;
+                    runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
+                    document.getElementById('sim-active-question-text').innerText = goodbyeText;
+                    speakTextAloud(goodbyeText);
+
+                    document.getElementById('sim-status-indicator').innerText = "Concluding session...";
+                    document.getElementById('submit-turn-btn').style.display = 'none';
+                    document.getElementById('mic-toggle-btn').style.display = 'none';
+                    document.getElementById('hint-request-btn').style.display = 'none';
+
+                    setTimeout(() => { finishAndWrapInterview(); }, 5000); 
+                    return;
+                }
+
+                let aiMsgText = data.aiMessage;
+                runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
+                document.getElementById('sim-active-question-text').innerText = aiMsgText;
+                document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
+                speakTextAloud(aiMsgText);
+
+            } catch (err) {
+                console.error(err); alert("Sync drop: " + err.message);
+            } finally {
+                document.getElementById('submit-turn-btn').disabled = false;
             }
         }
-
-        const response = await fetch('/api/interview', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
-        });
-
-        const data = await response.json();
-        
-        // Intercept backend paywall alerts (e.g., asking for too many hints)
-        if (response.status === 403 && data.error === "PAYWALL_TRIGGERED") {
-            openPaywallModal();
-            return;
-        }
-        
-        if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
-
-        if (data.isConcluded) {
-            clearInterval(countdownTimerIntervalInstance); 
-            latestEvaluationReportCache = data;
-            const goodbyeText = data.aiMessage;
-            runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
-            document.getElementById('sim-active-question-text').innerText = goodbyeText;
-            speakTextAloud(goodbyeText);
-
-            document.getElementById('sim-status-indicator').innerText = "Concluding session...";
-            document.getElementById('submit-turn-btn').style.display = 'none';
-            document.getElementById('mic-toggle-btn').style.display = 'none';
-            document.getElementById('hint-request-btn').style.display = 'none';
-
-            setTimeout(() => { finishAndWrapInterview(); }, 5000); 
-            return;
-        }
-
-        let aiMsgText = data.aiMessage;
-        runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
-        document.getElementById('sim-active-question-text').innerText = aiMsgText;
-        document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
-        speakTextAloud(aiMsgText);
-
-    } catch (err) {
-        console.error(err); alert("Sync drop: " + err.message);
-    } finally {
-        document.getElementById('submit-turn-btn').disabled = false;
-    }
-}
 
         async function submitCandidateResponseTurn() {
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
@@ -1274,13 +1180,19 @@ async function fetchNextInterviewerTurn() {
             const temporaryPayloadHistory = [...runningChatHistoryLedger];
             temporaryPayloadHistory.push({
                 role: "system",
-                content: "SYSTEM NOTE: HUB_HINT_REQUEST. The candidate is stuck and has explicitly requested a conceptual hint for your previous question. Do not give away the direct answer or write code solutions. Provide a subtle, guiding nudge or frame an alternative perspective to unblock them."
+                content: "SYSTEM NOTE: HUB_HINT_REQUEST. Provide a subtle, guiding nudge."
             });
 
             try {
+                let headers = { 'Content-Type': 'application/json' };
+                if (supabaseClientInstance) {
+                    const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                    if (session) { headers['Authorization'] = `Bearer ${session.access_token}`; }
+                }
+
                 const response = await fetch('/api/interview', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({
                         jobDescription: globalJobDescContext,
                         resume: globalResumeContext,
@@ -1292,7 +1204,6 @@ async function fetchNextInterviewerTurn() {
                 if (!response.ok) throw new Error(data.details || data.error || "Hint network sync failed.");
 
                 let genuineInterviewerMessage = data.aiMessage;
-
                 if (genuineInterviewerMessage.includes("SYSTEM NOTE:")) {
                     genuineInterviewerMessage = genuineInterviewerMessage.split("SYSTEM NOTE:")[0].trim();
                 }
@@ -1321,7 +1232,6 @@ async function fetchNextInterviewerTurn() {
                     return; 
                 }
             }
-
             executeFinalReportCompilation();
         }
 
@@ -1336,76 +1246,85 @@ async function fetchNextInterviewerTurn() {
             executeFinalReportCompilation();
         }
 
-        // 2. UPDATE THE REPORT COMPILATION TO APPLY THE CSS BLUR PAYWALL
-function executeFinalReportCompilation() {
-    clearInterval(countdownTimerIntervalInstance);
-    window.speechSynthesis.cancel(); 
-    if(isMicrophoneListening) toggleVoiceSpeechInput();
-    window.scrollTo({top: 0, behavior: 'smooth'});
-    
-    if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
-    if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+        function executeFinalReportCompilation() {
+            clearInterval(countdownTimerIntervalInstance);
+            window.speechSynthesis.cancel(); 
+            if(isMicrophoneListening) toggleVoiceSpeechInput();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+            if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-    if (latestEvaluationReportCache) { 
-        commitSessionToDatabaseHistory(latestEvaluationReportCache); 
-    }
-    
-    if (latestEvaluationReportCache) {
-        const report = latestEvaluationReportCache;
-        
-        document.getElementById('report-score-target').innerText = report.score || 0;
-        document.getElementById('report-resume-score-target').innerText = cachedResumePreflightScore || 0;
-        document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
+            if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
+            
+            if (latestEvaluationReportCache) {
+                const report = latestEvaluationReportCache;
+                
+                document.getElementById('report-score-target').innerText = report.score || 0;
+                document.getElementById('report-resume-score-target').innerText = cachedResumePreflightScore || 0;
+                document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
 
-        const badge = document.getElementById('report-verdict-badge');
-        const accentBar = document.getElementById('report-accent-bar');
-        const verdictStr = (report.verdict || "REJECTED").toUpperCase();
-        
-        if (badge) {
-            badge.innerText = verdictStr;
-            if (verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER')) {
-                badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
-                if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
-            } else {
-                badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
-                if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                const badge = document.getElementById('report-verdict-badge');
+                const accentBar = document.getElementById('report-accent-bar');
+                const verdictStr = (report.verdict || "REJECTED").toUpperCase();
+                
+                if (badge) {
+                    badge.innerText = verdictStr;
+                    if (verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER')) {
+                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
+                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
+                    } else {
+                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
+                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                    }
+                }
+
+                const gapsList = document.getElementById('report-gaps-list-target'); 
+                if (gapsList) {
+                    gapsList.innerHTML = '';
+                    if (!report.gapsToFix || report.gapsToFix.length === 0) {
+                        gapsList.innerHTML = `
+                            <div class="relative p-4 bg-neutral-950/40 rounded-xl border border-neutral-800/60 overflow-hidden select-none cursor-pointer hover:border-[#FFE500]/50 transition-colors" onclick="openPaywallModal()">
+                                <div class="filter blur-[4px] space-y-2">
+                                    <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Detailed optimization vulnerability analysis</span></li>
+                                    <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Missing production implementation architecture</span></li>
+                                </div>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+                                    <span class="text-xs font-black text-[#FFE500] bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-xl shadow-2xl">
+                                        🔒 Unlock Deficiency Diagnostic Roadmap
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        report.gapsToFix.forEach(gap => { gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; });
+                    }
+                }
             }
-        }
 
-        // --- THE DYNAMIC BLUR ENFORCEMENT ---
-        const gapsList = document.getElementById('report-gaps-list-target'); 
-        if (gapsList) {
-            gapsList.innerHTML = '';
-            // If the backend returned an empty array (Free Tier rule), render the locked teaser
-            if (!report.gapsToFix || report.gapsToFix.length === 0) {
-                gapsList.innerHTML = `
-                    <div class="relative p-4 bg-neutral-950/40 rounded-xl border border-neutral-800/60 overflow-hidden select-none cursor-pointer hover:border-[#FFE500]/50 transition-colors" onclick="openPaywallModal()">
-                        <div class="filter blur-[4px] space-y-2">
-                            <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Detailed optimization vulnerability analysis</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Missing production implementation architecture</span></li>
-                        </div>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-                            <span class="text-xs font-black text-[#FFE500] bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-xl shadow-2xl">
-                                🔒 Unlock Deficiency Diagnostic Roadmap
-                            </span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                report.gapsToFix.forEach(gap => { 
-                    gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; 
+            const targetDeck = document.getElementById('transcript-deck-target'); 
+            if (targetDeck) {
+                targetDeck.innerHTML = '';
+                let questionBufferText = '';
+                runningChatHistoryLedger.forEach((msg) => {
+                    if (msg.role === 'assistant') { questionBufferText = msg.content; } 
+                    else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST") && !msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED")) {
+                        targetDeck.innerHTML += `
+                            <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
+                                <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
+                                <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
+                                <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
+                                    <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
+                                    <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
+                                </div>
+                            </div>`;
+                    }
                 });
             }
+            
+            showScreen('results-screen');
         }
-    }
 
-    const targetDeck = document.getElementById('transcript-deck-target'); 
-    if (targetDeck) { /* KEEP YOUR EXISTING TRANSCRIPT LOOP HERE */ }
-    
-    showScreen('results-screen');
-}
-
-        // DOM CORE ROUTING INITIALIZATIONS
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
@@ -1427,10 +1346,8 @@ function executeFinalReportCompilation() {
                 });
             }
 
-            // ================= PASTE TEXT SCREENING DETECTOR =================
             const pasteInputArea = document.getElementById('resume-paste-input');
             let pasteDebounceTimer = null;
-
             if (pasteInputArea) {
                 pasteInputArea.addEventListener('input', (e) => {
                     const rawText = e.target.value.trim();
@@ -1445,13 +1362,10 @@ function executeFinalReportCompilation() {
                             preflightStatus.innerHTML = `<span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-amber-400 tracking-wider">Analyzing Pasted Context...</span>`;
                         }
                         
-                        pasteDebounceTimer = setTimeout(() => {
-                            executePreflightResumeScreening(rawText);
-                        }, 1500);
+                        pasteDebounceTimer = setTimeout(() => { executePreflightResumeScreening(rawText); }, 1500);
                     }
                 });
             }
-            // =====================================================================
 
             const zone = document.getElementById('resume-upload-zone');
             if(zone) {
@@ -1477,63 +1391,6 @@ function executeFinalReportCompilation() {
                 });
             }
         });
-
-        // Add this to your index.html <script> block
-async function initiatePremiumCheckout(tier) {
-    if (!supabaseClientInstance) return;
-    
-    try {
-        // 1. Get the active user session
-        const { data: { session } } = await supabaseClientInstance.auth.getSession();
-        
-        if (!session) {
-            triggerInlineAuthWall('signin');
-            return;
-        }
-
-        const userId = session.user.id;
-        const userEmail = session.user.email;
-        
-        // 2. Define your Lemon Squeezy Store Checkout URLs
-        // Replace these with your actual checkout links from the Lemon Squeezy dashboard
-        const PRO_CHECKOUT_URL = "https://your-store.lemonsqueezy.com/checkout/buy/123456";
-        const ELITE_CHECKOUT_URL = "https://your-store.lemonsqueezy.com/checkout/buy/789012";
-        
-        const baseCheckoutUrl = tier === 'elite' ? ELITE_CHECKOUT_URL : PRO_CHECKOUT_URL;
-        
-        // 3. Append the custom user_id so the webhook knows who paid
-        // We also pre-fill their email for a smoother checkout experience
-        const finalUrl = `${baseCheckoutUrl}?checkout[email]=${encodeURIComponent(userEmail)}&checkout[custom][user_id]=${userId}`;
-        
-        // 4. Redirect them to the secure checkout
-        window.open(finalUrl, '_blank');
-        
-    } catch (err) {
-        console.error("Checkout initialization failed:", err);
-        alert("Failed to initialize secure checkout. Please ensure you are logged in.");
-    }
-}
     </script>
-    <div id="stamina-timeout-overlay" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
-        <div class="max-w-md w-full text-center space-y-6">
-            <div class="w-20 h-20 bg-rose-950/30 border border-rose-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(244,63,94,0.1)] relative">
-                <span class="absolute inset-0 rounded-full bg-rose-500/10 animate-ping"></span>
-                <span class="text-3xl animate-pulse">🚨</span>
-            </div>
-            
-            <div class="space-y-2">
-                <h3 class="text-2xl font-black tracking-tight text-white uppercase font-mono">Cognitive Capacity Blown</h3>
-                <p class="text-rose-400 text-xs font-bold font-mono tracking-wider uppercase">Stamina Clock Severed • Session Terminated</p>
-                <p class="text-neutral-400 text-sm max-w-xs mx-auto pt-1 leading-relaxed">
-                    You failed to present concise technical signal within the allocated time boundary context.
-                </p>
-            </div>
-
-            <div class="inline-flex items-center space-x-2 bg-neutral-950 border border-neutral-900 px-4 py-2 rounded-xl text-xs font-mono text-neutral-500">
-                <span>Compiling diagnostic metrics panel in</span>
-                <span id="timeout-redirect-countdown" class="text-white font-black">3</span>s
-            </div>
-        </div>
-    </div>
 </body>
 </html>
