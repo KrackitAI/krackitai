@@ -17,8 +17,7 @@ export default async function handler(req, res) {
         }
 
         // ─── STAGE 1: BULLETPROOF MATH COUNTER ──────────────────────────
-        const assistantMessageCount = chatHistory.filter(msg => msg.role === "assistant").length;
-        const totalTechnicalQuestionsAsked = Math.max(0, assistantMessageCount - 1);
+        const totalTechnicalQuestionsAsked = chatHistory.filter(msg => msg.role === "assistant").length;
 
         const isTimeCeilingReached = chatHistory.some(msg => msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED"));
         const forceSessionConclusion = totalTechnicalQuestionsAsked >= 5 || isTimeCeilingReached;
@@ -38,13 +37,15 @@ ${resume}
 
 YOUR PERSONA MANDATE:
 - Dynamically invent a highly realistic name, an industry-accurate corporate title, and a fictitious company matching the job description on turn 1. Maintain it consistently.
+- CRITICAL TURN 1 RULE: On your very first message, you MUST introduce yourself AND immediately ask the first technical scenario question. Do not wait for the candidate to say hello.
 
 STRICT PACING AND CONVERSATIONAL CONTRACT:
 1. You must deliver exactly 5 comprehensive domain-specific interview questions. This is a standalone 5-question sprint. There are NO coding rounds, NO debugging rounds, and NO subsequent interviews. 
 2. Current Progress State: [ Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
 3. CRITICAL: NEVER promise or suggest future rounds, coding tests, or next steps to the candidate.
-4. CRITICAL: Never deploy a transitional remark as a standalone message. Every single response you send while the interview is active MUST end with a clear technical question mark "?".
-5. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
+4. THE HUMAN ELEMENT: You must sound like a real human engineer. For questions 2 through 5, you MUST briefly react to the candidate's previous answer before asking the next question. Validate their good points, correct their mistakes, or transition logically based on what they just said. 
+5. THE QUESTION MARK RULE: After your conversational feedback, seamlessly transition into your next technical question. Every single active response MUST end with a clear technical question mark "?".
+6. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
 ${forceSessionConclusion ? "" : "CRITICAL RULE: You are FORBIDDEN from ending the interview early. You MUST output isConcluded: false and ask a technical question."}
 
 GRADING OBJECTIVE DIRECTIVE:
@@ -53,7 +54,7 @@ ${forceSessionConclusion ? `The interview has ended. Evaluate the candidate's an
 DATA OUTPUT SCHEMA:
 You must output a raw JSON object matching this schema exactly:
 {
-    "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'Write a brief goodbye stating time expired.' : 'Write a brief goodbye stating they have completed all 5 questions.') : 'Your next tailored interview question ending with a ?.'}",
+    "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'Write a brief goodbye stating time expired.' : 'Write a brief goodbye stating they have completed all 5 questions.') : 'First, briefly react to their previous answer with realistic conversational feedback. Then, seamlessly ask your next tailored interview question ending with a ?.'}",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'OFFER EXTENDED (PROVISIONAL)' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
@@ -70,7 +71,7 @@ You must output a raw JSON object matching this schema exactly:
         const groqCompletionResponse = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: cleanPayloadArray,
-            temperature: 0.1, 
+            temperature: 0.15, // Bumped slightly from 0.1 to allow just a bit of conversational fluidity without hallucinating
             max_tokens: 1200,
             response_format: { type: "json_object" }
         });
@@ -80,7 +81,6 @@ You must output a raw JSON object matching this schema exactly:
 
         // ─── DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ───────────────
         
-        // HANDCUFF 1: Stop Illegal Early Terminations
         if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {
             parsedReportObjectPayload.isConcluded = false;
             parsedReportObjectPayload.score = 0;
@@ -89,26 +89,26 @@ You must output a raw JSON object matching this schema exactly:
             
             const msgLower = (parsedReportObjectPayload.aiMessage || "").toLowerCase();
             if (msgLower.includes("5 questions") || msgLower.includes("conclude") || msgLower.includes("goodbye") || msgLower.includes("thank you")) {
-                parsedReportObjectPayload.aiMessage = "Let's pivot slightly and dive a bit deeper. Based on our discussion so far, what specific structural trade-offs would you consider if we scaled this architecture by 10x?";
+                parsedReportObjectPayload.aiMessage = "Good points. Let's pivot slightly and dive a bit deeper. Based on our discussion so far, what specific structural trade-offs would you consider if we scaled this architecture by 10x?";
             }
         }
 
-        // HANDCUFF 2: The Question Mark Enforcer
-        // If the interview is active, the AI MUST ask a question. If it forgot, we force one in.
         if (parsedReportObjectPayload.isConcluded === false) {
             let aiMsg = parsedReportObjectPayload.aiMessage || "";
-            // Strip out any hallucinated promises about coding rounds
             aiMsg = aiMsg.replace(/let's simulate.*next/ig, "").replace(/in the next round.*/ig, "").trim();
             
             if (!aiMsg.includes("?")) {
-                aiMsg += " Given these constraints, how would you approach the next critical component of this design?";
+                if (totalTechnicalQuestionsAsked === 0) {
+                    aiMsg += " To get started, what would be your initial approach to designing the core architecture for this role's primary system?";
+                } else {
+                    aiMsg += " Given these constraints, how would you approach the next critical component of this design?";
+                }
             }
             parsedReportObjectPayload.aiMessage = aiMsg;
         }
 
         // ────────────────────────────────────────────────────────────────
 
-        // Grading Normalization Block
         if (parsedReportObjectPayload.isConcluded) {
             let finalCalculatedScore = parseInt(parsedReportObjectPayload.score) || 0;
             
