@@ -70,12 +70,9 @@
         </div>
     </nav>
 
-    <!-- ========================================== -->
-    <!-- SECURE PAYWALL OVERLAY (3-TIER ARCHITECTURE) -->
-    <!-- ========================================== -->
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-sm items-center justify-center p-4 overflow-y-auto">
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md items-center justify-center p-4 overflow-y-auto">
         
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative my-auto">
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
             
             <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
@@ -137,7 +134,7 @@
                         <ul class="space-y-2.5 text-xs text-neutral-300">
                             <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
                             <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Advanced 70B AI Reasoning Engine</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Company Personas</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Personas</span></li>
                             <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
                             <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
                         </ul>
@@ -652,7 +649,7 @@
     const modal = document.getElementById('upgrade-modal');
     if(modal) {
         modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.classList.add('flex'); // Adds flex dynamically to center the modal
     }
 }
 
@@ -660,7 +657,7 @@ function closePaywallModal() {
     const modal = document.getElementById('upgrade-modal');
     if(modal) {
         modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        modal.classList.remove('flex'); // Strips flex so it actually hides
     }
 }
 
