@@ -427,6 +427,7 @@
                 const profileHolder = document.getElementById('navbar-user-profile-holder');
 
                 if (!session) {
+                    window.currentUserTier = 'free';
                     if (profileHolder) {
                         profileHolder.innerHTML = `
                             <button onclick="triggerInlineAuthWall('signin')" class="text-neutral-400 hover:text-white font-bold px-3 py-1.5 transition-colors cursor-pointer">Login</button>
@@ -434,6 +435,10 @@
                         `;
                     }
                 } else {
+                    // Fetch tier from Supabase to show the right badge
+                    const { data: profile } = await supabaseClientInstance.from('profiles').select('tier').eq('id', session.user.id).single();
+                    window.currentUserTier = profile ? profile.tier : 'free';
+
                     if (overlayWall) overlayWall.classList.add('hidden');
                     if (profileHolder) {
                         profileHolder.innerHTML = `
@@ -442,6 +447,9 @@
                         `;
                     }
                 }
+                
+                // Refresh the navbar badge now that we know their tier
+                updateNavbarSessionBadge();
             } catch (err) {
                 console.error("Auth session engine exception:", err);
             }
@@ -545,14 +553,36 @@
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
         
         function updateNavbarSessionBadge() {
-            const rem = Math.max(0, 3 - getSessionCount());
             const target = document.getElementById('navbar-session-status-target');
             if (!target) return;
+
+            const tier = window.currentUserTier || 'free';
+
+            // 1. If they paid, show a premium active status
+            if (tier === 'pro' || tier === 'elite') {
+                target.innerHTML = `
+                    <span class="text-[10px] font-black text-[#FFE500] uppercase tracking-widest px-3 py-1.5 bg-[#FFE500]/10 border border-[#FFE500]/20 rounded-xl flex items-center space-x-1.5 select-none shadow-[0_0_15px_rgba(255,229,0,0.1)]">
+                        <span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span>
+                        <span>${tier} Active</span>
+                    </span>`;
+                return;
+            }
+
+            // 2. If they are Free, calculate remaining sessions
+            const rem = Math.max(0, 3 - getSessionCount());
             
             if (rem === 0) {
                 target.innerHTML = `<button onclick="openPaywallModal()" class="text-xs bg-[#FFE500] text-black px-4 py-1.5 rounded-xl font-black hover:bg-[#ebd300] transition-colors cursor-pointer shadow-lg shadow-[#FFE500]/10">Upgrade to Pro ⚡</button>`;
             } else {
-                target.innerHTML = `<button onclick="openPaywallModal()" class="text-sm text-neutral-400 hover:text-neutral-200 font-bold px-3 py-1.5 transition-colors cursor-pointer select-none">Pricing</button>`;
+                target.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 bg-neutral-500 rounded-full"></span>
+                            <span>Free Sessions: <span class="text-white">${rem}</span>/3</span>
+                        </span>
+                        <button onclick="openPaywallModal()" class="text-xs text-neutral-400 hover:text-white font-bold transition-colors cursor-pointer select-none uppercase tracking-wide">Upgrade</button>
+                    </div>
+                `;
             }
         }
         
