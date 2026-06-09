@@ -121,4 +121,37 @@ You must output a raw JSON object matching this schema exactly:
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
     "brutallyHonestReview": "${forceSessionConclusion ? "Your review string context based on Tier rules." : "Active session live."}",
-    "gapsToFix": ${forceSessionConclusion ? "A flat
+    "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific constructive areas to remediate." : "[]"}
+}`;
+
+        // ─── STAGE 4: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
+        const groqCompletionResponse = await groq.chat.completions.create({
+            model: groqModel, 
+            messages: [{ role: "system", content: systemPrompt }, ...chatHistory],
+            temperature: 0.15, 
+            max_tokens: 1200,
+            response_format: { type: "json_object" }
+        });
+
+        const parsedReportObjectPayload = JSON.parse(groqCompletionResponse.choices[0].message.content);
+
+        // ─── STAGE 5: DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ──────
+        if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {
+            parsedReportObjectPayload.isConcluded = false;
+            parsedReportObjectPayload.score = 0;
+            parsedReportObjectPayload.verdict = "PENDING";
+            parsedReportObjectPayload.gapsToFix = [];
+        }
+
+        // Clean missing parameters if model hallucinated free constraints
+        if (userTier === 'free' && forceSessionConclusion) {
+            parsedReportObjectPayload.gapsToFix = []; // Hard lock data gaps for free users
+        }
+
+        return res.status(200).json(parsedReportObjectPayload);
+
+    } catch (error) {
+        console.error("🚨 API ROUTE CRASH ERROR:", error);
+        return res.status(500).json({ error: "Internal server processing failure.", details: error.message });
+    }
+}
