@@ -1527,9 +1527,20 @@ const response = await fetch('/api/interview', {
             }
         });
     </script>
-    <footer class="text-xs text-neutral-600 flex space-x-4 justify-center py-8">
-    <span>© 2026 Krackit AI. All rights reserved.</span>
-    <a href="/privacy.html" class="hover:text-neutral-400 transition-colors">Privacy Policy</a>
-</footer>
+   <footer class="w-full border-t border-neutral-900 bg-neutral-950 py-8 mt-16 text-sm text-neutral-500">
+        <div class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            
+            <div class="mb-4 md:mb-0">
+                &copy; 2026 Krackit AI. All rights reserved.
+            </div>
+
+            <div class="flex space-x-6">
+                <a href="/terms.html" class="hover:text-white transition-colors duration-200">Terms of Service</a>
+                <a href="/privacy.html" class="hover:text-white transition-colors duration-200">Privacy Policy</a>
+                <a href="mailto:krackitai@gmail.com" class="hover:text-[#FFE500] transition-colors duration-200">Support</a>
+            </div>
+
+        </div>
+    </footer>
 </body>
 </html>
