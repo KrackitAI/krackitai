@@ -1100,11 +1100,15 @@
 const response = await fetch('/api/interview', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-        message: userMessage,
-        history: runningChatHistoryLedger, // Your existing history array
-        // ADD THIS LINE BELOW:
-        tier: window.currentUserTier || 'free'
+    body: JSON.stringify({
+        // Ensure you are passing your required context variables here
+        jobDescription: globalJobDescContext, 
+        resume: globalResumeContext,
+        chatHistory: runningChatHistoryLedger,
+        tier: window.currentUserTier || 'free',
+        
+        // 🚨 ADD THIS EXACT LINE:
+        isHintRequest: true 
     })
 });
                 const data = await response.json();
