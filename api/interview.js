@@ -16,23 +16,26 @@ export default async function handler(req, res) {
 
     try {
         // ─── STAGE 1: PAYLOAD EXTRACTION & SECURE TIER VERIFICATION ───────
-        const { jobDescription, resume, chatHistory, isHintRequest } = req.body;
+        // We now extract the 'tier' sent from the frontend
+        const { jobDescription, resume, chatHistory, isHintRequest, tier: frontendTier } = req.body;
 
         if (!jobDescription || !resume || !chatHistory) {
             return res.status(400).json({ error: "Missing required profile parameters." });
         }
 
-        // Extract the user token from Authorization header to check their real subscription tier
-        const authHeader = req.headers.authorization;
-        let userTier = 'free'; // Default fallback
+        // Default to what the frontend claims, but we will verify it below
+        let userTier = frontendTier ? frontendTier.toLowerCase() : 'free'; 
         let userId = null;
 
+        // Extract the user token from Authorization header to check their real subscription tier
+        const authHeader = req.headers.authorization;
+        
         if (authHeader) {
             const token = authHeader.replace("Bearer ", "");
             const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
             if (!authError && user) {
                 userId = user.id;
-                // Query your profiles table (synced via Lemon Squeezy webhooks)
+                // Query your profiles table securely
                 const { data: profile } = await supabaseAdmin
                     .from('profiles')
                     .select('tier')
@@ -40,7 +43,7 @@ export default async function handler(req, res) {
                     .single();
                 
                 if (profile && profile.tier) {
-                    userTier = profile.tier.toLowerCase(); // 'free', 'pro', or 'elite'
+                    userTier = profile.tier.toLowerCase(); // The database truth overrides the frontend
                 }
             }
         }
@@ -118,37 +121,4 @@ You must output a raw JSON object matching this schema exactly:
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
     "brutallyHonestReview": "${forceSessionConclusion ? "Your review string context based on Tier rules." : "Active session live."}",
-    "gapsToFix": ${forceSessionConclusion ? "A flat string array of specific constructive areas to remediate." : "[]"}
-}`;
-
-        // ─── STAGE 4: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
-        const groqCompletionResponse = await groq.chat.completions.create({
-            model: groqModel, // Dynamic routing based on tier (8B vs 70B)
-            messages: [{ role: "system", content: systemPrompt }, ...chatHistory],
-            temperature: 0.15, 
-            max_tokens: 1200,
-            response_format: { type: "json_object" }
-        });
-
-        const parsedReportObjectPayload = JSON.parse(groqCompletionResponse.choices[0].message.content);
-
-        // ─── STAGE 5: DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ──────
-        if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {
-            parsedReportObjectPayload.isConcluded = false;
-            parsedReportObjectPayload.score = 0;
-            parsedReportObjectPayload.verdict = "PENDING";
-            parsedReportObjectPayload.gapsToFix = [];
-        }
-
-        // Clean missing parameters if model hallucinated free constraints
-        if (userTier === 'free' && forceSessionConclusion) {
-            parsedReportObjectPayload.gapsToFix = []; // Hard lock data gaps for free users
-        }
-
-        return res.status(200).json(parsedReportObjectPayload);
-
-    } catch (error) {
-        console.error("🚨 API ROUTE CRASH ERROR:", error);
-        return res.status(500).json({ error: "Internal server processing failure.", details: error.message });
-    }
-}
+    "gapsToFix": ${forceSessionConclusion ? "A flat
