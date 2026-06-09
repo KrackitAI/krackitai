@@ -115,8 +115,7 @@ ${userTier === 'free' ? "TIER PRIVILEGE: This user is on the FREE sandbox. You M
 
 DATA OUTPUT SCHEMA:
 You must output a raw JSON object matching this schema exactly:
-{
-    "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'Write a brief goodbye stating time expired.' : 'Write a brief goodbye stating they have completed all 5 questions.') : (isHintMode ? 'Your conceptual [HINT] text here. No questions.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",
+{"aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'Write a brief goodbye stating time expired.' : 'Write a brief goodbye stating they have completed all 5 questions.') : (isHintMode ? '[HINT] Give a conceptual clue to help them answer. DO NOT ask a question. DO NOT end with a question mark.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
     "score": ${forceSessionConclusion ? "An integer between 1 and 100 based on performance." : "0"},
     "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
