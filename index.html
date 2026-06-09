@@ -1175,6 +1175,29 @@ const response = await fetch('/api/interview', {
     const micButton = document.getElementById('audio-mic-btn'); 
     if (micButton) {
         if (tier === 'free') {
+            micButton.disabled = true;
+            micButton.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+            micButton.title = "Voice Input requires Krackit Pro";
+        } else {
+            micButton.disabled = false;
+            micButton.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+            micButton.title = "Click to Speak";
+        }
+    }
+
+    // 6. DYNAMIC TIMERS
+    // We set a global variable here so your clock function knows how long to run
+    window.activeSessionMinutesLimit = (tier === 'elite') ? 45 : (tier === 'pro') ? 20 : 5;
+    
+    initializeActiveStaminaCountdownClock();
+
+    runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
+    
+    // Only burn a free session token if they are actually on the free tier
+    if (tier === 'free') incrementSessionCount(); 
+    
+    await fetchNextInterviewerTurn();
+}
 
         function renderAITypingBubble() {
             document.getElementById('sim-active-question-text').innerHTML = `
