@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Krackit AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-950 text-neutral-400 font-sans antialiased min-h-screen flex flex-col">
+
+    <nav class="w-full border-b border-neutral-900 bg-neutral-950/80 p-4">
+        <div class="max-w-4xl mx-auto">
+            <a href="/" class="text-xl font-black text-white">Krackit<span class="text-[#FFE500]">⚡</span></a>
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full max-w-xl mx-auto px-6 py-12">
+        <h1 class="text-3xl font-black text-white mb-6 uppercase tracking-wide">Contact Us</h1>
+        <p class="mb-8">Have a question or need assistance? Fill out the form below and we'll get back to you within 48 hours.</p>
+
+        <form action="https://api.web3forms.com/submit" method="POST" class="space-y-6">
+            <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+            
+            <div>
+                <label class="block text-sm font-bold text-white mb-2">Email Address</label>
+                <input type="email" name="email" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg p-3 text-white focus:border-[#FFE500] outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-white mb-2">Subject</label>
+                <select name="subject" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg p-3 text-white focus:border-[#FFE500] outline-none">
+                    <option>General Inquiry</option>
+                    <option>Technical Support</option>
+                    <option>Billing Question</option>
+                    <option>Feedback</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-white mb-2">Message</label>
+                <textarea name="message" rows="4" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg p-3 text-white focus:border-[#FFE500] outline-none"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-[#FFE500] text-black font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">
+                Send Message
+            </button>
+        </form>
+    </main>
+
+    <footer class="text-center py-8 text-xs text-neutral-600">© 2026 Krackit AI</footer>
+</body>
+</html>
