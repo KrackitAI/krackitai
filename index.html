@@ -1024,43 +1024,54 @@
         }
 
         function initializeActiveStaminaCountdownClock() {
-            clearInterval(countdownTimerIntervalInstance);
-            remainingInterviewSecondsBalance = TOTAL_ALLOCATED_SECONDS_MAX;
+    clearInterval(countdownTimerIntervalInstance);
+    
+    // 1. DYNAMIC TIME INJECTION: Use the variable we set in startLiveSimulation
+    const totalSeconds = (window.activeSessionMinutesLimit || 5) * 60;
+    remainingInterviewSecondsBalance = totalSeconds;
+    
+    const clockDisplay = document.getElementById('stamina-digital-clock');
+    const progressFill = document.getElementById('stamina-timer-progress-bar');
+    
+    // 2. INITIAL DISPLAY FIX: Dynamically format the starting minutes
+    const startMins = window.activeSessionMinutesLimit < 10 ? '0' + window.activeSessionMinutesLimit : window.activeSessionMinutesLimit;
+    if (clockDisplay) clockDisplay.innerText = `${startMins}:00`;
+    
+    if (progressFill) {
+        progressFill.style.width = "100%";
+        progressFill.className = "h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000";
+    }
+
+    countdownTimerIntervalInstance = setInterval(() => {
+        remainingInterviewSecondsBalance--;
+        
+        // Use the new dynamic total for the progress bar percentage
+        const currentPercentage = (remainingInterviewSecondsBalance / totalSeconds) * 100;
+        
+        const mins = Math.floor(remainingInterviewSecondsBalance / 60);
+        const secs = remainingInterviewSecondsBalance % 60;
+        
+        // 3. PADDING FIX: Ensure minutes and seconds format correctly for Pro/Elite (e.g., 20:00)
+        const paddedMins = mins < 10 ? '0' + mins : mins;
+        const paddedSecs = secs < 10 ? '0' + secs : secs;
+        
+        if (clockDisplay) clockDisplay.innerText = `${paddedMins}:${paddedSecs}`;
+        if (progressFill) {
+            progressFill.style.width = `${currentPercentage}%`;
             
-            const clockDisplay = document.getElementById('stamina-digital-clock');
-            const progressFill = document.getElementById('stamina-timer-progress-bar');
-            
-            if (clockDisplay) clockDisplay.innerText = "05:00";
-            if (progressFill) {
-                progressFill.style.width = "100%";
-                progressFill.className = "h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000";
+            // Turn red in the final 60 seconds
+            if (remainingInterviewSecondsBalance <= 60) {
+                progressFill.className = "h-full bg-gradient-to-r from-rose-600 to-red-500 transition-all duration-1000";
+                if (clockDisplay) clockDisplay.className = "text-xs font-black text-rose-500 tracking-widest shrink-0 bg-neutral-950 px-2.5 py-1 rounded-md border border-rose-900 animate-pulse";
             }
-
-            countdownTimerIntervalInstance = setInterval(() => {
-                remainingInterviewSecondsBalance--;
-                
-                const currentPercentage = (remainingInterviewSecondsBalance / TOTAL_ALLOCATED_SECONDS_MAX) * 100;
-                
-                const mins = Math.floor(remainingInterviewSecondsBalance / 60);
-                const secs = remainingInterviewSecondsBalance % 60;
-                const paddedSecs = secs < 10 ? '0' + secs : secs;
-                
-                if (clockDisplay) clockDisplay.innerText = `0${mins}:${paddedSecs}`;
-                if (progressFill) {
-                    progressFill.style.width = `${currentPercentage}%`;
-                    
-                    if (remainingInterviewSecondsBalance <= 60) {
-                        progressFill.className = "h-full bg-gradient-to-r from-rose-600 to-red-500 transition-all duration-1000";
-                        if (clockDisplay) clockDisplay.className = "text-xs font-black text-rose-500 tracking-widest shrink-0 bg-neutral-950 px-2.5 py-1 rounded-md border border-rose-900 animate-pulse";
-                    }
-                }
-
-                if (remainingInterviewSecondsBalance <= 0) {
-                    clearInterval(countdownTimerIntervalInstance);
-                    executeAbruptTimeExhaustionShutdown();
-                }
-            }, 1000);
         }
+
+        if (remainingInterviewSecondsBalance <= 0) {
+            clearInterval(countdownTimerIntervalInstance);
+            executeAbruptTimeExhaustionShutdown();
+        }
+    }, 1000);
+}
 
         async function executeAbruptTimeExhaustionShutdown() {
             window.speechSynthesis.cancel();
@@ -1085,12 +1096,17 @@
                     if (session) { headers['Authorization'] = `Bearer ${session.access_token}`; }
                 }
 
-                const response = await fetch('/api/interview', {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
-                });
-
+                // Look for your fetch call and add the tier property to the body
+const response = await fetch('/api/interview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        message: userMessage,
+        history: runningChatHistoryLedger, // Your existing history array
+        // ADD THIS LINE BELOW:
+        tier: window.currentUserTier || 'free'
+    })
+});
                 const data = await response.json();
                 latestEvaluationReportCache = data;
                 
@@ -1111,32 +1127,54 @@
         }
 
         async function startLiveSimulation() {
-            if (supabaseClientInstance) {
-                const { data: { session } } = await supabaseClientInstance.auth.getSession();
-                if (!session) { triggerInlineAuthWall('signin'); return; }
-            }
-            if (getSessionCount() >= 3) { openPaywallModal(); return; }
+    // 1. Session Auth Check
+    if (supabaseClientInstance) {
+        const { data: { session } } = await supabaseClientInstance.auth.getSession();
+        if (!session) { triggerInlineAuthWall('signin'); return; }
+    }
 
-            globalJobDescContext = document.getElementById('job-desc-input').value.trim();
-            globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+    // Grab the current tier from the global variable we set in the navbar
+    const tier = window.currentUserTier || 'free';
 
-            if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
-            runningChatHistoryLedger = []; latestEvaluationReportCache = null; showScreen('simulator-screen');
-            window.scrollTo({top: 0, behavior: 'instant'});
+    // 2. ENFORCE LIFETIME LIMITS (Free Tier Only)
+    if (tier === 'free' && getSessionCount() >= 3) { 
+        openPaywallModal(); 
+        return; 
+    }
 
-            remainingFreeHintsCount = 1;
-            runningSessionHintsUsedTotal = 0;
-            const badgeElement = document.getElementById('hint-tracker-badge');
-            if (badgeElement) {
-                badgeElement.innerText = "Free: 1";
-                badgeElement.className = "bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
-            }
+    // 3. Compile Context
+    globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+    globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            initializeActiveStaminaCountdownClock();
+    if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
+    runningChatHistoryLedger = []; latestEvaluationReportCache = null; showScreen('simulator-screen');
+    window.scrollTo({top: 0, behavior: 'instant'});
 
-            runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
-            incrementSessionCount(); await fetchNextInterviewerTurn();
+    // 4. DYNAMIC HINTS
+    if (tier === 'free') {
+        remainingFreeHintsCount = 1;
+    } else if (tier === 'pro') {
+        remainingFreeHintsCount = 5;
+    } else if (tier === 'elite') {
+        remainingFreeHintsCount = 999; // Practically unlimited
+    }
+    
+    runningSessionHintsUsedTotal = 0;
+    const badgeElement = document.getElementById('hint-tracker-badge');
+    if (badgeElement) {
+        if (tier === 'free') {
+            badgeElement.innerText = `Free: ${remainingFreeHintsCount}`;
+            badgeElement.className = "bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
+        } else {
+            badgeElement.innerText = `${tier.toUpperCase()} HINTS: ${tier === 'elite' ? '∞' : remainingFreeHintsCount}`;
+            badgeElement.className = "bg-[#FFE500]/20 text-[#FFE500] border border-[#FFE500]/50 text-[9px] px-1.5 py-0.5 rounded-md font-black tracking-widest";
         }
+    }
+
+    // 5. AUDIO / VOICE LOCK (Assuming your button has the ID 'audio-mic-btn' - change if different!)
+    const micButton = document.getElementById('audio-mic-btn'); 
+    if (micButton) {
+        if (tier === 'free') {
 
         function renderAITypingBubble() {
             document.getElementById('sim-active-question-text').innerHTML = `
