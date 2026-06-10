@@ -14,7 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth relative">
-
+<div class="bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white shadow-md relative z-50">
+    🚀 Krackit AI is currently in Closed Beta. Enjoy full premium features unlocked for a limited time!
+</div>
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
             <button type="button" onclick="closeInlineAuthWall()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
@@ -453,6 +455,12 @@
             } catch (err) {
                 console.error("Auth session engine exception:", err);
             }
+            // INSIDE enforceSecuritySessionWall()
+const { data: profile } = await supabaseClientInstance.from('profiles').select('tier').eq('id', session.user.id).single();
+
+// TEMPORARY BETA OVERRIDE: Unlock the frontend UI features
+window.currentUserTier = 'elite'; 
+// window.currentUserTier = profile ? profile.tier : 'free'; // <-- Comment this out for now
         }
 
         function triggerInlineAuthWall(mode) {
@@ -553,38 +561,24 @@
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
         
         function updateNavbarSessionBadge() {
-            const target = document.getElementById('navbar-session-status-target');
-            if (!target) return;
+    const target = document.getElementById('navbar-session-status-target');
+    if (!target) return;
 
-            const tier = window.currentUserTier || 'free';
-
-            // 1. If they paid, show a premium active status
-            if (tier === 'pro' || tier === 'elite') {
-                target.innerHTML = `
-                    <span class="text-[10px] font-black text-[#FFE500] uppercase tracking-widest px-3 py-1.5 bg-[#FFE500]/10 border border-[#FFE500]/20 rounded-xl flex items-center space-x-1.5 select-none shadow-[0_0_15px_rgba(255,229,0,0.1)]">
-                        <span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span>
-                        <span>${tier} Active</span>
-                    </span>`;
-                return;
-            }
-
-            // 2. If they are Free, calculate remaining sessions
-            const rem = Math.max(0, 3 - getSessionCount());
-            
-            if (rem === 0) {
-                target.innerHTML = `<button onclick="openPaywallModal()" class="text-xs bg-[#FFE500] text-black px-4 py-1.5 rounded-xl font-black hover:bg-[#ebd300] transition-colors cursor-pointer shadow-lg shadow-[#FFE500]/10">Upgrade to Pro ⚡</button>`;
-            } else {
-                target.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 bg-neutral-500 rounded-full"></span>
-                            <span>Free Sessions: <span class="text-white">${rem}</span>/3</span>
-                        </span>
-                        <button onclick="openPaywallModal()" class="text-xs text-neutral-400 hover:text-white font-bold transition-colors cursor-pointer select-none uppercase tracking-wide">Upgrade</button>
-                    </div>
-                `;
-            }
-        }
+    const rem = Math.max(0, 3 - getSessionCount());
+    
+    if (rem === 0) {
+        target.innerHTML = `<span class="text-xs bg-rose-950 text-rose-400 border border-rose-900 px-4 py-1.5 rounded-xl font-black shadow-lg shadow-rose-900/10">Beta Limit Reached</span>`;
+    } else {
+        target.innerHTML = `
+            <div class="flex items-center space-x-4">
+                <span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
+                    <span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span>
+                    <span>Beta Sessions Remaining: <span class="text-white">${rem}</span>/3</span>
+                </span>
+            </div>
+        `;
+    }
+}
         
         // --- PAYWALL MODAL TOGGLES ---
         function openPaywallModal() { 
@@ -1140,11 +1134,12 @@ const response = await fetch('/api/interview', {
     // Grab the current tier from the global variable we set in the navbar
     const tier = window.currentUserTier || 'free';
 
-    // 2. ENFORCE LIFETIME LIMITS (Free Tier Only)
-    if (tier === 'free' && getSessionCount() >= 3) { 
-        openPaywallModal(); 
-        return; 
-    }
+
+
+if (getSessionCount() >= 3) { 
+    alert("You have used your 3 free beta interviews! Thank you for testing Krackit AI. Please leave feedback using the button in the bottom right.");
+    return; 
+}
 
     // 3. Compile Context
     globalJobDescContext = document.getElementById('job-desc-input').value.trim();
@@ -1541,6 +1536,9 @@ const response = await fetch('/api/interview', {
             </div>
 
         </div>
+       <a href="https://tally.so/r/YOUR_FORM_ID" target="_blank" rel="noopener noreferrer" class="fixed bottom-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-sm z-50">
+    💬 Leave Feedback
+</a>
     </footer>
 </body>
 </html>
