@@ -1425,82 +1425,81 @@ if (getSessionCount() >= 3) {
         }
 
         function executeFinalReportCompilation() {
-            clearInterval(countdownTimerIntervalInstance);
-            window.speechSynthesis.cancel(); 
-            if(isMicrophoneListening) toggleVoiceSpeechInput();
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            
-            if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
-            if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
-
-            if (latestEvaluationReportCache) { commitSessionToDatabaseHistory(latestEvaluationReportCache); }
-            
-            if (latestEvaluationReportCache) {
-                const report = latestEvaluationReportCache;
+            try {
+                clearInterval(countdownTimerIntervalInstance);
+                window.speechSynthesis.cancel(); 
+                if(isMicrophoneListening) toggleVoiceSpeechInput();
+                window.scrollTo({top: 0, behavior: 'smooth'});
                 
-                document.getElementById('report-score-target').innerText = report.score || 0;
-                document.getElementById('report-resume-score-target').innerText = cachedResumePreflightScore || 0;
-                document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
+                if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+                if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-                const badge = document.getElementById('report-verdict-badge');
-                const accentBar = document.getElementById('report-accent-bar');
-                const verdictStr = (report.verdict || "REJECTED").toUpperCase();
+                if (latestEvaluationReportCache) { 
+                    commitSessionToDatabaseHistory(latestEvaluationReportCache).catch(e => console.error(e)); 
+                }
                 
-                if (badge) {
-                    badge.innerText = verdictStr;
-                    if (verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER')) {
-                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
-                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
-                    } else {
-                        badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
-                        if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                if (latestEvaluationReportCache) {
+                    const report = latestEvaluationReportCache;
+                    
+                    document.getElementById('report-score-target').innerText = report.score || 0;
+                    document.getElementById('report-resume-score-target').innerText = cachedResumePreflightScore || 0;
+                    document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
+
+                    const badge = document.getElementById('report-verdict-badge');
+                    const accentBar = document.getElementById('report-accent-bar');
+                    const verdictStr = (report.verdict || "REJECTED").toUpperCase();
+                    
+                    if (badge) {
+                        badge.innerText = verdictStr;
+                        if (verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER')) {
+                            badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-emerald-950 border border-emerald-800 text-emerald-400";
+                            if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-emerald-500";
+                        } else {
+                            badge.className = "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide bg-rose-950 border border-rose-900 text-rose-400";
+                            if (accentBar) accentBar.className = "absolute top-0 left-0 w-1.5 h-full bg-rose-500";
+                        }
+                    }
+
+                    const gapsList = document.getElementById('report-gaps-list-target'); 
+                    if (gapsList) {
+                        gapsList.innerHTML = '';
+                        
+                        // 🚨 BULLETPROOF ARRAY CHECK 🚨
+                        if (!report.gapsToFix || !Array.isArray(report.gapsToFix) || report.gapsToFix.length === 0) {
+                            gapsList.innerHTML = `<li class="text-neutral-500 italic">No specific structural gaps recorded by the AI.</li>`;
+                        } else {
+                            report.gapsToFix.forEach(gap => { 
+                                gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; 
+                            });
+                        }
                     }
                 }
 
-                const gapsList = document.getElementById('report-gaps-list-target'); 
-                if (gapsList) {
-                    gapsList.innerHTML = '';
-                    if (!report.gapsToFix || report.gapsToFix.length === 0) {
-                        gapsList.innerHTML = `
-                            <div class="relative p-4 bg-neutral-950/40 rounded-xl border border-neutral-800/60 overflow-hidden select-none cursor-pointer hover:border-[#FFE500]/50 transition-colors" onclick="openPaywallModal()">
-                                <div class="filter blur-[4px] space-y-2">
-                                    <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Detailed optimization vulnerability analysis</span></li>
-                                    <li class="flex items-center space-x-2"><span class="text-rose-500 font-bold">✕</span><span>Missing production implementation architecture</span></li>
-                                </div>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-                                    <span class="text-xs font-black text-[#FFE500] bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-xl shadow-2xl">
-                                        🔒 Unlock Deficiency Diagnostic Roadmap
-                                    </span>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        report.gapsToFix.forEach(gap => { gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; });
-                    }
+                const targetDeck = document.getElementById('transcript-deck-target'); 
+                if (targetDeck) {
+                    targetDeck.innerHTML = '';
+                    let questionBufferText = '';
+                    runningChatHistoryLedger.forEach((msg) => {
+                        if (msg.role === 'assistant') { questionBufferText = msg.content; } 
+                        else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST") && !msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED")) {
+                            targetDeck.innerHTML += `
+                                <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
+                                    <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
+                                    <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
+                                    <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
+                                        <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
+                                        <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
+                                    </div>
+                                </div>`;
+                        }
+                    });
                 }
+            } catch (error) {
+                console.error("Critical rendering error intercepted:", error);
+            } finally {
+                // 🚨 GUARANTEED REDIRECT 🚨
+                showScreen('results-screen');
             }
-
-            const targetDeck = document.getElementById('transcript-deck-target'); 
-            if (targetDeck) {
-                targetDeck.innerHTML = '';
-                let questionBufferText = '';
-                runningChatHistoryLedger.forEach((msg) => {
-                    if (msg.role === 'assistant') { questionBufferText = msg.content; } 
-                    else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST") && !msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED")) {
-                        targetDeck.innerHTML += `
-                            <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
-                                <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
-                                <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
-                                <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
-                                    <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
-                                    <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
-                                </div>
-                            </div>`;
-                    }
-                });
-            }
-            
-            showScreen('results-screen');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
