@@ -334,7 +334,28 @@
             </div>
         </div>
     </div>
-
+    <div id="beta-limit-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
+        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 text-center shadow-2xl relative">
+            <button type="button" onclick="closeBetaLimitModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+            
+            <div class="space-y-3">
+                <div class="w-14 h-14 bg-[#FFE500]/10 border border-[#FFE500]/20 text-[#FFE500] rounded-full flex items-center justify-center mx-auto text-2xl font-black mb-2 shadow-[0_0_15px_rgba(255,229,0,0.1)]">🚀</div>
+                <h3 class="text-2xl font-black text-white tracking-tight">Beta Limit Reached</h3>
+                <p class="text-neutral-400 text-sm leading-relaxed px-2">
+                    You have used your 3 free beta interviews! Thank you for testing Krackit AI. Your feedback is crucial for our launch.
+                </p>
+            </div>
+            
+            <div class="flex flex-col gap-3 pt-2">
+                <a href="https://tally.so/r/YOUR_ACTUAL_FORM_ID" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 text-sm font-black rounded-xl bg-[#FFE500] hover:bg-[#ebd300] text-black transition-all cursor-pointer shadow-lg shadow-[#FFE500]/10 block">
+                    💬 Leave Feedback
+                </a>
+                <button type="button" onclick="closeBetaLimitModal()" class="w-full py-3 text-sm font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">
+                    Return to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md items-center justify-center p-4 overflow-y-auto">
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
             <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
@@ -593,6 +614,12 @@ window.currentUserTier = 'elite';
             if(modal) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+            }
+        }
+        function closeBetaLimitModal() {
+            const modal = document.getElementById('beta-limit-overlay');
+            if (modal) {
+                modal.classList.add('hidden');
             }
         }
 
@@ -1142,7 +1169,10 @@ const response = await fetch('/api/interview', {
 
 
 if (getSessionCount() >= 3) { 
-    alert("You have used your 3 free beta interviews! Thank you for testing Krackit AI. Please leave feedback using the button in the bottom right.");
+    const limitModal = document.getElementById('beta-limit-overlay');
+    if (limitModal) {
+        limitModal.classList.remove('hidden');
+    }
     return; 
 }
 
@@ -1558,5 +1588,6 @@ if (getSessionCount() >= 3) {
     💬 Leave Feedback
 </a>
     </footer>
+   
 </body>
 </html>
