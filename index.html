@@ -101,6 +101,23 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div class="pt-8 max-w-md mx-auto w-full">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="h-px bg-neutral-900 flex-1"></div>
+                <span class="text-[10px] text-neutral-500 font-mono uppercase tracking-widest">Or join the launch list</span>
+                <div class="h-px bg-neutral-900 flex-1"></div>
+            </div>
+            
+            <div class="flex items-center bg-neutral-950 border border-neutral-800 rounded-xl p-1 shadow-inner focus-within:border-[#FFE500] focus-within:ring-1 focus-within:ring-[#FFE500]/20 transition-all">
+                <input type="email" id="waitlist-email-input" placeholder="name@college.edu" class="flex-1 bg-transparent border-none text-sm text-neutral-200 px-4 py-2.5 focus:outline-none placeholder-neutral-600">
+                <button onclick="submitWaitlist()" class="bg-neutral-900 hover:bg-neutral-800 text-[#FFE500] font-bold text-xs px-5 py-2.5 rounded-lg transition-colors cursor-pointer border border-neutral-800">
+                    Notify Me ⚡
+                </button>
+            </div>
+            <p id="waitlist-success-msg" class="hidden text-xs text-emerald-400 font-medium mt-3 transition-all animate-pulse">
+                ✓ Secured! We'll email you when Krackit officially launches.
+            </p>
+        </div>
             <button onclick="scrollToWorkspaceSetup()" class="w-full sm:w-auto bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-4 rounded-xl text-sm tracking-wide shadow-xl shadow-[#FFE500]/5 transition-all cursor-pointer">
                 Initialize Free Simulator →
             </button>
@@ -1568,6 +1585,26 @@ if (getSessionCount() >= 3) {
                 });
             }
         });
+        async function submitWaitlist() {
+            const input = document.getElementById('waitlist-email-input');
+            const msg = document.getElementById('waitlist-success-msg');
+            const email = input.value.trim();
+
+            if (email && email.includes('@') && email.includes('.')) {
+                // For now, we simulate a successful save so the UI feels incredibly fast.
+                // Later, you can wire this up to a Supabase table like supabase.from('waitlist').insert({ email })
+                
+                input.value = ''; // Clear the box
+                msg.classList.remove('hidden'); // Show success message
+                
+                // Hide the message after 4 seconds
+                setTimeout(() => {
+                    msg.classList.add('hidden');
+                }, 4000);
+            } else {
+                alert('Please enter a valid email address.');
+            }
+        }
     </script>
    <footer class="w-full border-t border-neutral-900 bg-neutral-950 py-8 mt-16 text-sm text-neutral-500">
         <div class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
