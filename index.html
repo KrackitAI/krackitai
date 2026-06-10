@@ -1251,19 +1251,27 @@ if (getSessionCount() >= 3) {
                     
                     const goodbyeText = data.aiMessage;
                     runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
-                    document.getElementById('sim-active-question-text').innerText = goodbyeText;
+                    
+                    const questionElement = document.getElementById('sim-active-question-text');
+                    if (questionElement) questionElement.innerText = goodbyeText;
+                    
                     speakTextAloud(goodbyeText);
 
-                    document.getElementById('sim-status-indicator').innerText = "Compiling diagnostic report...";
+                    // Update status text
+                    const statusIndicator = document.getElementById('sim-status-indicator');
+                    if (statusIndicator) statusIndicator.innerText = "Compiling diagnostic report...";
                     
-                    // Hide the input controls so they can't keep typing
-                    const inputSection = document.querySelector('#sim-user-response-box').parentElement;
-                    if (inputSection) inputSection.style.display = 'none';
+                    // Safely hide the input controls so the user can't keep typing
+                    const inputSection = document.getElementById('sim-user-response-box');
+                    if (inputSection && inputSection.parentElement) {
+                        inputSection.parentElement.style.display = 'none';
+                    }
 
                     // Wait 4 seconds for the voice to finish speaking, then force the transition
                     setTimeout(() => { 
                         executeFinalReportCompilation(); 
                     }, 4000); 
+                    
                     return;
                 }
 
