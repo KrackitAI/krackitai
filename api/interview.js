@@ -87,10 +87,7 @@ export default async function handler(req, res) {
         if (isTimeCeilingReached) conclusionReason = "TIME_EXPIRED";
         else if (totalTechnicalQuestionsAsked >= maxQuestions) conclusionReason = "ALL_QUESTIONS_ANSWERED";
 
-        // Paywall block if a free user manually bypasses frontend hints
-        if (isHintMode && totalHintsUsed >= maxHintsAllowed) {
-            return res.status(403).json({ error: "PAYWALL_TRIGGERED", message: "Hint capacity exhausted for your tier." });
-        }
+        
 
         // ─── STAGE 3: ADAPTIVE DOMAIN SYSTEM PROMPT ─────────────────────
         const systemPrompt = `You are an expert corporate interviewer tailored precisely to the domain of the provided Job Description.
