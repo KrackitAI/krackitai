@@ -1247,18 +1247,23 @@ if (getSessionCount() >= 3) {
 
                 if (data.isConcluded) {
                     clearInterval(countdownTimerIntervalInstance); 
-                    latestEvaluationReportCache = data;
+                    latestEvaluationReportCache = data; // Crucial: Store the final report
+                    
                     const goodbyeText = data.aiMessage;
                     runningChatHistoryLedger.push({ role: "assistant", content: goodbyeText });
                     document.getElementById('sim-active-question-text').innerText = goodbyeText;
                     speakTextAloud(goodbyeText);
 
-                    document.getElementById('sim-status-indicator').innerText = "Concluding session...";
-                    document.getElementById('submit-turn-btn').style.display = 'none';
-                    document.getElementById('mic-toggle-btn').style.display = 'none';
-                    document.getElementById('hint-request-btn').style.display = 'none';
+                    document.getElementById('sim-status-indicator').innerText = "Compiling diagnostic report...";
+                    
+                    // Hide the input controls so they can't keep typing
+                    const inputSection = document.querySelector('#sim-user-response-box').parentElement;
+                    if (inputSection) inputSection.style.display = 'none';
 
-                    setTimeout(() => { finishAndWrapInterview(); }, 5000); 
+                    // Wait 4 seconds for the voice to finish speaking, then force the transition
+                    setTimeout(() => { 
+                        executeFinalReportCompilation(); 
+                    }, 4000); 
                     return;
                 }
 
