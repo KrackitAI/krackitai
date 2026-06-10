@@ -48,6 +48,12 @@ export default async function handler(req, res) {
             }
         }
 
+        // 🚨 TEMPORARY CLOSED BETA OVERRIDE 🚨
+        // Force the backend to give everyone the 70B model, 45-min clock, and deep tech questions
+        userTier = 'elite'; 
+
+        // ─── STAGE 2: DYNAMIC TIER ENFORCEMENT CONFIG ─────────────────────
+
         // ─── STAGE 2: DYNAMIC TIER ENFORCEMENT CONFIG ─────────────────────
         let maxQuestions = 5;
         let timeCeilingSeconds = 300; // 5 mins free
