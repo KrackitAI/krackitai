@@ -1290,10 +1290,7 @@ if (getSessionCount() >= 3) {
             window.speechSynthesis.cancel();
             if(isMicrophoneListening) toggleVoiceSpeechInput();
 
-            if (remainingFreeHintsCount <= 0) {
-                openPaywallModal();
-                return;
-            }
+            // 🚨 PAYWALL CHECK COMPLETELY REMOVED 🚨
 
             const hintBtn = document.getElementById('hint-request-btn');
             const submitBtn = document.getElementById('submit-turn-btn');
@@ -1303,19 +1300,18 @@ if (getSessionCount() >= 3) {
             document.getElementById('sim-status-indicator').innerText = "Interviewer is tailoring a conceptual hint...";
             renderAITypingBubble();
 
-            remainingFreeHintsCount--;
             runningSessionHintsUsedTotal++;
             
             const badge = document.getElementById('hint-tracker-badge');
             if (badge) {
-                badge.innerText = `Used: ${runningSessionHintsUsedTotal}`;
-                badge.className = "bg-neutral-950 text-neutral-500 border border-neutral-800 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
+                badge.innerText = `Hints Used: ${runningSessionHintsUsedTotal}`;
+                badge.className = "bg-neutral-950 text-neutral-500 border border-neutral-800 text-[9px] px-1.5 py-0.5 rounded-md font-bold tracking-widest";
             }
 
             const temporaryPayloadHistory = [...runningChatHistoryLedger];
             temporaryPayloadHistory.push({
                 role: "system",
-                content: "SYSTEM NOTE: HUB_HINT_REQUEST. Provide a subtle, guiding nudge."
+                content: "SYSTEM NOTE: HUB_HINT_REQUEST. Provide a subtle, guiding nudge to help the candidate answer the current question."
             });
 
             try {
@@ -1331,7 +1327,8 @@ if (getSessionCount() >= 3) {
                     body: JSON.stringify({
                         jobDescription: globalJobDescContext,
                         resume: globalResumeContext,
-                        chatHistory: temporaryPayloadHistory 
+                        chatHistory: temporaryPayloadHistory,
+                        isHintRequest: true // 🚨 THIS FIXES THE HINT GENERATION BUG 🚨
                     })
                 });
 
@@ -1342,6 +1339,9 @@ if (getSessionCount() >= 3) {
                 if (genuineInterviewerMessage.includes("SYSTEM NOTE:")) {
                     genuineInterviewerMessage = genuineInterviewerMessage.split("SYSTEM NOTE:")[0].trim();
                 }
+                
+                // Remove any [HINT] prefix the AI might output
+                genuineInterviewerMessage = genuineInterviewerMessage.replace(/\[HINT\]/gi, '').trim();
                 
                 runningChatHistoryLedger.push({ role: "assistant", content: genuineInterviewerMessage });
                 
