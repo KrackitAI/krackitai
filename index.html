@@ -772,7 +772,11 @@ window.currentUserTier = 'elite';
         cachedResumePreflightScore = data.score || 0;
         
         // 2. Securely check the user's subscription tier in Supabase
-        let userTier = 'free'; 
+        
+        // 🚨 TEMPORARY BETA OVERRIDE: Unlock ATS Keywords
+        let userTier = 'elite'; 
+        
+        /* COMMENTED OUT FOR BETA
         if (supabaseClientInstance) {
             const { data: { session } } = await supabaseClientInstance.auth.getSession();
             if (session) {
@@ -784,6 +788,7 @@ window.currentUserTier = 'elite';
                 if (profile) userTier = profile.tier;
             }
         }
+        */
 
         // 3. Render the Score and Badges
         const scoreBadge = document.getElementById('preflight-audit-score-badge');
