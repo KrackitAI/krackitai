@@ -1475,6 +1475,7 @@ const response = await fetch('/api/interview', {
                 if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
                 if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
+                // Save to Database
                 if (latestEvaluationReportCache) { 
                     commitSessionToDatabaseHistory(latestEvaluationReportCache).catch(e => console.error(e)); 
                 }
@@ -1482,6 +1483,7 @@ const response = await fetch('/api/interview', {
                 if (latestEvaluationReportCache) {
                     const report = latestEvaluationReportCache;
                     
+                    // 1. Basic Scores & Verdicts
                     document.getElementById('report-score-target').innerText = report.score || 0;
                     document.getElementById('report-resume-score-target').innerText = cachedResumePreflightScore || 0;
                     document.getElementById('report-critique-target').innerText = report.brutallyHonestReview || "No review generated.";
@@ -1501,55 +1503,70 @@ const response = await fetch('/api/interview', {
                         }
                     }
 
+                    // 2. The Gaps / Deficiencies
                     const gapsList = document.getElementById('report-gaps-list-target'); 
                     if (gapsList) {
                         gapsList.innerHTML = '';
-                        
-                        // 🚨 BULLETPROOF ARRAY CHECK 🚨
                         if (!report.gapsToFix || !Array.isArray(report.gapsToFix) || report.gapsToFix.length === 0) {
-                            gapsList.innerHTML = `<li class="text-neutral-500 italic">No specific structural gaps recorded by the AI.</li>`;
+                            gapsList.innerHTML = `<li class="text-neutral-500 italic text-xs">No specific structural gaps recorded by the AI.</li>`;
                         } else {
                             report.gapsToFix.forEach(gap => { 
                                 gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; 
                             });
                         }
-                        
-                    }
-                    
-                }
-        // NEW: Populate the Highlight Reel
-                    const highlightsList = document.getElementById('report-highlights-target');
-                    if (highlightsList && report.highlightReel) {
-                        highlightsList.innerHTML = '';
-                        report.highlightReel.forEach(item => {
-                            highlightsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-emerald-500 font-bold">✓</span><span>${item}</span></li>`;
-                        });
                     }
 
-                    // NEW: Populate the Behavioral Red Flag
+                    // 3. Highlight Reel (With Fallback)
+                    const highlightsList = document.getElementById('report-highlights-target');
+                    if (highlightsList) {
+                        highlightsList.innerHTML = '';
+                        if (report.highlightReel && Array.isArray(report.highlightReel) && report.highlightReel.length > 0) {
+                            report.highlightReel.forEach(item => {
+                                highlightsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-emerald-500 font-bold">✓</span><span>${item}</span></li>`;
+                            });
+                        } else {
+                            highlightsList.innerHTML = `<li class="text-neutral-500 italic text-xs pt-1">No specific highlights recorded for this session.</li>`;
+                        }
+                    }
+
+                    // 4. Behavioral Red Flag (With Fallback)
                     const redFlagTarget = document.getElementById('report-redflag-target');
                     if (redFlagTarget) {
-                        redFlagTarget.innerText = report.behavioralRedFlag || "Solid communication and pacing throughout.";
+                        redFlagTarget.innerText = report.behavioralRedFlag || "Solid communication and pacing throughout. No major red flags detected.";
                     }
+                }
+
+                // 5. Q&A Transcript Engine (Guaranteed to render)
                 const targetDeck = document.getElementById('transcript-deck-target'); 
                 if (targetDeck) {
                     targetDeck.innerHTML = '';
                     let questionBufferText = '';
-                    runningChatHistoryLedger.forEach((msg) => {
-                        if (msg.role === 'assistant') { questionBufferText = msg.content; } 
-                        else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE: HUB_HINT_REQUEST") && !msg.content.includes("SYSTEM NOTE: TIME_CEILING_REACHED")) {
-                            targetDeck.innerHTML += `
-                                <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
-                                    <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
-                                    <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
-                                    <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900">
-                                        <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
-                                        <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
-                                    </div>
-                                </div>`;
-                        }
-                    });
+                    
+                    if (runningChatHistoryLedger && runningChatHistoryLedger.length > 0) {
+                        runningChatHistoryLedger.forEach((msg) => {
+                            if (msg.role === 'assistant') { 
+                                questionBufferText = msg.content; 
+                            } 
+                            else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE:")) {
+                                targetDeck.innerHTML += `
+                                    <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
+                                        <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
+                                        <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
+                                        <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900 mt-2">
+                                            <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
+                                            <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
+                                        </div>
+                                    </div>`;
+                            }
+                        });
+                    }
+                    
+                    // If the loop finished but printed nothing, show a fallback
+                    if (targetDeck.innerHTML === '') {
+                        targetDeck.innerHTML = '<p class="text-sm text-neutral-500 italic">No interaction history recorded for this session.</p>';
+                    }
                 }
+                
             } catch (error) {
                 console.error("Critical rendering error intercepted:", error);
             } finally {
