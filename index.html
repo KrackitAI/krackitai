@@ -1256,8 +1256,13 @@ const response = await fetch('/api/interview', {
                 }
             }
 
-            // 6. DYNAMIC TIMERS
+           // 6. DYNAMIC TIMERS
             window.activeSessionMinutesLimit = (tier === 'elite') ? 45 : (tier === 'pro') ? 20 : 5;
+            
+            // 🔥 THE FIX: Force beta testers down to 20 minutes instead of the full 45
+            if (window.realTier === 'free') {
+                window.activeSessionMinutesLimit = 20; 
+            }
             
             initializeActiveStaminaCountdownClock();
 
