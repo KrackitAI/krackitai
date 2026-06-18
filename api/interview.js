@@ -70,11 +70,9 @@ export default async function handler(req, res) {
             maxHintsAllowed = 999; // Essentially unlimited
         }
 
-        // Smart Hint Detection
-        const lastUserMessage = chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === "user" 
-            ? chatHistory[chatHistory.length - 1].content.toLowerCase() 
-            : "";
-        const isHintMode = isHintRequest === true || lastUserMessage.includes("hint") || lastUserMessage.includes("help");
+        
+        // Smart Hint Detection (STRICT MODE)
+        const isHintMode = isHintRequest === true;
 
         // Calculate hint count and question limits
         const totalHintsUsed = chatHistory.filter(msg => msg.role === "assistant" && msg.content.includes("[HINT]")).length;
