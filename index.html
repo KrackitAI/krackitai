@@ -315,8 +315,19 @@
                 <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">Analyzing response logs...</blockquote>
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-neutral-900/10 border border-emerald-900/30 p-6 rounded-2xl space-y-3">
+                    <h4 class="text-xs font-mono font-black uppercase tracking-wider text-emerald-500">✅ Highlight Reel:</h4>
+                    <ul id="report-highlights-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
+                </div>
+                <div class="bg-neutral-900/10 border border-rose-900/30 p-6 rounded-2xl space-y-3">
+                    <h4 class="text-xs font-mono font-black uppercase tracking-wider text-rose-500">🚨 Behavioral Red Flag:</h4>
+                    <p id="report-redflag-target" class="text-sm text-neutral-300 italic"></p>
+                </div>
+            </div>
+
             <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">🎯 Core Deficiencies to Remediate:</h4>
                 <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
             </div>
             
@@ -1502,9 +1513,24 @@ const response = await fetch('/api/interview', {
                                 gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; 
                             });
                         }
+                        
                     }
+                    
                 }
+        // NEW: Populate the Highlight Reel
+                    const highlightsList = document.getElementById('report-highlights-target');
+                    if (highlightsList && report.highlightReel) {
+                        highlightsList.innerHTML = '';
+                        report.highlightReel.forEach(item => {
+                            highlightsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-emerald-500 font-bold">✓</span><span>${item}</span></li>`;
+                        });
+                    }
 
+                    // NEW: Populate the Behavioral Red Flag
+                    const redFlagTarget = document.getElementById('report-redflag-target');
+                    if (redFlagTarget) {
+                        redFlagTarget.innerText = report.behavioralRedFlag || "Solid communication and pacing throughout.";
+                    }
                 const targetDeck = document.getElementById('transcript-deck-target'); 
                 if (targetDeck) {
                     targetDeck.innerHTML = '';
