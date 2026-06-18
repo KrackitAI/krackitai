@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krackit - Adaptive AI Interview Coach</title>
@@ -477,6 +478,7 @@
                 const profileHolder = document.getElementById('navbar-user-profile-holder');
 
                 if (!session) {
+                    window.realTier = 'free';
                     window.currentUserTier = 'free';
                     if (profileHolder) {
                         profileHolder.innerHTML = `
@@ -485,9 +487,14 @@
                         `;
                     }
                 } else {
-                    // Fetch tier from Supabase to show the right badge
+                    // Fetch real tier from Supabase database
                     const { data: profile } = await supabaseClientInstance.from('profiles').select('tier').eq('id', session.user.id).single();
-                    window.currentUserTier = profile ? profile.tier : 'free';
+                    
+                    // Track their actual database tier (defaults to free if missing)
+                    window.realTier = profile && profile.tier ? profile.tier : 'free'; 
+                    
+                    // The UI trick: Give free users Elite frontend features, but keep paying users on their correct tier
+                    window.currentUserTier = (window.realTier === 'free') ? 'elite' : window.realTier; 
 
                     if (overlayWall) overlayWall.classList.add('hidden');
                     if (profileHolder) {
@@ -503,12 +510,6 @@
             } catch (err) {
                 console.error("Auth session engine exception:", err);
             }
-            // INSIDE enforceSecuritySessionWall()
-const { data: profile } = await supabaseClientInstance.from('profiles').select('tier').eq('id', session.user.id).single();
-
-// TEMPORARY BETA OVERRIDE: Unlock the frontend UI features
-window.currentUserTier = 'elite'; 
-// window.currentUserTier = profile ? profile.tier : 'free'; // <-- Comment this out for now
         }
 
         function triggerInlineAuthWall(mode) {
@@ -608,25 +609,35 @@ window.currentUserTier = 'elite';
         function getSessionCount() { return parseInt(localStorage.getItem('krackit_sessions')) || 0; }
         function incrementSessionCount() { localStorage.setItem('krackit_sessions', getSessionCount() + 1); updateNavbarSessionBadge(); }
         
-        function updateNavbarSessionBadge() {
-    const target = document.getElementById('navbar-session-status-target');
-    if (!target) return;
+       function updateNavbarSessionBadge() {
+            const target = document.getElementById('navbar-session-status-target');
+            if (!target) return;
 
-    const rem = Math.max(0, 3 - getSessionCount());
-    
-    if (rem === 0) {
-        target.innerHTML = `<span class="text-xs bg-rose-950 text-rose-400 border border-rose-900 px-4 py-1.5 rounded-xl font-black shadow-lg shadow-rose-900/10">Beta Limit Reached</span>`;
-    } else {
-        target.innerHTML = `
-            <div class="flex items-center space-x-4">
-                <span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
-                    <span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span>
-                    <span>Beta Sessions Remaining: <span class="text-white">${rem}</span>/3</span>
-                </span>
-            </div>
-        `;
-    }
-}
+            // 🔥 Check their real tier to decide what badge to show
+            const tier = window.realTier || 'free';
+
+            // Show unlimited badge for paying users
+            if (tier === 'pro' || tier === 'elite') {
+                target.innerHTML = `<span class="bg-[#FFE500]/20 text-[#FFE500] border border-[#FFE500]/50 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-[0_0_10px_rgba(255,229,0,0.1)]">⚡ ${tier.toUpperCase()} PLAN ACTIVE</span>`;
+                return;
+            }
+
+            // Calculate remaining sessions for free beta users
+            const rem = Math.max(0, 3 - getSessionCount());
+            
+            if (rem === 0) {
+                target.innerHTML = `<span class="text-xs bg-rose-950 text-rose-400 border border-rose-900 px-4 py-1.5 rounded-xl font-black shadow-lg shadow-rose-900/10">Beta Limit Reached</span>`;
+            } else {
+                target.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span>
+                            <span>Beta Sessions Remaining: <span class="text-white">${rem}</span>/3</span>
+                        </span>
+                    </div>
+                `;
+            }
+        }
         
         // --- PAYWALL MODAL TOGGLES ---
         function openPaywallModal() { 
@@ -1184,81 +1195,84 @@ const response = await fetch('/api/interview', {
         }
 
         async function startLiveSimulation() {
-    // 1. Session Auth Check
-    if (supabaseClientInstance) {
-        const { data: { session } } = await supabaseClientInstance.auth.getSession();
-        if (!session) { triggerInlineAuthWall('signin'); return; }
-    }
+            // 1. Session Auth Check
+            if (supabaseClientInstance) {
+                const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                if (!session) { triggerInlineAuthWall('signin'); return; }
+            }
 
-    // Grab the current tier from the global variable we set in the navbar
-    const tier = window.currentUserTier || 'free';
+            // 🔥 THE FIX: Use the REAL tier to enforce the strict 3-session block
+            if (window.realTier === 'free' && getSessionCount() >= 3) { 
+                const limitModal = document.getElementById('beta-limit-overlay');
+                if (limitModal) {
+                    limitModal.classList.remove('hidden');
+                }
+                return; 
+            }
 
+            // Use the FEATURE TIER for everything else (this unlocks Elite UI for free users)
+            const tier = window.currentUserTier || 'free';
 
+            // 3. Compile Context
+            globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+            globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-if (getSessionCount() >= 3) { 
-    const limitModal = document.getElementById('beta-limit-overlay');
-    if (limitModal) {
-        limitModal.classList.remove('hidden');
-    }
-    return; 
-}
+            if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
+            runningChatHistoryLedger = []; latestEvaluationReportCache = null; showScreen('simulator-screen');
+            window.scrollTo({top: 0, behavior: 'instant'});
 
-    // 3. Compile Context
-    globalJobDescContext = document.getElementById('job-desc-input').value.trim();
-    globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+            // 4. DYNAMIC HINTS
+            if (tier === 'free') {
+                remainingFreeHintsCount = 1;
+            } else if (tier === 'pro') {
+                remainingFreeHintsCount = 5;
+            } else if (tier === 'elite') {
+                remainingFreeHintsCount = 999; // Practically unlimited
+            }
+            
+            runningSessionHintsUsedTotal = 0;
+            const badgeElement = document.getElementById('hint-tracker-badge');
+            if (badgeElement) {
+                if (tier === 'free') {
+                    badgeElement.innerText = `Free: ${remainingFreeHintsCount}`;
+                    badgeElement.className = "bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
+                } else {
+                    badgeElement.innerText = `${tier.toUpperCase()} HINTS: ${tier === 'elite' ? '∞' : remainingFreeHintsCount}`;
+                    badgeElement.className = "bg-[#FFE500]/20 text-[#FFE500] border border-[#FFE500]/50 text-[9px] px-1.5 py-0.5 rounded-md font-black tracking-widest";
+                }
+            }
 
-    if(!globalJobDescContext || !globalResumeContext) { alert("Please compile all fields completely."); return; }
-    runningChatHistoryLedger = []; latestEvaluationReportCache = null; showScreen('simulator-screen');
-    window.scrollTo({top: 0, behavior: 'instant'});
+            // 5. AUDIO / VOICE LOCK 
+            const micButton = document.getElementById('audio-mic-btn'); 
+            if (micButton) {
+                if (tier === 'free') {
+                    micButton.disabled = true;
+                    micButton.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+                    micButton.title = "Voice Input requires Krackit Pro";
+                } else {
+                    micButton.disabled = false;
+                    micButton.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+                    micButton.title = "Click to Speak";
+                }
+            }
 
-    // 4. DYNAMIC HINTS
-    if (tier === 'free') {
-        remainingFreeHintsCount = 1;
-    } else if (tier === 'pro') {
-        remainingFreeHintsCount = 5;
-    } else if (tier === 'elite') {
-        remainingFreeHintsCount = 999; // Practically unlimited
-    }
-    
-    runningSessionHintsUsedTotal = 0;
-    const badgeElement = document.getElementById('hint-tracker-badge');
-    if (badgeElement) {
-        if (tier === 'free') {
-            badgeElement.innerText = `Free: ${remainingFreeHintsCount}`;
-            badgeElement.className = "bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
-        } else {
-            badgeElement.innerText = `${tier.toUpperCase()} HINTS: ${tier === 'elite' ? '∞' : remainingFreeHintsCount}`;
-            badgeElement.className = "bg-[#FFE500]/20 text-[#FFE500] border border-[#FFE500]/50 text-[9px] px-1.5 py-0.5 rounded-md font-black tracking-widest";
+           // 6. DYNAMIC TIMERS
+            window.activeSessionMinutesLimit = (tier === 'elite') ? 45 : (tier === 'pro') ? 20 : 5;
+            
+            // 🔥 THE FIX: Force beta testers down to 20 minutes instead of the full 45
+            if (window.realTier === 'free') {
+                window.activeSessionMinutesLimit = 20; 
+            }
+            
+            initializeActiveStaminaCountdownClock();
+
+            runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
+            
+            // 🔥 THE FIX: Only burn a free session token if their REAL tier is free
+            if (window.realTier === 'free') incrementSessionCount(); 
+            
+            await fetchNextInterviewerTurn();
         }
-    }
-
-    // 5. AUDIO / VOICE LOCK (Assuming your button has the ID 'audio-mic-btn' - change if different!)
-    const micButton = document.getElementById('audio-mic-btn'); 
-    if (micButton) {
-        if (tier === 'free') {
-            micButton.disabled = true;
-            micButton.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
-            micButton.title = "Voice Input requires Krackit Pro";
-        } else {
-            micButton.disabled = false;
-            micButton.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
-            micButton.title = "Click to Speak";
-        }
-    }
-
-    // 6. DYNAMIC TIMERS
-    // We set a global variable here so your clock function knows how long to run
-    window.activeSessionMinutesLimit = (tier === 'elite') ? 45 : (tier === 'pro') ? 20 : 5;
-    
-    initializeActiveStaminaCountdownClock();
-
-    runningChatHistoryLedger.push({ role: "user", content: "Hello. I am ready. Please introduce yourself and start the interview by asking your first question." });
-    
-    // Only burn a free session token if they are actually on the free tier
-    if (tier === 'free') incrementSessionCount(); 
-    
-    await fetchNextInterviewerTurn();
-}
 
         function renderAITypingBubble() {
             document.getElementById('sim-active-question-text').innerHTML = `
