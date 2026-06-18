@@ -119,11 +119,16 @@ ${userTier === 'free' ? "TIER PRIVILEGE: This user is on the FREE sandbox. You M
 
 DATA OUTPUT SCHEMA:
 You must output a raw JSON object matching this schema exactly:
-{{"aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'We are unfortunately out of time for today. Thank you for your time, we will be in touch with feedback.' : 'Thank you for walking me through those scenarios. That concludes our technical questions for today. We appreciate your time and will follow up shortly.') : (isHintMode ? '[HINT] Give a conceptual clue to help them answer. DO NOT ask a question. DO NOT end with a question mark.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",
+{
+    "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'We are unfortunately out of time for today. Thank you for your time, we will be in touch with feedback.' : 'Thank you for walking me through those scenarios. That concludes our technical questions for today. We appreciate your time and will follow up shortly.') : (isHintMode ? '[HINT] Give a conceptual clue to help them answer. DO NOT ask a question. DO NOT end with a question mark.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
-"score": ${forceSessionConclusion ? "Generate a highly dynamic, precise integer between 1 and 100 based strictly on technical accuracy and depth. Do NOT default to 92 or 85. Use the full spectrum (e.g., 73, 88, 96)." : "0"},    "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
+    "score": ${forceSessionConclusion ? "Generate a highly dynamic, precise integer between 1 and 100 based strictly on technical accuracy and depth. Do NOT default to 92 or 85. Use the full spectrum." : "0"},
+    "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
     "brutallyHonestReview": "${forceSessionConclusion ? "Your review string context based on Tier rules." : "Active session live."}",
-"gapsToFix": ${forceSessionConclusion ? "A flat string array of exactly 2-3 specific constructive areas, weaknesses, or advanced edge-cases to study further. You MUST provide at least 2 items, even if the candidate performed perfectly." : "[]"}}`;
+    "highlightReel": ${forceSessionConclusion ? "A flat string array of 2 specific technical or behavioral things they actually did well." : "[]"},
+    "gapsToFix": ${forceSessionConclusion ? "A flat string array of exactly 3 specific constructive areas, weaknesses, or advanced edge-cases to study further." : "[]"},
+    "behavioralRedFlag": "${forceSessionConclusion ? "One specific critique about their communication style, use of filler words, or confidence." : ""}"
+}`;
 
         // ─── STAGE 4: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
         const groqCompletionResponse = await groq.chat.completions.create({
