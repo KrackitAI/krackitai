@@ -48,9 +48,10 @@ export default async function handler(req, res) {
             }
         }
 
-        // 🚨 TEMPORARY CLOSED BETA OVERRIDE 🚨
-        // Force the backend to give everyone the 70B model, 45-min clock, and deep tech questions
-        userTier = 'elite'; 
+        // 🔥 THE FIX: Give free beta users the Elite AI brain, but respect Pro/Elite tiers
+        if (userTier === 'free') {
+            userTier = 'elite'; 
+        }
 
         // ─── STAGE 2: DYNAMIC TIER ENFORCEMENT CONFIG ─────────────────────
 
