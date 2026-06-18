@@ -821,96 +821,87 @@
         }
 
        async function executePreflightResumeScreening(rawText) {
-    const statusIndicator = document.getElementById('resume-preflight-status-indicator');
-    const alertBox = document.getElementById('preflight-audit-alert-box');
-    
-    try {
-        // 1. Fetch the raw analysis from the backend
-        const response = await fetch('/api/analyze-resume', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ resumeText: rawText })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Failed screening loop.");
-
-        cachedResumePreflightScore = data.score || 0;
-        
-        // 2. Securely check the user's subscription tier in Supabase
-        
-        // 🚨 TEMPORARY BETA OVERRIDE: Unlock ATS Keywords
-        let userTier = 'elite'; 
-        
-        /* COMMENTED OUT FOR BETA
-        if (supabaseClientInstance) {
-            const { data: { session } } = await supabaseClientInstance.auth.getSession();
-            if (session) {
-                const { data: profile } = await supabaseClientInstance
-                    .from('profiles')
-                    .select('tier')
-                    .eq('id', session.user.id)
-                    .single();
-                if (profile) userTier = profile.tier;
-            }
-        }
-        */
-
-        // 3. Render the Score and Badges
-        const scoreBadge = document.getElementById('preflight-audit-score-badge');
-        if (scoreBadge) {
-            scoreBadge.innerText = cachedResumePreflightScore;
-            if (cachedResumePreflightScore >= 75) {
-                scoreBadge.className = "text-xl font-black block mt-0.5 text-emerald-400";
-                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">ATS Score Passed</span>`;
-            } else {
-                scoreBadge.className = "text-xl font-black block mt-0.5 text-rose-400";
-                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">ATS Flaws Detected</span>`;
-            }
-        }
-
-        const critiqueMsg = document.getElementById('preflight-audit-critique-msg');
-        if (critiqueMsg) critiqueMsg.innerText = data.critique || "Formatting optimization advised.";
-        
-        // 4. DYNAMIC PAYWALL ENFORCEMENT FOR ATS KEYWORDS
-        const keywordsHolder = document.getElementById('preflight-missing-keywords-holder');
-        if (keywordsHolder) {
-            keywordsHolder.innerHTML = '';
+            const statusIndicator = document.getElementById('resume-preflight-status-indicator');
+            const alertBox = document.getElementById('preflight-audit-alert-box');
             
-            if (userTier === 'free') {
-                // Render the blurred visual paywall lock for Free users
-                keywordsHolder.innerHTML = `
-                    <div onclick="openPaywallModal()" class="relative group cursor-pointer mt-1 w-full max-w-xs">
-                        <div class="flex flex-wrap gap-1.5 filter blur-[4px] opacity-60 group-hover:blur-[5px] transition-all select-none pointer-events-none">
-                            <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: Microservices</span>
-                            <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: AWS Architecture</span>
-                            <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: CI/CD Pipelines</span>
-                        </div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="bg-[#FFE500] text-black text-[9px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg border border-[#ebd300]">
-                                🔒 Pro: Reveal Missing Keywords
-                            </span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Fully reveal the exact keywords for Pro and Elite users
-                if (data.missingKeywords && data.missingKeywords.length > 0) {
-                    data.missingKeywords.forEach(word => {
-                        keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
-                    });
-                } else {
-                    keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing.</span>`;
+            // 🔥 GRAB THE JOB DESCRIPTION TEXT
+            const currentJobDesc = document.getElementById('job-desc-input').value.trim();
+            
+            try {
+                // 1. Fetch the raw analysis from the backend using BOTH data points
+                const response = await fetch('/api/analyze-resume', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        resumeText: rawText,
+                        jobDescription: currentJobDesc 
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Failed screening loop.");
+
+                cachedResumePreflightScore = data.score || 0;
+                
+                // 2. Grab the Feature Tier from our new global variable
+                // Free beta testers have 'elite' here, so the keywords will unlock!
+                const userTier = window.currentUserTier || 'free';
+
+                // 3. Render the Score and Badges
+                const scoreBadge = document.getElementById('preflight-audit-score-badge');
+                if (scoreBadge) {
+                    scoreBadge.innerText = cachedResumePreflightScore;
+                    if (cachedResumePreflightScore >= 75) {
+                        scoreBadge.className = "text-xl font-black block mt-0.5 text-emerald-400";
+                        if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-emerald-400 tracking-wider">ATS Score Passed</span>`;
+                    } else {
+                        scoreBadge.className = "text-xl font-black block mt-0.5 text-rose-400";
+                        if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">ATS Flaws Detected</span>`;
+                    }
                 }
+
+                const critiqueMsg = document.getElementById('preflight-audit-critique-msg');
+                if (critiqueMsg) critiqueMsg.innerText = data.critique || "Formatting optimization advised.";
+                
+                // 4. DYNAMIC PAYWALL ENFORCEMENT FOR ATS KEYWORDS
+                const keywordsHolder = document.getElementById('preflight-missing-keywords-holder');
+                if (keywordsHolder) {
+                    keywordsHolder.innerHTML = '';
+                    
+                    if (userTier === 'free') {
+                        // Render the blurred visual paywall lock for Free users
+                        keywordsHolder.innerHTML = `
+                            <div onclick="openPaywallModal()" class="relative group cursor-pointer mt-1 w-full max-w-xs">
+                                <div class="flex flex-wrap gap-1.5 filter blur-[4px] opacity-60 group-hover:blur-[5px] transition-all select-none pointer-events-none">
+                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: Microservices</span>
+                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: AWS Architecture</span>
+                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: CI/CD Pipelines</span>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="bg-[#FFE500] text-black text-[9px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg border border-[#ebd300]">
+                                        🔒 Pro: Reveal Missing Keywords
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Fully reveal the exact keywords extracted from the JD!
+                        if (data.missingKeywords && data.missingKeywords.length > 0) {
+                            data.missingKeywords.forEach(word => {
+                                keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
+                            });
+                        } else {
+                            keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing from the JD!</span>`;
+                        }
+                    }
+                }
+                
+                if (alertBox) alertBox.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
             }
         }
-        
-        if (alertBox) alertBox.classList.remove('hidden');
-
-    } catch (err) {
-        console.error(err);
-        if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
-    }
-}
 
         async function revealPastSessionsModal() {
             if (!supabaseClientInstance) return;
@@ -1584,7 +1575,31 @@ const response = await fetch('/api/interview', {
                     }
                 });
             }
-
+        // 🔥 AUTO-SCAN WHEN THEY TYPE THE JOB DESCRIPTION
+            const jdInputArea = document.getElementById('job-desc-input');
+            let jdDebounceTimer = null;
+            if (jdInputArea) {
+                jdInputArea.addEventListener('input', (e) => {
+                    const jdText = e.target.value.trim();
+                    const currentResume = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
+                    
+                    clearTimeout(jdDebounceTimer);
+                    
+                    // Only rescan if they actually have a resume loaded and the JD is decent length
+                    if (jdText.length > 50 && currentResume && currentResume.length > 100) { 
+                        const alertBox = document.getElementById('preflight-audit-alert-box');
+                        if (alertBox) alertBox.classList.remove('hidden');
+                        
+                        const preflightStatus = document.getElementById('resume-preflight-status-indicator');
+                        if (preflightStatus) {
+                            preflightStatus.innerHTML = `<span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-[#FFE500] tracking-wider">Cross-referencing JD Keywords...</span>`;
+                        }
+                        
+                        // Wait 1.5 seconds after they stop typing to fire the API
+                        jdDebounceTimer = setTimeout(() => { executePreflightResumeScreening(currentResume); }, 1500);
+                    }
+                });
+            }
             const zone = document.getElementById('resume-upload-zone');
             if(zone) {
                 zone.addEventListener('click', () => document.getElementById('pdf-input').click());
