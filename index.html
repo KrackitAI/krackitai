@@ -216,9 +216,17 @@
                     </div>
                 </div>
 
-                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 flex items-center justify-between">
-                    <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
-                    <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
+                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
+                        <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-neutral-900/50">
+                        <span class="text-xs font-bold tracking-wider text-neutral-500 uppercase">Interviewer Voice:</span>
+                        <select id="voice-select-dropdown" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#FFE500] cursor-pointer max-w-[180px] truncate">
+                            <option value="">Loading voices...</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="space-y-1">
@@ -777,14 +785,54 @@
             else { speechRecognitionEngine.stop(); }
         }
 
+        let globalAvailableVoices = [];
+
+        // Engine to fetch and load voices into the dropdown
+        function populateVoiceList() {
+            globalAvailableVoices = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voice-select-dropdown');
+            if (!voiceSelect || globalAvailableVoices.length === 0) return;
+
+            voiceSelect.innerHTML = '';
+            
+            // Filter to only show English voices to keep it clean
+            const englishVoices = globalAvailableVoices.filter(v => v.lang.startsWith('en'));
+
+            englishVoices.forEach((voice) => {
+                const option = document.createElement('option');
+                // Clean up the names so they look professional (e.g., "Google US English")
+                option.textContent = `${voice.name.replace('Microsoft ', '').replace('Google ', '').replace('Apple ', '')} (${voice.lang.split('-')[1] || voice.lang})`;
+                option.value = voice.name;
+                voiceSelect.appendChild(option);
+            });
+
+            // Try to auto-select a premium-sounding default voice if available
+            const defaultVoice = englishVoices.find(v => v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Google US'));
+            if (defaultVoice) {
+                voiceSelect.value = defaultVoice.name;
+            }
+        }
+
+        // Browsers load voices asynchronously, so we have to listen for when they are ready
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        // The updated speaking function
         function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
             window.speechSynthesis.cancel();
+            
             const speech = new SpeechSynthesisUtterance(str);
-            const availableVoices = window.speechSynthesis.getVoices();
-            const premiumVoiceFallback = availableVoices.find(v => (v.name.includes('Google') && v.lang.startsWith('en')) || (v.name.includes('Natural') && v.lang.startsWith('en')) || (v.name.includes('Siri') && v.lang.startsWith('en')));
-            if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
-            speech.rate = 0.96;
+            const voiceSelect = document.getElementById('voice-select-dropdown');
+            const selectedVoiceName = voiceSelect ? voiceSelect.value : null;
+
+            if (selectedVoiceName && globalAvailableVoices.length > 0) {
+                const chosenVoice = globalAvailableVoices.find(v => v.name === selectedVoiceName);
+                if (chosenVoice) speech.voice = chosenVoice;
+            }
+            
+            speech.rate = 0.96; // Slightly slower for a more thoughtful interviewer vibe
             window.speechSynthesis.speak(speech);
         }
 
@@ -1617,6 +1665,7 @@ const response = await fetch('/api/interview', {
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
+            populateVoiceList();
             initializeSecureAccessClient();
 
             document.getElementById('overlay-tab-signin-btn').addEventListener('click', () => switchOverlayAuthViewMode('signin'));
