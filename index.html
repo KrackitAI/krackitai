@@ -1759,18 +1759,28 @@ const response = await fetch('/api/interview', {
             const email = input.value.trim();
 
             if (email && email.includes('@') && email.includes('.')) {
-                // For now, we simulate a successful save so the UI feels incredibly fast.
-                // Later, you can wire this up to a Supabase table like supabase.from('waitlist').insert({ email })
                 
-                input.value = ''; // Clear the box
-                msg.classList.remove('hidden'); // Show success message
+                // 1. Actually send it to your Supabase 'waitlist' table
+                if (supabaseClientInstance) {
+                    const { error } = await supabaseClientInstance
+                        .from('waitlist')
+                        .insert([{ email: email }]);
+                        
+                    if (error) {
+                        showCustomAlert("Database error: Could not save email.", "error");
+                        return;
+                    }
+                }
+
+                // 2. Clear the box and show success
+                input.value = ''; 
+                msg.classList.remove('hidden'); 
                 
-                // Hide the message after 4 seconds
                 setTimeout(() => {
                     msg.classList.add('hidden');
                 }, 4000);
             } else {
-                showCustomAlert("Please enter a valid email address.", "error");
+                showCustomAlert('Please enter a valid email address.', 'warning');
             }
         }
         // 🔥 THE MAGIC BUTTON UPGRADER ENGINE
