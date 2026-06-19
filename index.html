@@ -25,6 +25,7 @@
 </script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth relative">
+    <div id="custom-alert-container" class="fixed top-5 right-5 z-[9999] flex flex-col space-y-3 pointer-events-none"></div>
 <div class="bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white shadow-md relative z-50">
     🚀 Krackit AI is currently in Closed Beta. Enjoy full premium features unlocked for a limited time!
 </div>
@@ -473,7 +474,46 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
         let supabaseClientInstance = null;
+    // Tailwind Toast Engine
+        function showCustomAlert(message, type = 'error') {
+            const container = document.getElementById('custom-alert-container');
+            if (!container) return;
 
+            const alertBox = document.createElement('div');
+            
+            let bgClass = 'bg-neutral-900 border-neutral-800 text-neutral-200';
+            let icon = '🔔';
+
+            if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border-rose-900 text-rose-300';
+                icon = '🚨';
+            } else if (type === 'success') {
+                bgClass = 'bg-emerald-950/90 border-emerald-900 text-emerald-300';
+                icon = '✅';
+            } else if (type === 'warning') {
+                bgClass = 'bg-amber-950/90 border-amber-900 text-amber-300';
+                icon = '⚠️';
+            }
+
+            alertBox.className = `flex items-center space-x-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md transform transition-all duration-300 translate-x-full opacity-0 ${bgClass}`;
+            alertBox.innerHTML = `
+                <span class="text-lg">${icon}</span>
+                <p class="text-sm font-medium font-sans">${message}</p>
+            `;
+
+            container.appendChild(alertBox);
+
+            setTimeout(() => {
+                alertBox.classList.remove('translate-x-full', 'opacity-0');
+                alertBox.classList.add('translate-x-0', 'opacity-100');
+            }, 10);
+
+            setTimeout(() => {
+                alertBox.classList.remove('translate-x-0', 'opacity-100');
+                alertBox.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => alertBox.remove(), 300);
+            }, 3500);
+        }
         function initializeSecureAccessClient() {
             if (window.supabase) {
                 supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -540,8 +580,7 @@
                 await supabaseClientInstance.auth.signOut();
                 window.location.reload();
             } catch (err) {
-                alert("Signout error: " + err.message);
-            }
+        showCustomAlert("Signout error: " + err.message, "error");            }
         }
 
         function switchOverlayAuthViewMode(targetMode) {
@@ -584,7 +623,7 @@
                 if (actionType === 'signup') {
                     const { error } = await supabaseClientInstance.auth.signUp({ email, password });
                     if (error) throw error;
-                    alert("Registration Successful! Please complete logging into your account.");
+                    showCustomAlert("Registration Successful! Try logging in.", "success");
                     switchOverlayAuthViewMode('signin');
                 } else {
                     const { error } = await supabaseClientInstance.auth.signInWithPassword({ email, password });
@@ -1218,7 +1257,7 @@ const response = await fetch('/api/interview', {
 
             // The JD is the only strict requirement now
             if(!globalJobDescContext || globalJobDescContext.length < 50) { 
-                alert("Please paste a valid Job Description to calibrate the AI interviewer."); 
+                showCustomAlert("Please paste a valid Job Description to calibrate the AI interviewer.", "warning"); 
                 return; 
             }
 
@@ -1362,7 +1401,7 @@ const response = await fetch('/api/interview', {
         async function submitCandidateResponseTurn() {
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
-            if(!userTextResponse) { alert("Please provide an answer before submitting."); return; }
+            if(!userTextResponse) { showCustomAlert("Please provide an answer before submitting.", "warning"); return; }
 
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
@@ -1682,7 +1721,7 @@ const response = await fetch('/api/interview', {
                     msg.classList.add('hidden');
                 }, 4000);
             } else {
-                alert('Please enter a valid email address.');
+                showCustomAlert("Please enter a valid email address.", "error");
             }
         }
         // 🔥 THE MAGIC BUTTON UPGRADER ENGINE
