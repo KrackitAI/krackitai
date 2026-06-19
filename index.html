@@ -25,6 +25,7 @@
 </script>
 </head>
 <body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth relative">
+    <div id="custom-alert-container" class="fixed top-5 right-5 z-[9999] flex flex-col space-y-3 pointer-events-none"></div>
 <div class="bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white shadow-md relative z-50">
     🚀 Krackit AI is currently in Closed Beta. Enjoy full premium features unlocked for a limited time!
 </div>
@@ -215,9 +216,17 @@
                     </div>
                 </div>
 
-                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 flex items-center justify-between">
-                    <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
-                    <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded">
+                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
+                        <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded cursor-pointer">
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-neutral-900/50">
+                        <span class="text-xs font-bold tracking-wider text-neutral-500 uppercase">Interviewer Voice:</span>
+                        <select id="voice-select-dropdown" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#FFE500] cursor-pointer max-w-[180px] truncate">
+                            <option value="">Loading voices...</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="space-y-1">
@@ -473,7 +482,46 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_WFsf4cQLdkjOh7Ar0MBytg_EVck_dLQ';
         
         let supabaseClientInstance = null;
+    // Tailwind Toast Engine
+        function showCustomAlert(message, type = 'error') {
+            const container = document.getElementById('custom-alert-container');
+            if (!container) return;
 
+            const alertBox = document.createElement('div');
+            
+            let bgClass = 'bg-neutral-900 border-neutral-800 text-neutral-200';
+            let icon = '🔔';
+
+            if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border-rose-900 text-rose-300';
+                icon = '🚨';
+            } else if (type === 'success') {
+                bgClass = 'bg-emerald-950/90 border-emerald-900 text-emerald-300';
+                icon = '✅';
+            } else if (type === 'warning') {
+                bgClass = 'bg-amber-950/90 border-amber-900 text-amber-300';
+                icon = '⚠️';
+            }
+
+            alertBox.className = `flex items-center space-x-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md transform transition-all duration-300 translate-x-full opacity-0 ${bgClass}`;
+            alertBox.innerHTML = `
+                <span class="text-lg">${icon}</span>
+                <p class="text-sm font-medium font-sans">${message}</p>
+            `;
+
+            container.appendChild(alertBox);
+
+            setTimeout(() => {
+                alertBox.classList.remove('translate-x-full', 'opacity-0');
+                alertBox.classList.add('translate-x-0', 'opacity-100');
+            }, 10);
+
+            setTimeout(() => {
+                alertBox.classList.remove('translate-x-0', 'opacity-100');
+                alertBox.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => alertBox.remove(), 300);
+            }, 3500);
+        }
         function initializeSecureAccessClient() {
             if (window.supabase) {
                 supabaseClientInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -540,8 +588,7 @@
                 await supabaseClientInstance.auth.signOut();
                 window.location.reload();
             } catch (err) {
-                alert("Signout error: " + err.message);
-            }
+        showCustomAlert("Signout error: " + err.message, "error");            }
         }
 
         function switchOverlayAuthViewMode(targetMode) {
@@ -584,7 +631,7 @@
                 if (actionType === 'signup') {
                     const { error } = await supabaseClientInstance.auth.signUp({ email, password });
                     if (error) throw error;
-                    alert("Registration Successful! Please complete logging into your account.");
+                    showCustomAlert("Registration Successful! Try logging in.", "success");
                     switchOverlayAuthViewMode('signin');
                 } else {
                     const { error } = await supabaseClientInstance.auth.signInWithPassword({ email, password });
@@ -738,14 +785,54 @@
             else { speechRecognitionEngine.stop(); }
         }
 
+        let globalAvailableVoices = [];
+
+        // Engine to fetch and load voices into the dropdown
+        function populateVoiceList() {
+            globalAvailableVoices = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voice-select-dropdown');
+            if (!voiceSelect || globalAvailableVoices.length === 0) return;
+
+            voiceSelect.innerHTML = '';
+            
+            // Filter to only show English voices to keep it clean
+            const englishVoices = globalAvailableVoices.filter(v => v.lang.startsWith('en'));
+
+            englishVoices.forEach((voice) => {
+                const option = document.createElement('option');
+                // Clean up the names so they look professional (e.g., "Google US English")
+                option.textContent = `${voice.name.replace('Microsoft ', '').replace('Google ', '').replace('Apple ', '')} (${voice.lang.split('-')[1] || voice.lang})`;
+                option.value = voice.name;
+                voiceSelect.appendChild(option);
+            });
+
+            // Try to auto-select a premium-sounding default voice if available
+            const defaultVoice = englishVoices.find(v => v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Google US'));
+            if (defaultVoice) {
+                voiceSelect.value = defaultVoice.name;
+            }
+        }
+
+        // Browsers load voices asynchronously, so we have to listen for when they are ready
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        // The updated speaking function
         function speakTextAloud(str) {
             if (!document.getElementById('voice-synthesis-toggle').checked) return;
             window.speechSynthesis.cancel();
+            
             const speech = new SpeechSynthesisUtterance(str);
-            const availableVoices = window.speechSynthesis.getVoices();
-            const premiumVoiceFallback = availableVoices.find(v => (v.name.includes('Google') && v.lang.startsWith('en')) || (v.name.includes('Natural') && v.lang.startsWith('en')) || (v.name.includes('Siri') && v.lang.startsWith('en')));
-            if (premiumVoiceFallback) speech.voice = premiumVoiceFallback;
-            speech.rate = 0.96;
+            const voiceSelect = document.getElementById('voice-select-dropdown');
+            const selectedVoiceName = voiceSelect ? voiceSelect.value : null;
+
+            if (selectedVoiceName && globalAvailableVoices.length > 0) {
+                const chosenVoice = globalAvailableVoices.find(v => v.name === selectedVoiceName);
+                if (chosenVoice) speech.voice = chosenVoice;
+            }
+            
+            speech.rate = 0.96; // Slightly slower for a more thoughtful interviewer vibe
             window.speechSynthesis.speak(speech);
         }
 
@@ -1218,7 +1305,7 @@ const response = await fetch('/api/interview', {
 
             // The JD is the only strict requirement now
             if(!globalJobDescContext || globalJobDescContext.length < 50) { 
-                alert("Please paste a valid Job Description to calibrate the AI interviewer."); 
+                showCustomAlert("Please paste a valid Job Description to calibrate the AI interviewer.", "warning"); 
                 return; 
             }
 
@@ -1362,7 +1449,7 @@ const response = await fetch('/api/interview', {
         async function submitCandidateResponseTurn() {
             window.speechSynthesis.cancel(); if(isMicrophoneListening) toggleVoiceSpeechInput();
             const userTextResponse = document.getElementById('sim-user-response-box').value.trim();
-            if(!userTextResponse) { alert("Please provide an answer before submitting."); return; }
+            if(!userTextResponse) { showCustomAlert("Please provide an answer before submitting.", "warning"); return; }
 
             runningChatHistoryLedger.push({ role: "user", content: userTextResponse });
             document.getElementById('sim-user-response-box').value = '';
@@ -1578,6 +1665,7 @@ const response = await fetch('/api/interview', {
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
+            populateVoiceList();
             initializeSecureAccessClient();
 
             document.getElementById('overlay-tab-signin-btn').addEventListener('click', () => switchOverlayAuthViewMode('signin'));
@@ -1682,7 +1770,7 @@ const response = await fetch('/api/interview', {
                     msg.classList.add('hidden');
                 }, 4000);
             } else {
-                alert('Please enter a valid email address.');
+                showCustomAlert("Please enter a valid email address.", "error");
             }
         }
         // 🔥 THE MAGIC BUTTON UPGRADER ENGINE
