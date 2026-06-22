@@ -337,9 +337,7 @@
         <button onclick="downloadReportPDF()" class="w-full md:w-1/2 bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-[#FFE500]/10">
             ⬇️ Download PDF Report
         </button>
-        <button onclick="window.location.reload()" class="w-full md:w-1/2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer">
-            Return to Dashboard
-        </button>
+        
     </div>
             </div>
             
@@ -1663,6 +1661,12 @@ const response = await fetch('/api/interview', {
     let a = document.getElementById('printable-report');
     let b = document.querySelector('button[onclick="downloadReportPDF()"]');
     let c = b.innerHTML;
+
+    // Safety check: Make sure you actually added the id="printable-report" wrapper in your HTML!
+    if (!a) {
+        alert("Error: Could not find the report wrapper. Make sure you added id='printable-report' to the div containing the results.");
+        return;
+    }
     
     // Show loading state
     b.innerHTML = '⏳ Generating PDF...';
@@ -1677,7 +1681,13 @@ const response = await fetch('/api/interview', {
     };
 
     html2pdf().set(d).from(a).save().then(() => {
-        // Restore button state after download
+        // Restore button state after successful download
+        b.innerHTML = c;
+        b.disabled = false;
+    }).catch(err => {
+        // If it fails, un-freeze the button and log the error
+        console.error("PDF Engine Error:", err);
+        alert("Failed to generate PDF. Check the browser console for details.");
         b.innerHTML = c;
         b.disabled = false;
     });
