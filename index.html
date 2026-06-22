@@ -295,6 +295,12 @@
         </div>
 
         <div id="results-screen" class="hidden space-y-8">
+            
+    
+    <div id="printable-report" class="space-y-8 bg-[#0a0a0a] p-2 md:p-6 rounded-2xl">
+
+        <div class="border-b border-neutral-900 pb-5 text-center">
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
             <div class="border-b border-neutral-900 pb-5 text-center">
                 <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
                 <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
@@ -331,15 +337,20 @@
             </div>
             
             <div class="border-t border-neutral-900 pt-6">
-                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
-                <div class="space-y-4" id="transcript-deck-target"></div>
-                <div class="flex flex-col md:flex-row gap-4 pt-8 pb-4">
-        <button onclick="downloadReportPDF()" class="w-full md:w-1/2 bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-[#FFE500]/10">
+            <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
+            <div class="space-y-4" id="transcript-deck-target"></div>
+        </div>
+        
+    </div> <div class="flex flex-col sm:flex-row gap-4 pt-6">
+        <button onclick="downloadReportPDF()" class="w-full sm:w-1/2 bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-[#FFE500]/10">
             ⬇️ Download PDF Report
         </button>
-        
+        <button onclick="window.location.reload()" class="w-full sm:w-1/2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer">
+            Return to Dashboard
+        </button>
     </div>
-            </div>
+
+</div>
             
             <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer">Return to Entry Screen</button>
         </div>
