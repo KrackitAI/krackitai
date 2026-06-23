@@ -1674,36 +1674,40 @@ const response = await fetch('/api/interview', {
     let c = b.innerHTML;
 
     if (!a) {
-        alert("Error: Could not find the report wrapper. Make sure you added id='printable-report' to the div containing the results.");
+        alert("Error: Could not find the report wrapper.");
         return;
     }
     
-    // Show loading state
     b.innerHTML = '⏳ Generating PDF...';
     b.disabled = true;
 
-    // Snap to the top to avoid invisible blank spaces
+    // Snap to top
     window.scrollTo(0, 0);
 
     let d = {
-        margin:       [0.4, 0.4, 0.4, 0.4], 
+        margin:       0.4, 
         filename:     'KrackitAI_Evaluation_Report.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        // THE FIX 1: Auto-generate new pages for long timelines
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }, 
+        // THE FIX 1: We removed 'avoid-all'. It was forcing the engine to squish everything onto one page.
+        pagebreak:    { mode: ['css', 'legacy'] }, 
         html2canvas:  { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#0a0a0a', 
             scrollY: 0,
-            // THE FIX 2: Force a clean desktop layout for the PDF
-            windowWidth: 1024 
+            
+            // THE FIX 2: Explicitly force the camera width to desktop size
+            width: 1024,
+            windowWidth: 1024,
+            
+            // THE FIX 3: Brute-force the camera to stretch to the absolute bottom of your timeline
+            height: a.scrollHeight,
+            windowHeight: a.scrollHeight
         },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
     html2pdf().set(d).from(a).save().then(() => {
-        // Restore button state after successful download
         b.innerHTML = c;
         b.disabled = false;
     }).catch(err => {
