@@ -1673,7 +1673,6 @@ const response = await fetch('/api/interview', {
     let b = document.querySelector('button[onclick="downloadReportPDF()"]');
     let c = b.innerHTML;
 
-    // Safety check: Make sure you actually added the id="printable-report" wrapper in your HTML!
     if (!a) {
         alert("Error: Could not find the report wrapper. Make sure you added id='printable-report' to the div containing the results.");
         return;
@@ -1683,11 +1682,23 @@ const response = await fetch('/api/interview', {
     b.innerHTML = '⏳ Generating PDF...';
     b.disabled = true;
 
+    // Snap to the top to avoid invisible blank spaces
+    window.scrollTo(0, 0);
+
     let d = {
-        margin:       0.4,
+        margin:       [0.4, 0.4, 0.4, 0.4], 
         filename:     'KrackitAI_Evaluation_Report.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#0a0a0a' },
+        // THE FIX 1: Auto-generate new pages for long timelines
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }, 
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#0a0a0a', 
+            scrollY: 0,
+            // THE FIX 2: Force a clean desktop layout for the PDF
+            windowWidth: 1024 
+        },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
@@ -1696,7 +1707,6 @@ const response = await fetch('/api/interview', {
         b.innerHTML = c;
         b.disabled = false;
     }).catch(err => {
-        // If it fails, un-freeze the button and log the error
         console.error("PDF Engine Error:", err);
         alert("Failed to generate PDF. Check the browser console for details.");
         b.innerHTML = c;
