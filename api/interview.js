@@ -120,7 +120,11 @@ You must output a raw JSON object matching this schema exactly:
 {
     "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'We are unfortunately out of time for today. Thank you for your time, we will be in touch with feedback.' : 'Thank you for walking me through those scenarios. That concludes our technical questions for today. We appreciate your time and will follow up shortly.') : (isHintMode ? '[HINT] Give a conceptual clue to help them answer. DO NOT ask a question. DO NOT end with a question mark.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",
     "isConcluded": ${forceSessionConclusion ? "true" : "false"},
-    "score": ${forceSessionConclusion ? "Generate a highly dynamic, precise integer between 1 and 100 based strictly on technical accuracy and depth. Do NOT default to 92 or 85. Use the full spectrum." : "0"},
+    "rubric": ${forceSessionConclusion ? `{
+        "technical_depth": { "score": <Integer 1-10>, "reason": "<1 strict sentence justifying technical accuracy>" },
+        "jd_alignment": { "score": <Integer 1-10>, "reason": "<1 strict sentence justifying alignment with the JD>" },
+        "communication_clarity": { "score": <Integer 1-10>, "reason": "<1 strict sentence critiquing their articulation and conciseness>" }
+    }` : "null"},
     "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
     "brutallyHonestReview": "${forceSessionConclusion ? "Your review string context based on Tier rules." : "Active session live."}",
     "highlightReel": ${forceSessionConclusion ? "A flat string array of 2 specific technical or behavioral things they actually did well." : "[]"},
@@ -138,6 +142,25 @@ You must output a raw JSON object matching this schema exactly:
         });
 
         const parsedReportObjectPayload = JSON.parse(groqCompletionResponse.choices[0].message.content);
+
+        // --- NEW DETERMINISTIC SCORING ENGINE ---
+        if (parsedReportObjectPayload.isConcluded === true && parsedReportObjectPayload.rubric) {
+            const r = parsedReportObjectPayload.rubric;
+            
+            // Weight: 50% Tech, 30% JD, 20% Clarity (Scores are out of 10, so multiply by 5, 3, and 2 to get /100)
+            const techPoints = (r.technical_depth?.score || 0) * 5;
+            const jdPoints = (r.jd_alignment?.score || 0) * 3;
+            const commPoints = (r.communication_clarity?.score || 0) * 2;
+            
+            parsedReportObjectPayload.score = techPoints + jdPoints + commPoints;
+            
+            // Overwrite the verdict logic to be strictly based on the deterministic score
+            parsedReportObjectPayload.verdict = parsedReportObjectPayload.score >= 70 ? "ACCEPTED" : "REJECTED";
+        } else if (!parsedReportObjectPayload.score) {
+            // Fallback for active sessions
+            parsedReportObjectPayload.score = 0;
+        }
+
 
         // ─── STAGE 5: DEFENSIVE VERIFICATION SHIELD & AI HANDCUFFS ──────
         if (parsedReportObjectPayload.isConcluded === true && forceSessionConclusion === false) {

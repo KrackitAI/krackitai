@@ -14,29 +14,21 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing resume context data profile.' });
         }
 
-        // Check if the user provided a real Job Description (longer than 50 chars)
         const isTealMode = jobDescription && jobDescription.length > 50;
 
-        const systemPrompt = `You are a strict Applicant Tracking System (ATS) and Senior Technical Recruiter. 
-        Analyze the candidate's resume against ${isTealMode ? 'the provided TARGET JOB DESCRIPTION' : 'standard tech industry expectations'} and return a raw JSON evaluation.
+        // STEP 1: Use the LLM ONLY to extract an array of required keywords and write the critique.
+        // We DO NOT ask it to score the resume or guess what is missing.
+        const systemPrompt = `You are an expert Technical Recruiter. 
         
-        ${isTealMode ? `TARGET JOB DESCRIPTION TO MATCH AGAINST:\n${jobDescription}\n\n` : ''}
+        TASK 1: Extract exactly 10 to 15 critical technical keywords, frameworks, or hard skills required from the provided Job Description. If no Job Description is provided, extract 10 standard industry skills based on the candidate's resume.
+        TASK 2: Write a piercing 1-2 sentence critique of the candidate's resume formatting, use of action verbs, and quantifiable impact.
         
-        SCORING RUBRIC:
-        - 90-100: Top tier. ${isTealMode ? 'Perfect alignment with the Job Description keywords and skills.' : 'Heavy use of quantifiable metrics, strong action verbs.'}
-        - 75-89: Solid fit. ${isTealMode ? 'Hits most core JD requirements but misses some specific tools.' : 'Good skills but lacks depth or measurable impact.'}
-        - 50-74: Mediocre. ${isTealMode ? 'Missing major required keywords from the JD.' : 'Generic descriptions, missing keywords.'}
-        - 1-49: Poor. ${isTealMode ? 'Completely irrelevant to the target Job Description.' : 'Barebones or highly irrelevant.'}
-
-        CRITICAL: Do not include markdown. Return ONLY valid JSON matching this schema:
+        ${isTealMode ? `TARGET JOB DESCRIPTION TO EXTRACT FROM:\n${jobDescription}\n\n` : ''}
+        
+        CRITICAL: Return ONLY valid JSON matching this schema:
         {
-            "score": <Generate a dynamic integer between 1 and 100>,
-            "critique": "<A piercing 1-2 sentence summary of their gaps ${isTealMode ? 'relative to the Job Description' : 'in formatting/impact'}>",
-            "missingKeywords": [
-                ${isTealMode ? '"<Crucial JD keyword 1 missing from resume>"' : '"<Core industry skill 1 lacking>"'}, 
-                "<Keyword 2>", 
-                "<Keyword 3>"
-            ]
+            "extractedKeywords": ["<Skill 1>", "<Skill 2>", "<Skill 3>"],
+            "critique": "<Your 1-2 sentence qualitative review of their formatting and impact>"
         }`;
 
         const completion = await groq.chat.completions.create({
@@ -45,23 +37,44 @@ export default async function handler(req, res) {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `CANDIDATE RESUME TEXT:\n\n${resumeText}` }
             ],
-            temperature: 0.15, 
+            temperature: 0.1, 
             response_format: { type: "json_object" }
         });
 
         const rawContent = completion.choices[0].message.content.trim();
         const parsedData = JSON.parse(rawContent);
-
-        // Defensive checks
-        let finalScore = parseInt(parsedData.score) || 50;
-        if (finalScore <= 10 && finalScore > 0) finalScore = finalScore * 10; 
-        parsedData.score = finalScore;
         
-        if (!Array.isArray(parsedData.missingKeywords)) {
-            parsedData.missingKeywords = ["Quantifiable Metrics", "Keyword Alignment"];
+        // Fallback safety
+        const requiredKeywords = Array.isArray(parsedData.extractedKeywords) ? parsedData.extractedKeywords : ["JavaScript", "APIs", "Git", "Teamwork"];
+        const qualitativeCritique = parsedData.critique || "Resume lacks quantifiable metrics and strong action verbs.";
+
+        // STEP 2: DETERMINISTIC JAVASCRIPT MATCHING (The Real ATS Engine)
+        const resumeLower = resumeText.toLowerCase();
+        const missing = [];
+        const found = [];
+
+        requiredKeywords.forEach(keyword => {
+            // Check if the resume text actually includes the keyword
+            if (resumeLower.includes(keyword.toLowerCase())) {
+                found.push(keyword);
+            } else {
+                missing.push(keyword);
+            }
+        });
+
+        // STEP 3: DETERMINISTIC MATH
+        // Score is simply: (Keywords Found / Total Required Keywords) * 100
+        let calculatedScore = 0;
+        if (requiredKeywords.length > 0) {
+            calculatedScore = Math.round((found.length / requiredKeywords.length) * 100);
         }
 
-        return res.status(200).json(parsedData);
+        // Return the exact JSON structure your frontend is expecting
+        return res.status(200).json({
+            score: calculatedScore,
+            critique: qualitativeCritique,
+            missingKeywords: missing
+        });
 
     } catch (error) {
         console.error("Backend screening execution error:", error);

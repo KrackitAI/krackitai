@@ -7,6 +7,9 @@
     <title>Krackit - Adaptive AI Interview Coach</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
@@ -14,6 +17,7 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Xi tn init mn Qr yn xn pn capture calculateEventProperties Tn register register_once register_for_session unregister unregister_for_session Pn getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync On identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty Mn Cn createPersonProfile setInternalOrTestUser Rn vn Fn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing kn debug Kr En getPageViewId captureTraceFeedback captureTraceMetric hn".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
@@ -85,17 +89,34 @@
     </nav>
 
     <div id="history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-end">
-        <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between">
-            <div class="space-y-6">
-                <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
-                    <div>
-                        <h3 class="text-xl font-black text-white">Your Practice History</h3>
-                        <p class="text-neutral-500 text-xs">Review past architectural critiques and performance logs.</p>
-                    </div>
-                    <button type="button" onclick="closeHistoryModal()" class="text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕ Close</button>
+        <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-2xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col">
+            
+            <div class="flex items-center justify-between border-b border-neutral-900 pb-4 shrink-0">
+                <div>
+                    <h3 class="text-xl font-black text-white">Performance Analytics</h3>
+                    <p class="text-neutral-500 text-xs">Track your technical growth and recurring blind spots.</p>
                 </div>
-                <div id="history-rows-container" class="space-y-3"></div>
+                <button type="button" onclick="closeHistoryModal()" class="text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕ Close</button>
             </div>
+
+            <div id="analytics-dashboard-wrapper" class="hidden space-y-4 shrink-0">
+                <div class="bg-neutral-900/20 border border-neutral-900 rounded-xl p-4">
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 mb-3">Interview Score Trajectory</h4>
+                    <div class="w-full h-40">
+                        <canvas id="scoreTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-rose-950/10 border border-rose-900/30 rounded-xl p-4">
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-rose-500 mb-2">🚨 Priority Weaknesses to Remediate</h4>
+                    <ul id="recurring-gaps-list" class="space-y-2 text-xs text-neutral-300"></ul>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col min-h-0">
+                <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 pb-3 border-b border-neutral-900 shrink-0">Raw Session Logs</h4>
+                <div id="history-rows-container" class="space-y-3 pt-3 overflow-y-auto pr-1"></div>
+            </div>
+
         </div>
     </div>
 
@@ -294,10 +315,14 @@
         </div>
 
         <div id="results-screen" class="hidden space-y-8">
-            <div class="border-b border-neutral-900 pb-5 text-center">
-                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
-                <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
-            </div>
+            
+    
+    <div id="printable-report" class="space-y-8 bg-[#0a0a0a] p-2 md:p-6 rounded-2xl">
+
+        <div class="border-b border-neutral-900 pb-5 text-center">
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
+            <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
+        </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
@@ -324,19 +349,8 @@
                 <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">Analyzing response logs...</blockquote>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-neutral-900/10 border border-emerald-900/30 p-6 rounded-2xl space-y-3">
-                    <h4 class="text-xs font-mono font-black uppercase tracking-wider text-emerald-500">✅ Highlight Reel:</h4>
-                    <ul id="report-highlights-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
-                </div>
-                <div class="bg-neutral-900/10 border border-rose-900/30 p-6 rounded-2xl space-y-3">
-                    <h4 class="text-xs font-mono font-black uppercase tracking-wider text-rose-500">🚨 Behavioral Red Flag:</h4>
-                    <p id="report-redflag-target" class="text-sm text-neutral-300 italic"></p>
-                </div>
-            </div>
-
             <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">🎯 Core Deficiencies to Remediate:</h4>
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
                 <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
             </div>
             
@@ -344,9 +358,7 @@
                 <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
                 <div class="space-y-4" id="transcript-deck-target"></div>
             </div>
-            
-            <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer">Return to Entry Screen</button>
-        </div>
+        </div> <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer shadow-lg">Return to Dashboard</button>       </div>
     </main>
 
     <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
@@ -652,7 +664,7 @@
         let isMicrophoneListening = false;
         let latestEvaluationReportCache = null;
         let cachedResumePreflightScore = 0; 
-
+        let performanceChartInstance = null; 
         let remainingFreeHintsCount = 1;
         let runningSessionHintsUsedTotal = 0;
         let countdownTimerIntervalInstance = null;
@@ -961,35 +973,18 @@
                 if (critiqueMsg) critiqueMsg.innerText = data.critique || "Formatting optimization advised.";
                 
                 // 4. DYNAMIC PAYWALL ENFORCEMENT FOR ATS KEYWORDS
+                // 4. FULLY UNLOCKED ATS KEYWORDS FOR ALL USERS
                 const keywordsHolder = document.getElementById('preflight-missing-keywords-holder');
                 if (keywordsHolder) {
                     keywordsHolder.innerHTML = '';
                     
-                    if (userTier === 'free') {
-                        // Render the blurred visual paywall lock for Free users
-                        keywordsHolder.innerHTML = `
-                            <div onclick="openPaywallModal()" class="relative group cursor-pointer mt-1 w-full max-w-xs">
-                                <div class="flex flex-wrap gap-1.5 filter blur-[4px] opacity-60 group-hover:blur-[5px] transition-all select-none pointer-events-none">
-                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: Microservices</span>
-                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: AWS Architecture</span>
-                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: CI/CD Pipelines</span>
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="bg-[#FFE500] text-black text-[9px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg border border-[#ebd300]">
-                                        🔒 Pro: Reveal Missing Keywords
-                                    </span>
-                                </div>
-                            </div>
-                        `;
+                    // Fully reveal the exact keywords extracted from the JD to everyone!
+                    if (data.missingKeywords && data.missingKeywords.length > 0) {
+                        data.missingKeywords.forEach(word => {
+                            keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
+                        });
                     } else {
-                        // Fully reveal the exact keywords extracted from the JD!
-                        if (data.missingKeywords && data.missingKeywords.length > 0) {
-                            data.missingKeywords.forEach(word => {
-                                keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
-                            });
-                        } else {
-                            keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing from the JD!</span>`;
-                        }
+                        keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing from the JD!</span>`;
                     }
                 }
                 
@@ -1008,23 +1003,90 @@
 
             document.getElementById('history-modal').classList.remove('hidden');
             const container = document.getElementById('history-rows-container');
-            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Querying comprehensive session logs...</p>`;
+            const dashboardWrapper = document.getElementById('analytics-dashboard-wrapper');
+            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Aggregating historical performance data...</p>`;
 
             try {
+                // Fetch all data, oldest to newest so the graph goes left to right
                 const { data, error } = await supabaseClientInstance
                     .from('interview_sessions')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .order('created_at', { ascending: true });
 
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
                     container.innerHTML = `<p class="text-xs text-neutral-600 font-medium italic">No past simulation logs found on profile.</p>`;
+                    dashboardWrapper.classList.add('hidden');
                     return;
                 }
 
+                dashboardWrapper.classList.remove('hidden');
+
+                // --- DATA PROCESSING FOR DASHBOARD ---
+                const chartLabels = [];
+                const chartScores = [];
+                let allGaps = [];
+
+                data.forEach((row, index) => {
+                    chartLabels.push(`Session ${index + 1}`);
+                    chartScores.push(row.score || 0);
+                    if (Array.isArray(row.gaps_to_fix)) {
+                        allGaps = allGaps.concat(row.gaps_to_fix);
+                    }
+                });
+
+                // Render Chart.js
+                const ctx = document.getElementById('scoreTrendChart').getContext('2d');
+                if (performanceChartInstance) performanceChartInstance.destroy();
+                
+                performanceChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Technical Score / 100',
+                            data: chartScores,
+                            borderColor: '#FFE500',
+                            backgroundColor: 'rgba(255, 229, 0, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0a0a0a',
+                            pointBorderColor: '#FFE500',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#737373', font: { family: 'monospace', size: 10 } } },
+                            x: { grid: { display: false }, ticks: { color: '#737373', font: { family: 'monospace', size: 10 } } }
+                        }
+                    }
+                });
+
+                // Extract and render Top 3 Weaknesses
+                const gapsList = document.getElementById('recurring-gaps-list');
+                gapsList.innerHTML = '';
+                if (allGaps.length > 0) {
+                    // Quick way to get the last 3 unique gaps they encountered
+                    const uniqueRecentGaps = [...new Set(allGaps.reverse())].slice(0, 3);
+                    uniqueRecentGaps.forEach(gap => {
+                        gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`;
+                    });
+                } else {
+                    gapsList.innerHTML = `<li class="text-neutral-500 italic">No recurring weaknesses detected yet.</li>`;
+                }
+
+                // --- RENDER OLD LOGBOOK (Newest First) ---
                 container.innerHTML = '';
-                data.forEach((row, idx) => {
+                const reversedData = [...data].reverse();
+                
+                reversedData.forEach((row, idx) => {
                     const dateStr = new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
                     const verdictStr = (row.verdict || "REJECTED").toUpperCase();
                     const passed = verdictStr.includes('PASS') || verdictStr.includes('HIRE') || verdictStr.includes('ACCEPT') || verdictStr.includes('OFFER');
@@ -1037,31 +1099,21 @@
                         const cleanLines = row.job_description.split('\n').filter(line => line.trim().length > 0);
                         if (cleanLines.length > 0) {
                             displayTitle = cleanLines[0].trim();
-                            if (cleanLines.length > 1 && displayTitle.length < 25) {
-                                displayTitle = displayTitle + " - " + cleanLines[1].trim();
-                            }
-                            if (displayTitle.length > 45) {
-                                displayTitle = displayTitle.substring(0, 45) + "...";
-                            }
+                            if (displayTitle.length > 45) displayTitle = displayTitle.substring(0, 45) + "...";
                         }
                     }
-
-                    let gapsHtml = '';
-                    if (gaps.length > 0) {
-                        gaps.forEach(g => { gapsHtml += `<li class="flex items-start space-x-1.5"><span class="text-rose-500 font-bold">✕</span><span>${g}</span></li>`; });
-                    } else { gapsHtml = `<li class="text-neutral-500 italic">No structural gaps recorded.</li>`; }
 
                     let transcriptHtml = '';
                     let questionBuffer = '';
                     transcriptDeck.forEach(msg => {
                         if (msg.role === 'assistant') { questionBuffer = msg.content; }
-                        else if (msg.role === 'user' && questionBuffer) {
+                        else if (msg.role === 'user' && questionBuffer && !msg.content.includes("SYSTEM NOTE:")) {
                             transcriptHtml += `
                                 <div class="bg-neutral-950 p-3 rounded-lg border border-neutral-900 space-y-2">
                                     <p class="text-[10px] font-mono text-neutral-500 font-bold uppercase">Parameter Asked:</p>
                                     <p class="text-xs text-neutral-300 font-bold leading-relaxed">${questionBuffer}</p>
                                     <div class="bg-neutral-900/50 p-2.5 rounded border border-neutral-800">
-                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Registered Input:</p>
+                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Input:</p>
                                         <p class="text-xs text-neutral-400 font-normal leading-relaxed mt-0.5">${msg.content}</p>
                                     </div>
                                 </div>`;
@@ -1069,15 +1121,14 @@
                     });
 
                     container.innerHTML += `
-                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl transition-all overflow-hidden">
+                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl transition-all overflow-hidden mb-3">
                             <div onclick="toggleHistoryItemAccordion(${idx})" class="p-4 flex items-center justify-between cursor-pointer hover:bg-neutral-900/80 transition-colors select-none">
                                 <div class="space-y-1 min-w-0 pr-2">
                                     <div class="flex items-center space-x-2">
                                         <span class="text-[10px] font-mono font-bold text-neutral-500">${dateStr}</span>
                                         <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/30' : 'bg-rose-950/60 text-rose-400 border border-rose-900/30'}">${verdictStr}</span>
-                                        ${atsScore > 0 ? `<span class="text-[9px] font-mono bg-neutral-950 border border-neutral-800 text-neutral-400 px-1.5 rounded">ATS: ${atsScore}</span>` : ''}
                                     </div>
-                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]" title="${displayTitle}">${displayTitle}</h4>
+                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]">${displayTitle}</h4>
                                 </div>
                                 <div class="flex items-center space-x-3 font-mono">
                                     <span class="text-base font-black text-white">${row.score}<span class="text-[10px] text-neutral-500 font-normal">/100</span></span>
@@ -1090,12 +1141,6 @@
                                     <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Unvarnished AI Critique:</h5>
                                     <p class="text-neutral-300 font-medium italic leading-relaxed">"${row.brutally_honest_review}"</p>
                                 </div>
-
-                                <div class="space-y-1.5">
-                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Deficiencies To Remediate:</h5>
-                                    <ul class="space-y-1 text-neutral-400">${gapsHtml}</ul>
-                                </div>
-
                                 <div class="space-y-2 pt-2 border-t border-neutral-900">
                                     <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Interaction Timeline:</h5>
                                     <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">${transcriptHtml || '<p class="text-neutral-600 italic">No timeline entries generated.</p>'}</div>
@@ -1661,7 +1706,55 @@ const response = await fetch('/api/interview', {
                 showScreen('results-screen');
             }
         }
+    function downloadReportPDF() {
+    let a = document.getElementById('printable-report');
+    let b = document.querySelector('button[onclick="downloadReportPDF()"]');
+    let c = b.innerHTML;
 
+    if (!a) {
+        alert("Error: Could not find the report wrapper.");
+        return;
+    }
+    
+    b.innerHTML = '⏳ Generating PDF...';
+    b.disabled = true;
+
+    // Snap to top
+    window.scrollTo(0, 0);
+
+    let d = {
+        margin:       0.4, 
+        filename:     'KrackitAI_Evaluation_Report.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        // THE FIX 1: We removed 'avoid-all'. It was forcing the engine to squish everything onto one page.
+        pagebreak:    { mode: ['css', 'legacy'] }, 
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#0a0a0a', 
+            scrollY: 0,
+            
+            // THE FIX 2: Explicitly force the camera width to desktop size
+            width: 1024,
+            windowWidth: 1024,
+            
+            // THE FIX 3: Brute-force the camera to stretch to the absolute bottom of your timeline
+            height: a.scrollHeight,
+            windowHeight: a.scrollHeight
+        },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(d).from(a).save().then(() => {
+        b.innerHTML = c;
+        b.disabled = false;
+    }).catch(err => {
+        console.error("PDF Engine Error:", err);
+        alert("Failed to generate PDF. Check the browser console for details.");
+        b.innerHTML = c;
+        b.disabled = false;
+    });
+}
         window.addEventListener('DOMContentLoaded', () => {
             updateNavbarSessionBadge();
             speechRecognitionEngine = initSpeechFramework();
