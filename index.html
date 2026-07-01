@@ -973,35 +973,18 @@
                 if (critiqueMsg) critiqueMsg.innerText = data.critique || "Formatting optimization advised.";
                 
                 // 4. DYNAMIC PAYWALL ENFORCEMENT FOR ATS KEYWORDS
+                // 4. FULLY UNLOCKED ATS KEYWORDS FOR ALL USERS
                 const keywordsHolder = document.getElementById('preflight-missing-keywords-holder');
                 if (keywordsHolder) {
                     keywordsHolder.innerHTML = '';
                     
-                    if (userTier === 'free') {
-                        // Render the blurred visual paywall lock for Free users
-                        keywordsHolder.innerHTML = `
-                            <div onclick="openPaywallModal()" class="relative group cursor-pointer mt-1 w-full max-w-xs">
-                                <div class="flex flex-wrap gap-1.5 filter blur-[4px] opacity-60 group-hover:blur-[5px] transition-all select-none pointer-events-none">
-                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: Microservices</span>
-                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: AWS Architecture</span>
-                                    <span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md">+ Missing: CI/CD Pipelines</span>
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="bg-[#FFE500] text-black text-[9px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg border border-[#ebd300]">
-                                        🔒 Pro: Reveal Missing Keywords
-                                    </span>
-                                </div>
-                            </div>
-                        `;
+                    // Fully reveal the exact keywords extracted from the JD to everyone!
+                    if (data.missingKeywords && data.missingKeywords.length > 0) {
+                        data.missingKeywords.forEach(word => {
+                            keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
+                        });
                     } else {
-                        // Fully reveal the exact keywords extracted from the JD!
-                        if (data.missingKeywords && data.missingKeywords.length > 0) {
-                            data.missingKeywords.forEach(word => {
-                                keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
-                            });
-                        } else {
-                            keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing from the JD!</span>`;
-                        }
+                        keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing from the JD!</span>`;
                     }
                 }
                 
