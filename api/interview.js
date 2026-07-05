@@ -1,6 +1,9 @@
 import { Groq } from "groq-sdk";
 import { createClient } from "@supabase/supabase-js";
 
+// 🔥 CRITICAL FIX: Overrides Vercel's default 10s timeout to prevent report card crashes
+export const maxDuration = 60; 
+
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 // Initialize Supabase admin auto-verify instance to securely check user tiers on the backend
@@ -106,7 +109,7 @@ STRICT PACING AND CONVERSATIONAL CONTRACT:
 1. You must deliver exactly 5 comprehensive domain-specific interview questions. This is a standalone 5-question sprint.
 2. Current Progress State: [ Questions Asked So Far: ${totalTechnicalQuestionsAsked} / 5 ].
 3. ${isHintMode ? 
-    "HINT DIRECTIVE ACTIVE: The candidate is asking for a hint. You MUST start your response exactly with '[HINT]'. Provide a brief, conceptual clue. DO NOT ask a new question. DO NOT answer the current question entirely." : 
+    "HINT DIRECTIVE ACTIVE: The candidate is stuck. You MUST start your response exactly with '[HINT]'. Provide a STRICT 1-sentence conceptual nudge. You are FORBIDDEN from writing code snippets, FORBIDDEN from revealing the direct answer, and FORBIDDEN from asking follow-up questions." : 
     "THE HUMAN ELEMENT: Briefly react to the candidate's previous answer before asking the next question. Validate good points or critique technical flaws."}
 4. ${isHintMode ? "NO QUESTION MARK ALLOWED: You are just providing a clue. Do not end your message with a question mark." : "THE QUESTION MARK RULE: Every single active response MUST end with a clear technical question mark '?'."}
 5. SESSION CONCLUSION STATUS: [ ${forceSessionConclusion ? `TRUE - THE INTERVIEW IS OVER.` : `FALSE - THE INTERVIEW IS ACTIVE.`} ].
@@ -118,18 +121,17 @@ ${userTier === 'free' ? "TIER PRIVILEGE: This user is on the FREE sandbox. You M
 DATA OUTPUT SCHEMA:
 You must output a raw JSON object matching this schema exactly:
 {
-    "aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'We are unfortunately out of time for today. Thank you for your time, we will be in touch with feedback.' : 'Thank you for walking me through those scenarios. That concludes our technical questions for today. We appreciate your time and will follow up shortly.') : (isHintMode ? '[HINT] Give a conceptual clue to help them answer. DO NOT ask a question. DO NOT end with a question mark.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",
-    "isConcluded": ${forceSessionConclusion ? "true" : "false"},
+"aiMessage": "${forceSessionConclusion ? (conclusionReason === 'TIME_EXPIRED' ? 'We are unfortunately out of time for today. Thank you for your time, we will be in touch with feedback.' : 'Thank you for walking me through those scenarios. That concludes our technical questions for today. We appreciate your time and will follow up shortly.') : (isHintMode ? '[HINT] Strict 1-sentence conceptual nudge. NO CODE. NO DIRECT ANSWERS. NO QUESTIONS.' : 'First, briefly react to their previous answer. Then, ask your next tailored interview question ending with a ?.')}",    "isConcluded": ${forceSessionConclusion ? "true" : "false"},
     "rubric": ${forceSessionConclusion ? `{
-        "technical_depth": { "score": <Integer 1-10>, "reason": "<1 strict sentence justifying technical accuracy>" },
-        "jd_alignment": { "score": <Integer 1-10>, "reason": "<1 strict sentence justifying alignment with the JD>" },
-        "communication_clarity": { "score": <Integer 1-10>, "reason": "<1 strict sentence critiquing their articulation and conciseness>" }
+        "technical_depth": { "score": <Integer 1-10>, "reason": "<Max 10 words justifying tech accuracy>" },
+        "jd_alignment": { "score": <Integer 1-10>, "reason": "<Max 10 words justifying JD alignment>" },
+        "communication_clarity": { "score": <Integer 1-10>, "reason": "<Max 10 words critiquing articulation>" }
     }` : "null"},
     "verdict": "${forceSessionConclusion ? "Set to 'ACCEPTED' if score >= 70, otherwise set to 'REJECTED'." : "PENDING"}",
-    "brutallyHonestReview": "${forceSessionConclusion ? "Your review string context based on Tier rules." : "Active session live."}",
-    "highlightReel": ${forceSessionConclusion ? "A flat string array of 2 specific technical or behavioral things they actually did well." : "[]"},
-    "gapsToFix": ${forceSessionConclusion ? "A flat string array of exactly 3 specific constructive areas, weaknesses, or advanced edge-cases to study further." : "[]"},
-    "behavioralRedFlag": "${forceSessionConclusion ? "One specific critique about their communication style, use of filler words, or confidence." : ""}"
+    "brutallyHonestReview": "${forceSessionConclusion ? (userTier === 'free' ? "Max 15 words. Vague high-level summary." : "Max 2 sentences. Piercing, unvarnished technical review.") : "Active session live."}",
+    "highlightReel": ${forceSessionConclusion ? "A string array of exactly 2 short bullet points (max 10 words each) of what they did well." : "[]"},
+    "gapsToFix": ${forceSessionConclusion ? "A string array of exactly 3 short bullet points (max 10 words each) of weaknesses to study." : "[]"},
+    "behavioralRedFlag": "${forceSessionConclusion ? "Max 10 words critiquing communication style." : ""}"
 }`;
 
         // ─── STAGE 4: EXECUTE GROQ COMPILATION PIPELINE ─────────────────

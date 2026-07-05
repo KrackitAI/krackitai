@@ -969,8 +969,16 @@
                     }
                 }
 
-                const critiqueMsg = document.getElementById('preflight-audit-critique-msg');
-                if (critiqueMsg) critiqueMsg.innerText = data.critique || "Formatting optimization advised.";
+            const critiqueMsg = document.getElementById('preflight-audit-critique-msg');
+                if (critiqueMsg) {
+                    if (data.sectionCritiques && data.sectionCritiques.length > 0) {
+                        critiqueMsg.innerHTML = '<ul class="list-disc pl-4 space-y-2 mt-2 text-rose-300 font-medium italic text-[11px]">' + 
+                            data.sectionCritiques.map(c => `<li>${c}</li>`).join('') + 
+                            '</ul>';
+                    } else {
+                        critiqueMsg.innerText = "Formatting optimization advised.";
+                    }
+                }
                 
                 // 4. DYNAMIC PAYWALL ENFORCEMENT FOR ATS KEYWORDS
                 // 4. FULLY UNLOCKED ATS KEYWORDS FOR ALL USERS

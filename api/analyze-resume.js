@@ -17,18 +17,21 @@ export default async function handler(req, res) {
         const isTealMode = jobDescription && jobDescription.length > 50;
 
         // STEP 1: Use the LLM ONLY to extract an array of required keywords and write the critique.
-        // We DO NOT ask it to score the resume or guess what is missing.
-        const systemPrompt = `You are an expert Technical Recruiter. 
+        const systemPrompt = `You are a ruthless, top-tier FAANG Technical Recruiter. 
         
         TASK 1: Extract exactly 10 to 15 critical technical keywords, frameworks, or hard skills required from the provided Job Description. If no Job Description is provided, extract 10 standard industry skills based on the candidate's resume.
-        TASK 2: Write a piercing 1-2 sentence critique of the candidate's resume formatting, use of action verbs, and quantifiable impact.
+        
+        TASK 2: Provide a brutal, section-by-section critique of the candidate's resume. Do not be polite. Call out specific weak bullet points, missing quantifiable metrics, and poor phrasing in their Experience and Projects sections.
         
         ${isTealMode ? `TARGET JOB DESCRIPTION TO EXTRACT FROM:\n${jobDescription}\n\n` : ''}
         
         CRITICAL: Return ONLY valid JSON matching this schema:
         {
             "extractedKeywords": ["<Skill 1>", "<Skill 2>", "<Skill 3>"],
-            "critique": "<Your 1-2 sentence qualitative review of their formatting and impact>"
+            "sectionCritiques": [
+                "Experience: Your second bullet point under TechLabs is weak. 'Assisted in hardware bring-up' means nothing. What was the impact?",
+                "Projects: You list an IoT project but fail to mention the exact data throughput or cloud architecture."
+            ]
         }`;
 
         const completion = await groq.chat.completions.create({
@@ -46,7 +49,7 @@ export default async function handler(req, res) {
         
         // Fallback safety
         const requiredKeywords = Array.isArray(parsedData.extractedKeywords) ? parsedData.extractedKeywords : ["JavaScript", "APIs", "Git", "Teamwork"];
-        const qualitativeCritique = parsedData.critique || "Resume lacks quantifiable metrics and strong action verbs.";
+        const critiquesArray = Array.isArray(parsedData.sectionCritiques) ? parsedData.sectionCritiques : ["Resume lacks quantifiable metrics and strong action verbs."];
 
         // STEP 2: DETERMINISTIC JAVASCRIPT MATCHING (The Real ATS Engine)
         const resumeLower = resumeText.toLowerCase();
@@ -54,7 +57,6 @@ export default async function handler(req, res) {
         const found = [];
 
         requiredKeywords.forEach(keyword => {
-            // Check if the resume text actually includes the keyword
             if (resumeLower.includes(keyword.toLowerCase())) {
                 found.push(keyword);
             } else {
@@ -63,16 +65,14 @@ export default async function handler(req, res) {
         });
 
         // STEP 3: DETERMINISTIC MATH
-        // Score is simply: (Keywords Found / Total Required Keywords) * 100
         let calculatedScore = 0;
         if (requiredKeywords.length > 0) {
             calculatedScore = Math.round((found.length / requiredKeywords.length) * 100);
         }
 
-        // Return the exact JSON structure your frontend is expecting
         return res.status(200).json({
             score: calculatedScore,
-            critique: qualitativeCritique,
+            sectionCritiques: critiquesArray,
             missingKeywords: missing
         });
 
