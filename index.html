@@ -159,18 +159,21 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left max-w-3xl mx-auto">
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
-                <span class="text-sm font-bold text-white block">🧠 Adaptive Conversational Drilling</span>
-                <p class="text-neutral-500 text-xs leading-normal">Evaluates data matrices dynamically. Challenges vague responses with deeper technical follow-ups.</p>
+       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left max-w-3xl mx-auto">
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
+                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                <span class="text-sm font-bold text-white block tracking-tight">Adaptive Drilling</span>
+                <p class="text-neutral-500 text-xs leading-relaxed">Evaluates data matrices dynamically. Challenges vague responses with deeper technical follow-ups.</p>
             </div>
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
-                <span class="text-sm font-bold text-white block">📊 Real-Time ATS Screening</span>
-                <p class="text-neutral-500 text-xs leading-normal">Scans profile layers to flag critical missing keywords and compute alignment ratings instantly.</p>
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
+                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="text-sm font-bold text-white block tracking-tight">ATS Screening</span>
+                <p class="text-neutral-500 text-xs leading-relaxed">Scans profile layers to flag critical missing keywords and compute alignment ratings instantly.</p>
             </div>
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-4 space-y-1">
-                <span class="text-sm font-bold text-white block">🎙️ Native Audio Agent Synthesis</span>
-                <p class="text-neutral-500 text-xs leading-normal">Toggle hyper-realistic voice workflows for realistic, conversational engineering pressure simulations.</p>
+            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
+                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                <span class="text-sm font-bold text-white block tracking-tight">Audio Synthesis</span>
+                <p class="text-neutral-500 text-xs leading-relaxed">Toggle hyper-realistic voice workflows for realistic, conversational engineering pressure simulations.</p>
             </div>
         </div>
     </header>
@@ -251,7 +254,7 @@
                 </div>
 
                 <div class="space-y-1">
-                    <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview ⚡</button>
+                    <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview </button>
                     <span class="text-[10px] text-neutral-500 tracking-wide block text-center font-medium select-none">Adaptive free sessions run on a strict 5:00 minute cognitive stamina window limit.</span>
                 </div>
             </div>
@@ -271,12 +274,12 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between border-b border-neutral-900 pb-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-neutral-900 pb-4 gap-4 sm:gap-0">
                 <div>
-                    <h3 class="text-2xl font-black text-white">Live AI Interview Panel</h3>
-                    <p class="text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is gathering data matrices...</p>
+                    <h3 class="text-xl sm:text-2xl font-black text-white">Live AI Interview Panel</h3>
+                    <p class="text-[10px] sm:text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is gathering data matrices...</p>
                 </div>
-                <button onclick="finishAndWrapInterview()" class="text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-2 rounded-xl font-bold transition-all">🏁 Cancel Session</button>
+                <button onclick="finishAndWrapInterview()" class="w-full sm:w-auto text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-3 sm:py-2 rounded-xl font-bold transition-all text-center">✕ Abort Session</button>
             </div>
 
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden min-h-[140px] flex flex-col justify-center">
@@ -286,30 +289,30 @@
             </div>
 
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                     <div class="space-y-0.5">
                         <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Response Turn</label>
-                        <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> to submit response</span>
+                        <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> on desktop to submit</span>
                     </div>
                     
-                    <div class="flex items-center space-x-2">
-                        <button id="hint-request-btn" onclick="executeCandidateHintRetrieval()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 hover:border-amber-500/50 text-xs text-amber-400 px-3.5 py-2 rounded-xl flex items-center space-x-1.5 transition-all cursor-pointer font-medium select-none">
+                    <div class="flex items-center space-x-2 w-full sm:w-auto">
+                        <button id="hint-request-btn" onclick="executeCandidateHintRetrieval()" class="flex-1 sm:flex-none justify-center bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 hover:border-amber-500/50 text-xs text-amber-400 px-3.5 py-3 sm:py-2 rounded-xl flex items-center space-x-1.5 transition-all cursor-pointer font-medium select-none">
                             <span>💡 Hint</span>
                             <span id="hint-tracker-badge" class="bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold">Free: 1</span>
                         </button>
 
-                        <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all">
+                        <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="flex-1 sm:flex-none justify-center bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-3 sm:py-2 rounded-xl flex items-center space-x-2 transition-all">
                             <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
-                            <span id="mic-action-label">🎤 Speak Answer</span>
+                            <span id="mic-action-label" class="whitespace-nowrap"> Speak Answer</span>
                         </button>
                     </div>
                 </div>
 
                 <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or click 'Speak Answer' to speak out loud..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
 
-                <div class="flex justify-between items-center text-[11px] text-neutral-500 select-none">
-                    <div id="response-char-counter" class="font-mono">0 characters written</div>
-                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Submit Answer →</button>
+                <div class="flex flex-col-reverse sm:flex-row justify-between items-center text-[11px] text-neutral-500 select-none gap-4">
+                    <div id="response-char-counter" class="font-mono w-full sm:w-auto text-center sm:text-left">0 characters written</div>
+                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="w-full sm:w-auto bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-4 sm:py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Submit Answer →</button>
                 </div>
             </div>
         </div>

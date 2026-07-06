@@ -64,10 +64,18 @@ export default async function handler(req, res) {
             }
         });
 
-        // STEP 3: DETERMINISTIC MATH
+        // STEP 3: DETERMINISTIC MATH (THE RUTHLESS ENTERPRISE MODEL)
         let calculatedScore = 0;
         if (requiredKeywords.length > 0) {
-            calculatedScore = Math.round((found.length / requiredKeywords.length) * 100);
+            const basePercentage = (found.length / requiredKeywords.length) * 100;
+            const harshPenalty = missing.length * 8; 
+            calculatedScore = Math.round(basePercentage - harshPenalty);
+            
+            if (calculatedScore < 15) calculatedScore = 15;
+            if (calculatedScore > 100) calculatedScore = 100;
+            
+            if (missing.length > 0 && calculatedScore > 89) calculatedScore = 89;
+            if (missing.length >= 3 && calculatedScore > 65) calculatedScore = 65;
         }
 
         return res.status(200).json({
