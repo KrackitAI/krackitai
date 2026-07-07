@@ -16,10 +16,10 @@ export default async function handler(req, res) {
 
         const isTealMode = jobDescription && jobDescription.length > 50;
 
-        // STEP 1: Use the LLM ONLY to extract an array of required keywords and write the critique.
+        // STEP 1: Use the LLM to extract keywords, synonyms, and importance weights
         const systemPrompt = `You are a ruthless, top-tier FAANG Technical Recruiter. 
         
-        TASK 1: Extract exactly 10 to 15 critical technical keywords, frameworks, or hard skills required from the provided Job Description. If no Job Description is provided, extract 10 standard industry skills based on the candidate's resume.
+        TASK 1: Extract exactly 10 to 12 skills required from the provided Job Description. Distinguish between 'Critical' (must-have) and 'Bonus' (nice-to-have) skills. For each skill, provide an array of 2-3 common synonyms or formatting variations (e.g., "Kubernetes", "K8s").
         
         TASK 2: Provide a brutal, section-by-section critique of the candidate's resume. Do not be polite. Call out specific weak bullet points, missing quantifiable metrics, and poor phrasing in their Experience and Projects sections.
         
@@ -27,10 +27,15 @@ export default async function handler(req, res) {
         
         CRITICAL: Return ONLY valid JSON matching this schema:
         {
-            "extractedKeywords": ["<Skill 1>", "<Skill 2>", "<Skill 3>"],
+            "extractedSkills": [
+                {
+                    "skill": "React",
+                    "synonyms": ["React.js", "ReactJS"],
+                    "isCritical": true
+                }
+            ],
             "sectionCritiques": [
-                "Experience: Your second bullet point under TechLabs is weak. 'Assisted in hardware bring-up' means nothing. What was the impact?",
-                "Projects: You list an IoT project but fail to mention the exact data throughput or cloud architecture."
+                "Experience: Your second bullet point under TechLabs is weak. 'Assisted in hardware bring-up' means nothing. What was the impact?"
             ]
         }`;
 
@@ -40,42 +45,63 @@ export default async function handler(req, res) {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `CANDIDATE RESUME TEXT:\n\n${resumeText}` }
             ],
-            temperature: 0.1, 
+            temperature: 0.0, // HARD ZERO. We need deterministic, reproducible parsing.
             response_format: { type: "json_object" }
         });
 
         const rawContent = completion.choices[0].message.content.trim();
         const parsedData = JSON.parse(rawContent);
         
-        // Fallback safety
-        const requiredKeywords = Array.isArray(parsedData.extractedKeywords) ? parsedData.extractedKeywords : ["JavaScript", "APIs", "Git", "Teamwork"];
+        // Fallback safety (Structured for the new schema)
+        const extractedSkills = Array.isArray(parsedData.extractedSkills) ? parsedData.extractedSkills : [
+            { skill: "JavaScript", synonyms: ["JS", "Node.js"], isCritical: true },
+            { skill: "APIs", synonyms: ["REST", "GraphQL"], isCritical: true },
+            { skill: "Git", synonyms: ["GitHub", "Version Control"], isCritical: false }
+        ];
         const critiquesArray = Array.isArray(parsedData.sectionCritiques) ? parsedData.sectionCritiques : ["Resume lacks quantifiable metrics and strong action verbs."];
 
-        // STEP 2: DETERMINISTIC JAVASCRIPT MATCHING (The Real ATS Engine)
-        const resumeLower = resumeText.toLowerCase();
+        // STEP 2: SEMANTIC REGEX MATCHING (The Real ATS Engine)
         const missing = [];
         const found = [];
+        let maxPossiblePoints = 0;
+        let earnedPoints = 0;
 
-        requiredKeywords.forEach(keyword => {
-            if (resumeLower.includes(keyword.toLowerCase())) {
-                found.push(keyword);
+        extractedSkills.forEach(item => {
+            // Must-haves are worth 10 points. Nice-to-haves are worth 3 points.
+            const weight = item.isCritical ? 10 : 3; 
+            maxPossiblePoints += weight;
+
+            // Build a strict regex pattern: \b(Skill|Syn1|Syn2)\b 
+            // This ensures "Java" doesn't match "JavaScript", and "React" doesn't match "Reaction"
+            const searchTerms = [item.skill, ...(item.synonyms || [])].map(term => 
+                term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape regex special characters safely
+            );
+            const regexPattern = new RegExp(`\\b(${searchTerms.join('|')})\\b`, 'i');
+
+            if (regexPattern.test(resumeText)) {
+                found.push(item.skill);
+                earnedPoints += weight;
             } else {
-                missing.push(keyword);
+                missing.push(item.skill);
             }
         });
 
-        // STEP 3: DETERMINISTIC MATH (THE RUTHLESS ENTERPRISE MODEL)
+        // STEP 3: DETERMINISTIC MATH (WEIGHTED MODEL)
         let calculatedScore = 0;
-        if (requiredKeywords.length > 0) {
-            const basePercentage = (found.length / requiredKeywords.length) * 100;
-            const harshPenalty = missing.length * 8; 
-            calculatedScore = Math.round(basePercentage - harshPenalty);
+        if (maxPossiblePoints > 0) {
+            // Pure percentage of weighted points earned
+            calculatedScore = Math.round((earnedPoints / maxPossiblePoints) * 100);
             
+            // The Corporate Reality Ceiling: If you miss ANY critical 'Must-Have' skill, 
+            // you are heavily penalized and mathematically cannot score above an 82.
+            const missedCritical = extractedSkills.some(item => item.isCritical && !found.includes(item.skill));
+            if (missedCritical && calculatedScore > 82) {
+                calculatedScore = 82;
+            }
+            
+            // Hard floor to prevent zeros
             if (calculatedScore < 15) calculatedScore = 15;
             if (calculatedScore > 100) calculatedScore = 100;
-            
-            if (missing.length > 0 && calculatedScore > 89) calculatedScore = 89;
-            if (missing.length >= 3 && calculatedScore > 65) calculatedScore = 65;
         }
 
         return res.status(200).json({
