@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         - "bonus": Nice-to-have skills.
         For each, provide an array of 2-3 common synonyms (e.g., "Kubernetes", "K8s").
         
-        TASK 2 (CANDIDATE TIMELINE): Parse the candidate's work experience into a chronological structure. Extract the job title, a boolean indicating if it is their current/most recent job, and an array of their exact bullet points.
+        TASK 2 (CANDIDATE TIMELINE): Parse the candidate's work experience into a chronological structure. For each role, extract the "company", "title", "startDate" (YYYY-MM), "endDate" (YYYY-MM or "Present"), a boolean "isCurrent", and an array of their exact bullet points.
         
         TASK 3 (CRITIQUE): Provide a brutal, section-by-section critique calling out weak bullet points, missing quantifiable metrics, and poor phrasing.
         
@@ -34,10 +34,10 @@ export default async function handler(req, res) {
         CRITICAL: Return ONLY valid JSON matching this schema:
         {
             "requirements": [
-                { "skill": "Python", "tier": "critical", "synonyms": ["Python 3", "Python3"] }
+                { "skill": "C++", "tier": "critical", "synonyms": ["CPP"] }
             ],
             "experienceTimeline": [
-                { "title": "Software Engineer", "isCurrent": true, "bullets": ["Led migration to AWS...", "Fixed bugs."] }
+                { "company": "Tech Inc", "title": "Software Engineer", "startDate": "2020-05", "endDate": "Present", "isCurrent": true, "bullets": ["Led migration to AWS...", "Fixed bugs."] }
             ],
             "sectionCritiques": ["Experience: Bullet 2 lacks metrics. 'Fixed bugs' means nothing."]
         }`;
@@ -59,28 +59,45 @@ export default async function handler(req, res) {
         const timeline = Array.isArray(parsedData.experienceTimeline) ? parsedData.experienceTimeline : [];
         const critiquesArray = Array.isArray(parsedData.sectionCritiques) ? parsedData.sectionCritiques : ["Formatting optimization advised."];
 
-        // LAYER 2: EVIDENCE DENSITY HEURISTICS
+        // LAYER 2: TRAJECTORY & EVIDENCE DENSITY HEURISTICS
         let totalBullets = 0;
         let strongBullets = 0;
+        let totalMonths = 0;
+        let validRolesCount = 0;
         const strongVerbRegex = /^(architected|led|drove|spearheaded|engineered|developed|built|designed|launched|managed|scaled|optimized|increased|decreased|reduced)\b/i;
         
         timeline.forEach(role => {
+            // Calculate Tenure
+            if (role.startDate) {
+                const start = new Date(role.startDate);
+                let end = role.endDate && role.endDate.toLowerCase() !== 'present' ? new Date(role.endDate) : new Date();
+                if (!isNaN(start) && !isNaN(end)) {
+                    const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+                    if (months > 0) {
+                        totalMonths += months;
+                        validRolesCount++;
+                    }
+                }
+            }
+
+            // Calculate Evidence
             if (Array.isArray(role.bullets)) {
                 role.bullets.forEach(bullet => {
                     totalBullets++;
-                    // A strong bullet has numbers (metrics) or starts with an ownership verb
                     const hasMetrics = /\d/.test(bullet) || /[%$]/.test(bullet);
                     const hasOwnership = strongVerbRegex.test(bullet.trim());
-                    if (hasMetrics || hasOwnership) {
-                        strongBullets++;
-                    }
+                    if (hasMetrics || hasOwnership) strongBullets++;
                 });
             }
         });
         
-        // Evidence multiplier (0.0 to 1.0). If no bullets, default to 0.5 to prevent harsh 0s.
         const evidenceRatio = totalBullets > 0 ? (strongBullets / totalBullets) : 0.5;
-
+        const avgTenure = validRolesCount > 0 ? totalMonths / validRolesCount : 0;
+        
+        // Trajectory Multiplier: Job Hoppers (<12mo) get penalized. Stable engineers (>24mo) get a bonus.
+        let trajectoryMultiplier = 1.0;
+        if (validRolesCount > 1 && avgTenure < 12) trajectoryMultiplier = 0.85; 
+        else if (avgTenure >= 24) trajectoryMultiplier = 1.1; 
 
         // LAYER 3: SEMANTIC REGEX WITH RECENCY WEIGHTING
         const missing = [];
@@ -93,38 +110,32 @@ export default async function handler(req, res) {
             const isDealbreaker = req.tier === 'dealbreaker';
             const isCritical = req.tier === 'critical';
             
-            // Dealbreakers are gates, not points. Critical = 10, Bonus = 3.
             const weight = isDealbreaker ? 0 : (isCritical ? 10 : 3);
             maxPossiblePoints += weight;
 
+            // Safe regex that handles C++, .NET, C# without word boundary failures
             const searchTerms = [req.skill, ...(req.synonyms || [])].map(term => 
                 term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') 
             );
-            const regexPattern = new RegExp(`\\b(${searchTerms.join('|')})\\b`, 'i');
+            const regexPattern = new RegExp(`(?<![a-zA-Z0-9])(${searchTerms.join('|')})(?![a-zA-Z0-9])`, 'i');
 
-            let found = false;
-            let recencyMultiplier = 0;
+            let maxRecencyMultiplier = 0;
 
-            // Search the timeline to weigh recency
+            // Scan all roles, take the highest multiplier found
             for (const role of timeline) {
-                const roleText = `${role.title} ${Array.isArray(role.bullets) ? role.bullets.join(' ') : ''}`;
+                const roleText = `${role.title} ${role.company || ''} ${Array.isArray(role.bullets) ? role.bullets.join(' ') : ''}`;
                 if (regexPattern.test(roleText)) {
-                    found = true;
-                    // Current roles get 100% credit. Older roles decay to 60% credit.
-                    recencyMultiplier = role.isCurrent ? 1.0 : 0.6;
-                    break; 
+                    maxRecencyMultiplier = Math.max(maxRecencyMultiplier, role.isCurrent ? 1.0 : 0.6);
                 }
             }
 
-            // Fallback: If not in a specific role, check the raw text (e.g., a "Skills" list at the bottom).
-            // Skills dumped in a list without context only get 40% credit.
-            if (!found && regexPattern.test(resumeText)) {
-                found = true;
-                recencyMultiplier = 0.4;
+            // Fallback to unstructured text at a 40% penalty
+            if (maxRecencyMultiplier === 0 && regexPattern.test(resumeText)) {
+                maxRecencyMultiplier = 0.4;
             }
 
-            if (found) {
-                earnedPoints += (weight * recencyMultiplier);
+            if (maxRecencyMultiplier > 0) {
+                earnedPoints += (weight * maxRecencyMultiplier);
             } else {
                 missing.push(req.skill);
                 if (isDealbreaker) dealbreakersMissed++;
@@ -134,33 +145,46 @@ export default async function handler(req, res) {
 
         // LAYER 4: THE CORPORATE REALITY GUILLOTINE (Math)
         let calculatedScore = 0;
+        let keywordScore = 0;
+        
         if (maxPossiblePoints > 0) {
-            // Keywords make up 75% of the score. Evidence Density makes up 25%.
-            const keywordScore = (earnedPoints / maxPossiblePoints) * 75;
-            const evidenceScore = evidenceRatio * 25;
-            
-            calculatedScore = Math.round(keywordScore + evidenceScore);
-            
-            // The Guillotines
-            if (dealbreakersMissed > 0) {
-                // Miss a dealbreaker? Auto-reject ceiling.
-                calculatedScore = Math.min(calculatedScore, 20);
-                critiquesArray.unshift(`🚨 DEALBREAKER MISSING: You are missing critical gating requirements (${missing.slice(0,2).join(', ')}). This resume would be auto-rejected.`);
-            } else if (criticalMissed > 0) {
-                // Miss a core requirement? Hard cap at 75.
-                calculatedScore = Math.min(calculatedScore, 75);
-            }
-            
-            // Hard floors and ceilings
-            if (calculatedScore < 15) calculatedScore = 15;
-            if (calculatedScore > 100) calculatedScore = 100;
+            keywordScore = (earnedPoints / maxPossiblePoints) * 75;
+        } else {
+            keywordScore = dealbreakersMissed > 0 ? 0 : 75; // Edge case fix
         }
 
-        // Return the payload exactly as the frontend expects it
+        const evidenceScore = Math.min(evidenceRatio * 25 * trajectoryMultiplier, 25);
+        calculatedScore = Math.round(keywordScore + evidenceScore);
+        
+        // The Guillotines
+        if (dealbreakersMissed > 0) {
+            calculatedScore = Math.min(calculatedScore, 20);
+            critiquesArray.unshift(`🚨 DEALBREAKER MISSING: You are missing absolute requirements (${missing.slice(0,2).join(', ')}). This is an auto-reject.`);
+        } else if (criticalMissed > 0) {
+            // Dynamic Cap: 1 missed = max 70, 2 missed = max 55, 3 missed = max 40
+            const dynamicCap = Math.max(40, 85 - (criticalMissed * 15));
+            calculatedScore = Math.min(calculatedScore, dynamicCap);
+            critiquesArray.unshift(`⚠️ CRITICAL MISSING: You missed ${criticalMissed} core skills. Your score has been forcefully capped at ${dynamicCap}.`);
+        }
+        
+        // Hard floors and ceilings
+        if (calculatedScore < 15) calculatedScore = 15;
+        if (calculatedScore > 100) calculatedScore = 100;
+
+        // LAYER 5: EXPLAINABLE PAYLOAD RETURN
         return res.status(200).json({
             score: calculatedScore,
             sectionCritiques: critiquesArray,
-            missingKeywords: missing
+            missingKeywords: missing,
+            breakdown: {
+                keywordScore: Math.round(keywordScore),
+                evidenceScore: Math.round(evidenceScore),
+                evidenceRatio: Number(evidenceRatio.toFixed(2)),
+                trajectoryMultiplier: Number(trajectoryMultiplier.toFixed(2)),
+                averageTenureMonths: Math.round(avgTenure),
+                dealbreakersMissed,
+                criticalMissed
+            }
         });
 
     } catch (error) {
