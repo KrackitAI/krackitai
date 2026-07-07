@@ -1,16 +1,17 @@
 import { Groq } from "groq-sdk";
 
-// 🚨 FIX 1: Increase payload size limit so large PDF text dumps don't crash the server
+// Vercel/Next.js Pages Router function config.
+// NOTE: maxDuration must live INSIDE this config object for Pages Router API routes.
+// A separate top-level `export const maxDuration = 60` is the App Router convention
+// and is silently ignored here, leaving you on the platform default timeout.
 export const config = {
     api: {
         bodyParser: {
-            sizeLimit: '5mb', 
+            sizeLimit: '5mb',
         },
     },
+    maxDuration: 60,
 };
-
-// 🚨 FIX 2: Vercel timeout override to prevent the 10-second death
-export const maxDuration = 60; 
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
 
     try {
         const { resumeText, jobDescription } = req.body;
-        
+
         if (!resumeText) {
             return res.status(400).json({ error: 'Missing resume context data profile.' });
         }
@@ -57,43 +58,47 @@ export default async function handler(req, res) {
         }`;
 
         const completion = await groq.chat.completions.create({
-            // 🚨 FIX 4: Replaced the deprecated model with a stable Groq model
+            // FIX: llama3-8b-8192 and its successor llama-3.1-8b-instant are both
+            // decommissioned on Groq. Current recommended replacement: openai/gpt-oss-20b.
             model: "openai/gpt-oss-20b",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `CANDIDATE RESUME TEXT:\n\n${resumeText}` }
             ],
-            temperature: 0.0, 
-            max_tokens: 1500, 
+            temperature: 0.0,
+            max_tokens: 1500,
             response_format: { type: "json_object" }
         });
 
-        // 🚨 FIX 3: Aggressive JSON Sanitization (Safely escaped so it won't cut off)
+        // Defensive JSON sanitization in case the model wraps output in markdown fences
         let rawContent = completion.choices[0].message.content.trim();
         const backticks = String.fromCharCode(96, 96, 96);
-        rawContent = rawContent.replace(new RegExp('^' + backticks + '(?:json)?\\n?', 'gi'), '').replace(new RegExp(backticks + '$', 'g'), '').trim();
-        
+        rawContent = rawContent
+            .replace(new RegExp('^' + backticks + '(?:json)?\\n?', 'gi'), '')
+            .replace(new RegExp(backticks + '$', 'g'), '')
+            .trim();
+
         console.log("ATS ENGINE: Groq parsing successful. Calculating math...");
 
         const parsedData = JSON.parse(rawContent);
-        
+
         const requirements = Array.isArray(parsedData.requirements) ? parsedData.requirements : [];
         const timeline = Array.isArray(parsedData.experienceTimeline) ? parsedData.experienceTimeline : [];
         const critiquesArray = Array.isArray(parsedData.sectionCritiques) ? parsedData.sectionCritiques : ["Formatting optimization advised."];
 
         // LAYER 2: EVIDENCE DENSITY HEURISTICS (Lightning Fast JS String Parsing)
-        const resumeLines = resumeText.split('\n').filter(line => line.trim().length > 30); 
+        const resumeLines = resumeText.split('\n').filter(line => line.trim().length > 30);
         let strongBullets = 0;
         let totalMonths = 0;
         let validRolesCount = 0;
         const strongVerbRegex = /\b(architected|led|drove|spearheaded|engineered|developed|built|designed|launched|managed|scaled|optimized|increased|decreased|reduced)\b/i;
-        
+
         resumeLines.forEach(line => {
             const hasMetrics = /\d/.test(line) || /[%$]/.test(line);
             const hasOwnership = strongVerbRegex.test(line);
             if (hasMetrics || hasOwnership) strongBullets++;
         });
-        
+
         const evidenceRatio = resumeLines.length > 0 ? (strongBullets / resumeLines.length) : 0.5;
 
         // Calculate Tenure and Trajectory
@@ -110,11 +115,11 @@ export default async function handler(req, res) {
                 }
             }
         });
-        
+
         const avgTenure = validRolesCount > 0 ? totalMonths / validRolesCount : 0;
         let trajectoryMultiplier = 1.0;
-        if (validRolesCount > 1 && avgTenure < 12) trajectoryMultiplier = 0.85; 
-        else if (avgTenure >= 24) trajectoryMultiplier = 1.1; 
+        if (validRolesCount > 1 && avgTenure < 12) trajectoryMultiplier = 0.85;
+        else if (avgTenure >= 24) trajectoryMultiplier = 1.1;
 
         // LAYER 3: SEMANTIC REGEX WITH TRUE RECENCY WEIGHTING
         const missing = [];
@@ -126,13 +131,13 @@ export default async function handler(req, res) {
         requirements.forEach(req => {
             const isDealbreaker = req.tier === 'dealbreaker';
             const isCritical = req.tier === 'critical';
-            
+
             const weight = isDealbreaker ? 0 : (isCritical ? 10 : 3);
             maxPossiblePoints += weight;
 
             // Safe regex that handles C++, .NET without word boundary failures
-            const searchTerms = [req.skill, ...(req.synonyms || [])].map(term => 
-                term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') 
+            const searchTerms = [req.skill, ...(req.synonyms || [])].map(term =>
+                term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
             );
             const regexPattern = new RegExp(`(?<![a-zA-Z0-9])(${searchTerms.join('|')})(?![a-zA-Z0-9])`, 'i');
 
@@ -142,8 +147,8 @@ export default async function handler(req, res) {
             // PROPER RECENCY CHECK: Scan the specific skills tied to each job era
             for (const role of timeline) {
                 const roleSkillsBlob = Array.isArray(role.skillsUsed) ? role.skillsUsed.join(' ') : '';
-                
-                if (regexPattern.test(roleSkillsBlob)) { 
+
+                if (regexPattern.test(roleSkillsBlob)) {
                     maxRecencyMultiplier = Math.max(maxRecencyMultiplier, role.isCurrent ? 1.0 : 0.6);
                     foundInTimeline = true;
                 }
@@ -166,26 +171,26 @@ export default async function handler(req, res) {
         // LAYER 4: THE CORPORATE REALITY GUILLOTINE
         let calculatedScore = 0;
         let keywordScore = 0;
-        
+
         if (maxPossiblePoints > 0) {
             keywordScore = (earnedPoints / maxPossiblePoints) * 75;
         } else {
-            keywordScore = dealbreakersMissed > 0 ? 0 : 75; 
+            keywordScore = dealbreakersMissed > 0 ? 0 : 75;
         }
 
         const evidenceScore = Math.min(evidenceRatio * 25 * trajectoryMultiplier, 25);
         calculatedScore = Math.round(keywordScore + evidenceScore);
-        
+
         if (dealbreakersMissed > 0) {
             calculatedScore = Math.min(calculatedScore, 20);
-            critiquesArray.unshift(`🚨 DEALBREAKER MISSING: You are missing absolute requirements (${missing.slice(0,2).join(', ')}). This is an auto-reject.`);
+            critiquesArray.unshift(`🚨 DEALBREAKER MISSING: You are missing absolute requirements (${missing.slice(0, 2).join(', ')}). This is an auto-reject.`);
         } else if (criticalMissed > 0) {
             // Dynamic Cap: 1 missed = max 70, 2 missed = max 55, 3 missed = max 40
             const dynamicCap = Math.max(40, 85 - (criticalMissed * 15));
             calculatedScore = Math.min(calculatedScore, dynamicCap);
             critiquesArray.unshift(`⚠️ CRITICAL MISSING: You missed ${criticalMissed} core skills. Your score has been forcefully capped at ${dynamicCap}.`);
         }
-        
+
         if (calculatedScore < 15) calculatedScore = 15;
         if (calculatedScore > 100) calculatedScore = 100;
 
