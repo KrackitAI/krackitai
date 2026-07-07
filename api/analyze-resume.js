@@ -58,7 +58,7 @@ export default async function handler(req, res) {
 
         const completion = await groq.chat.completions.create({
             // 🚨 FIX 4: Replaced the deprecated model with a stable Groq model
-            model: "llama3-8b-8192",
+            model: "openai/gpt-oss-20b",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `CANDIDATE RESUME TEXT:\n\n${resumeText}` }
