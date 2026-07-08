@@ -67,7 +67,52 @@ export default async function handler(req, res) {
             ],
             temperature: 0.0,
             max_tokens: 1500,
-            response_format: { type: "json_object" }
+            response_format: {
+                type: "json_schema",
+                json_schema: {
+                    name: "resume_analysis",
+                    strict: true,
+                    schema: {
+                        type: "object",
+                        properties: {
+                            requirements: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        skill: { type: "string" },
+                                        tier: { type: "string", enum: ["dealbreaker", "critical", "bonus"] },
+                                        synonyms: { type: "array", items: { type: "string" } }
+                                    },
+                                    required: ["skill", "tier", "synonyms"],
+                                    additionalProperties: false
+                                }
+                            },
+                            experienceTimeline: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        company: { type: "string" },
+                                        startDate: { type: "string" },
+                                        endDate: { type: "string" },
+                                        isCurrent: { type: "boolean" },
+                                        skillsUsed: { type: "array", items: { type: "string" } }
+                                    },
+                                    required: ["company", "startDate", "endDate", "isCurrent", "skillsUsed"],
+                                    additionalProperties: false
+                                }
+                            },
+                            sectionCritiques: {
+                                type: "array",
+                                items: { type: "string" }
+                            }
+                        },
+                        required: ["requirements", "experienceTimeline", "sectionCritiques"],
+                        additionalProperties: false
+                    }
+                }
+            }
         });
 
         // Defensive JSON sanitization in case the model wraps output in markdown fences
