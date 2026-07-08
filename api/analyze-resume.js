@@ -66,7 +66,8 @@ export default async function handler(req, res) {
                 { role: "user", content: `CANDIDATE RESUME TEXT:\n\n${resumeText}` }
             ],
             temperature: 0.0,
-            max_tokens: 1500,
+            max_completion_tokens: 3000,
+            reasoning_effort: "low",
             response_format: {
                 type: "json_schema",
                 json_schema: {
