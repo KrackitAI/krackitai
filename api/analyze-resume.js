@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         
         TASK 3 (CRITIQUE): Provide a brutal, section-by-section critique calling out weak bullet points, missing quantifiable metrics, and poor phrasing.
         
-        ${isTealMode ? `TARGET JOB DESCRIPTION:\n${jobDescription}\n\n` : 'If no JD is provided, extract 10 standard industry skills based on the candidate\\'s resume as "critical".\n\n'}
+        ${isTealMode ? `TARGET JOB DESCRIPTION:\n${jobDescription}\n\n` : 'If no JD is provided, extract 10 standard industry skills based on the candidate\'s resume as "critical".\n\n'}
         
         CRITICAL: Return ONLY valid JSON matching this schema:
         {
