@@ -1,9 +1,9 @@
 import { Groq } from "groq-sdk";
+import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
 // Vercel/Next.js Pages Router function config.
 // NOTE: maxDuration must live INSIDE this config object for Pages Router API routes.
-// A separate top-level `export const maxDuration = 60` is the App Router convention
-// and is silently ignored here, leaving you on the platform default timeout.
 export const config = {
     api: {
         bodyParser: {
@@ -13,15 +13,263 @@ export const config = {
     maxDuration: 60,
 };
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
 
+function sanitizeJson(rawContent) {
+    const backticks = String.fromCharCode(96, 96, 96);
+    return rawContent
+        .trim()
+        .replace(new RegExp('^' + backticks + '(?:json)?\\n?', 'gi'), '')
+        .replace(new RegExp(backticks + '$', 'g'), '')
+        .trim();
+}
+
+const REQUIREMENTS_SCHEMA = {
+    type: "object",
+    properties: {
+        requirements: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    skill: { type: "string" },
+                    tier: { type: "string", enum: ["dealbreaker", "critical", "bonus"] },
+                    synonyms: { type: "array", items: { type: "string" } }
+                },
+                required: ["skill", "tier", "synonyms"],
+                additionalProperties: false
+            }
+        }
+    },
+    required: ["requirements"],
+    additionalProperties: false
+};
+
+const CANDIDATE_SCHEMA = {
+    type: "object",
+    properties: {
+        experienceTimeline: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    company: { type: "string" },
+                    startDate: { type: "string" },
+                    endDate: { type: "string" },
+                    isCurrent: { type: "boolean" },
+                    skillsUsed: { type: "array", items: { type: "string" } }
+                },
+                required: ["company", "startDate", "endDate", "isCurrent", "skillsUsed"],
+                additionalProperties: false
+            }
+        },
+        sectionCritiques: { type: "array", items: { type: "string" } }
+    },
+    required: ["experienceTimeline", "sectionCritiques"],
+    additionalProperties: false
+};
+
+// ---------------------------------------------------------------------------
+// STEP A: Extract tiered requirements from the JOB DESCRIPTION ONLY.
+// This is intentionally independent of any candidate resume, so every
+// applicant to the same job is judged against the exact same yardstick.
+// Result is cached (see getCachedRequirements/saveCachedRequirements) so
+// this only runs once per unique job description, not once per resume.
+// ---------------------------------------------------------------------------
+async function extractRequirementsFromJD(groq, jobDescription) {
+    const systemPrompt = `You are a ruthless, top-tier FAANG Technical Recruiter.
+
+TASK: Extract exactly 10 to 12 skills required from the Job Description into three strict tiers:
+- "dealbreaker": Absolute mandatory requirements (e.g., specific clearances, required degrees, core languages).
+- "critical": Core skills necessary for the job.
+- "bonus": Nice-to-have skills.
+For each, provide an array of 2-3 common synonyms or formatting variations (e.g., "Kubernetes", "K8s").
+
+IMPORTANT: This tiering will be reused as the fixed scoring rubric for every candidate who applies to this exact job. Base your tiers ONLY on the job description text below — do not consider any specific candidate.
+
+JOB DESCRIPTION:
+${jobDescription}
+
+Return ONLY valid JSON matching the schema.`;
+
+    const completion = await groq.chat.completions.create({
+        model: "openai/gpt-oss-20b",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: "Extract the tiered requirements now." }
+        ],
+        temperature: 0.0,
+        max_completion_tokens: 1500,
+        reasoning_effort: "low",
+        response_format: {
+            type: "json_schema",
+            json_schema: { name: "requirements_extraction", strict: true, schema: REQUIREMENTS_SCHEMA }
+        }
+    });
+
+    const parsed = JSON.parse(sanitizeJson(completion.choices[0].message.content));
+    return Array.isArray(parsed.requirements) ? parsed.requirements : [];
+}
+
+// ---------------------------------------------------------------------------
+// STEP A (fallback): No JD was provided at all, so derive baseline skills
+// from the resume itself. This is inherently candidate-specific, so it is
+// NOT cached — there is no stable JD to key the cache on.
+// ---------------------------------------------------------------------------
+async function extractRequirementsFromResume(groq, resumeText) {
+    const systemPrompt = `You are a ruthless, top-tier FAANG Technical Recruiter.
+
+No job description was provided for this screening. Extract 10 standard industry skills based on the candidate's own resume below, and tier all of them as "critical". Provide 2-3 synonyms for each.
+
+CANDIDATE RESUME:
+${resumeText}
+
+Return ONLY valid JSON matching the schema.`;
+
+    const completion = await groq.chat.completions.create({
+        model: "openai/gpt-oss-20b",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: "Extract the requirements now." }
+        ],
+        temperature: 0.0,
+        max_completion_tokens: 1500,
+        reasoning_effort: "low",
+        response_format: {
+            type: "json_schema",
+            json_schema: { name: "requirements_extraction", strict: true, schema: REQUIREMENTS_SCHEMA }
+        }
+    });
+
+    const parsed = JSON.parse(sanitizeJson(completion.choices[0].message.content));
+    return Array.isArray(parsed.requirements) ? parsed.requirements : [];
+}
+
+// ---------------------------------------------------------------------------
+// STEP B: Parse this specific candidate's timeline and write the critique,
+// against the ALREADY FIXED requirements list from Step A. This call never
+// re-derives or reinterprets what the job requires.
+// ---------------------------------------------------------------------------
+async function analyzeCandidate(groq, resumeText, requirements) {
+    const requirementsSummary = requirements
+        .map(r => `${r.skill} (${r.tier})`)
+        .join(', ');
+
+    const systemPrompt = `You are a ruthless, top-tier FAANG Technical Recruiter and Data Extractor.
+
+The job's required skills have ALREADY been determined and are FIXED for this screening. Do not reinterpret, add to, or remove from this list — just use it as context:
+${requirementsSummary}
+
+TASK 1 (CANDIDATE TIMELINE): Parse the candidate's chronological work experience. For each role, extract "company", "startDate" (YYYY-MM), "endDate", "isCurrent", and a concise array of "skillsUsed" in that specific role. DO NOT extract full sentences or bullet points.
+
+TASK 2 (CRITIQUE): Provide a brutal, section-by-section critique calling out weak bullet points, missing quantifiable metrics, poor phrasing, and any of the fixed required skills above that appear absent from this candidate's background.
+
+CANDIDATE RESUME TEXT:
+${resumeText}
+
+Return ONLY valid JSON matching the schema.`;
+
+    const completion = await groq.chat.completions.create({
+        model: "openai/gpt-oss-20b",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: "Analyze this candidate now." }
+        ],
+        temperature: 0.0,
+        max_completion_tokens: 2500,
+        reasoning_effort: "low",
+        response_format: {
+            type: "json_schema",
+            json_schema: { name: "candidate_analysis", strict: true, schema: CANDIDATE_SCHEMA }
+        }
+    });
+
+    const parsed = JSON.parse(sanitizeJson(completion.choices[0].message.content));
+    return {
+        timeline: Array.isArray(parsed.experienceTimeline) ? parsed.experienceTimeline : [],
+        critiques: Array.isArray(parsed.sectionCritiques) ? parsed.sectionCritiques : ["Formatting optimization advised."]
+    };
+}
+
+// ---------------------------------------------------------------------------
+// Requirement cache (Supabase). Fails OPEN: any cache error just means we
+// fall back to a fresh LLM extraction rather than crashing the request.
+// ---------------------------------------------------------------------------
+async function getCachedRequirements(supabase, jdHash) {
+    if (!supabase) return null;
+    try {
+        const { data, error } = await supabase
+            .from('jd_requirements_cache')
+            .select('requirements')
+            .eq('jd_hash', jdHash)
+            .maybeSingle();
+        if (error) {
+            console.error("Cache read error (continuing without cache):", error.message);
+            return null;
+        }
+        return data ? data.requirements : null;
+    } catch (err) {
+        console.error("Cache read exception (continuing without cache):", err.message);
+        return null;
+    }
+}
+
+async function saveCachedRequirements(supabase, jdHash, requirements) {
+    if (!supabase || !jdHash) return;
+    try {
+        await supabase
+            .from('jd_requirements_cache')
+            .upsert({ jd_hash: jdHash, requirements }, { onConflict: 'jd_hash' });
+    } catch (err) {
+        console.error("Cache write exception (non-fatal):", err.message);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Employer override support: lets a hiring manager correct the LLM's tier
+// assignment for specific skills (e.g. bump "C++" from critical -> dealbreaker).
+// Expects req.body.requirementOverrides = [{ skill: "C++", tier: "dealbreaker" }, ...]
+// ---------------------------------------------------------------------------
+function applyOverrides(requirements, overrides) {
+    if (!Array.isArray(overrides) || overrides.length === 0) return requirements;
+
+    const overrideMap = new Map(
+        overrides
+            .filter(o => o && typeof o.skill === 'string' && typeof o.tier === 'string')
+            .map(o => [o.skill.trim().toLowerCase(), o.tier])
+    );
+
+    return requirements.map(req => {
+        const overrideTier = overrideMap.get((req.skill || '').trim().toLowerCase());
+        return overrideTier ? { ...req, tier: overrideTier } : req;
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Main handler
+// ---------------------------------------------------------------------------
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    if (!process.env.GROQ_API_KEY) {
+        return res.status(500).json({ error: 'GROQ_API_KEY is not configured on the server.' });
+    }
+
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+    let supabase = null;
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    } else {
+        console.warn("ATS ENGINE: Supabase not fully configured — JD requirement caching disabled for this request.");
+    }
+
     try {
-        const { resumeText, jobDescription } = req.body;
+        const { resumeText, jobDescription, requirementOverrides } = req.body;
 
         if (!resumeText) {
             return res.status(400).json({ error: 'Missing resume context data profile.' });
@@ -29,108 +277,41 @@ export default async function handler(req, res) {
 
         const isTealMode = jobDescription && jobDescription.length > 50;
 
-        console.log("ATS ENGINE: Initiating Groq parsing...");
+        console.log("ATS ENGINE: Resolving job requirements...");
 
-        // LAYER 1: TIMELINE PARSING & REQUIREMENT TRIAGE
-        const systemPrompt = `You are a ruthless, top-tier FAANG Technical Recruiter and Data Extractor. 
-        
-        TASK 1 (REQUIREMENTS): Extract exactly 10 to 12 skills from the Job Description into three strict tiers:
-        - "dealbreaker": Absolute mandatory requirements (e.g., specific clearances, required degrees, core languages).
-        - "critical": Core skills necessary for the job.
-        - "bonus": Nice-to-have skills.
-        For each, provide an array of 2-3 common synonyms (e.g., "Kubernetes", "K8s").
-        
-        TASK 2 (CANDIDATE TIMELINE): Parse the candidate's chronological work experience. For each role, extract "company", "startDate" (YYYY-MM), "endDate", "isCurrent", and a concise array of "skillsUsed" in that specific role. DO NOT extract full sentences or bullet points.
-        
-        TASK 3 (CRITIQUE): Provide a brutal, section-by-section critique calling out weak bullet points, missing quantifiable metrics, and poor phrasing.
-        
-        ${isTealMode ? `TARGET JOB DESCRIPTION:\n${jobDescription}\n\n` : 'If no JD is provided, extract 10 standard industry skills based on the candidate\'s resume as "critical".\n\n'}
-        
-        CRITICAL: Return ONLY valid JSON matching this schema:
-        {
-            "requirements": [
-                { "skill": "C++", "tier": "critical", "synonyms": ["CPP"] }
-            ],
-            "experienceTimeline": [
-                { "company": "Tech Inc", "startDate": "2020-05", "endDate": "Present", "isCurrent": true, "skillsUsed": ["AWS", "Docker", "Python"] }
-            ],
-            "sectionCritiques": ["Experience: Bullet 2 lacks metrics. 'Fixed bugs' means nothing."]
-        }`;
+        let requirements;
+        let jdHash = null;
 
-        const completion = await groq.chat.completions.create({
-            // FIX: llama3-8b-8192 and its successor llama-3.1-8b-instant are both
-            // decommissioned on Groq. Current recommended replacement: openai/gpt-oss-20b.
-            model: "openai/gpt-oss-20b",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: `CANDIDATE RESUME TEXT:\n\n${resumeText}` }
-            ],
-            temperature: 0.0,
-            max_completion_tokens: 3000,
-            reasoning_effort: "low",
-            response_format: {
-                type: "json_schema",
-                json_schema: {
-                    name: "resume_analysis",
-                    strict: true,
-                    schema: {
-                        type: "object",
-                        properties: {
-                            requirements: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        skill: { type: "string" },
-                                        tier: { type: "string", enum: ["dealbreaker", "critical", "bonus"] },
-                                        synonyms: { type: "array", items: { type: "string" } }
-                                    },
-                                    required: ["skill", "tier", "synonyms"],
-                                    additionalProperties: false
-                                }
-                            },
-                            experienceTimeline: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        company: { type: "string" },
-                                        startDate: { type: "string" },
-                                        endDate: { type: "string" },
-                                        isCurrent: { type: "boolean" },
-                                        skillsUsed: { type: "array", items: { type: "string" } }
-                                    },
-                                    required: ["company", "startDate", "endDate", "isCurrent", "skillsUsed"],
-                                    additionalProperties: false
-                                }
-                            },
-                            sectionCritiques: {
-                                type: "array",
-                                items: { type: "string" }
-                            }
-                        },
-                        required: ["requirements", "experienceTimeline", "sectionCritiques"],
-                        additionalProperties: false
-                    }
-                }
+        if (isTealMode) {
+            jdHash = crypto.createHash('sha256').update(jobDescription.trim()).digest('hex');
+            requirements = await getCachedRequirements(supabase, jdHash);
+
+            if (requirements && requirements.length > 0) {
+                console.log("ATS ENGINE: Cache hit — reusing existing requirement tiers for this JD.");
+            } else {
+                console.log("ATS ENGINE: No cache hit — extracting requirements from JD via Groq...");
+                requirements = await extractRequirementsFromJD(groq, jobDescription);
+                await saveCachedRequirements(supabase, jdHash, requirements);
             }
-        });
+        } else {
+            console.log("ATS ENGINE: No JD provided — deriving baseline requirements from resume (not cached).");
+            requirements = await extractRequirementsFromResume(groq, resumeText);
+        }
 
-        // Defensive JSON sanitization in case the model wraps output in markdown fences
-        let rawContent = completion.choices[0].message.content.trim();
-        const backticks = String.fromCharCode(96, 96, 96);
-        rawContent = rawContent
-            .replace(new RegExp('^' + backticks + '(?:json)?\\n?', 'gi'), '')
-            .replace(new RegExp(backticks + '$', 'g'), '')
-            .trim();
+        // Apply any employer-provided tier corrections, and persist them for
+        // future candidates screened against this same job description.
+        if (Array.isArray(requirementOverrides) && requirementOverrides.length > 0) {
+            requirements = applyOverrides(requirements, requirementOverrides);
+            if (jdHash) {
+                await saveCachedRequirements(supabase, jdHash, requirements);
+            }
+        }
 
-        console.log("ATS ENGINE: Groq parsing successful. Calculating math...");
+        console.log("ATS ENGINE: Analyzing candidate against fixed requirements...");
+        const { timeline, critiques: parsedCritiques } = await analyzeCandidate(groq, resumeText, requirements);
+        const critiquesArray = parsedCritiques;
 
-        const parsedData = JSON.parse(rawContent);
-
-        const requirements = Array.isArray(parsedData.requirements) ? parsedData.requirements : [];
-        const timeline = Array.isArray(parsedData.experienceTimeline) ? parsedData.experienceTimeline : [];
-        const critiquesArray = Array.isArray(parsedData.sectionCritiques) ? parsedData.sectionCritiques : ["Formatting optimization advised."];
+        console.log("ATS ENGINE: Candidate parsed. Calculating math...");
 
         // LAYER 2: EVIDENCE DENSITY HEURISTICS (Lightning Fast JS String Parsing)
         const resumeLines = resumeText.split('\n').filter(line => line.trim().length > 30);
@@ -247,6 +428,9 @@ export default async function handler(req, res) {
             score: calculatedScore,
             sectionCritiques: critiquesArray,
             missingKeywords: missing,
+            // Echoed back so a frontend can show/edit tiers and resend as
+            // requirementOverrides on a future request against this same JD.
+            appliedRequirements: requirements,
             breakdown: {
                 keywordScore: Math.round(keywordScore),
                 evidenceScore: Math.round(evidenceScore),
