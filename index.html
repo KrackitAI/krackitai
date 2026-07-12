@@ -7,7 +7,6 @@
     <title>Krackit - Adaptive AI Interview Coach</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -35,7 +34,7 @@
 </div>
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
-            <button type="button" onclick="closeInlineAuthWall()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+            <button type="button" onclick="closeInlineAuthWall()" aria-label="Close" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1 select-none">
                 <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
@@ -53,11 +52,11 @@
 
             <div class="space-y-4">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
+                    <label for="overlay-auth-email" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
                     <input type="email" id="overlay-auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
+                    <label for="overlay-auth-password" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
                     <input type="password" id="overlay-auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
                 </div>
 
@@ -101,19 +100,19 @@
 
             <div id="analytics-dashboard-wrapper" class="hidden space-y-4 shrink-0">
                 <div class="bg-neutral-900/20 border border-neutral-900 rounded-xl p-4">
-                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 mb-3">Interview Score Trajectory</h4>
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 mb-3">Score Over Time</h4>
                     <div class="w-full h-40">
                         <canvas id="scoreTrendChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-rose-950/10 border border-rose-900/30 rounded-xl p-4">
-                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-rose-500 mb-2">🚨 Priority Weaknesses to Remediate</h4>
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-rose-500 mb-2">🚨 Recurring Weaknesses</h4>
                     <ul id="recurring-gaps-list" class="space-y-2 text-xs text-neutral-300"></ul>
                 </div>
             </div>
 
             <div class="flex-1 flex flex-col min-h-0">
-                <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 pb-3 border-b border-neutral-900 shrink-0">Raw Session Logs</h4>
+                <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 pb-3 border-b border-neutral-900 shrink-0">Session History</h4>
                 <div id="history-rows-container" class="space-y-3 pt-3 overflow-y-auto pr-1"></div>
             </div>
 
@@ -123,7 +122,7 @@
     <header id="marketing-hero-section" class="max-w-4xl mx-auto px-4 pt-20 pb-16 text-center space-y-8 select-none">
         <div class="space-y-4">
             <span class="mx-auto bg-neutral-900 border border-neutral-800 text-[10px] text-neutral-400 font-mono tracking-widest uppercase px-3 py-1.5 rounded-full block w-max shadow-inner">
-                ⚡ Adaptive Technical Simulation Engine
+                ⚡ Adaptive AI Interview Practice
             </span>
             <h1 class="text-5xl md:text-6xl font-black tracking-tight text-white max-w-3xl mx-auto leading-[1.1]">
                 Technical interviews are <span class="text-[#FFE500]">passed</span>, not just studied.
@@ -163,17 +162,17 @@
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
                 <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                 <span class="text-sm font-bold text-white block tracking-tight">Adaptive Drilling</span>
-                <p class="text-neutral-500 text-xs leading-relaxed">Evaluates data matrices dynamically. Challenges vague responses with deeper technical follow-ups.</p>
+                <p class="text-neutral-500 text-xs leading-relaxed">Adapts to your answers in real time and pushes back on vague responses with deeper follow-up questions.</p>
             </div>
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
                 <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 <span class="text-sm font-bold text-white block tracking-tight">ATS Screening</span>
-                <p class="text-neutral-500 text-xs leading-relaxed">Scans profile layers to flag critical missing keywords and compute alignment ratings instantly.</p>
+                <p class="text-neutral-500 text-xs leading-relaxed">Scans your resume against the job description to flag missing keywords and score your match instantly.</p>
             </div>
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
                 <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                 <span class="text-sm font-bold text-white block tracking-tight">Audio Synthesis</span>
-                <p class="text-neutral-500 text-xs leading-relaxed">Toggle hyper-realistic voice workflows for realistic, conversational engineering pressure simulations.</p>
+                <p class="text-neutral-500 text-xs leading-relaxed">Switch on realistic AI voice for a more natural, conversational interview experience.</p>
             </div>
         </div>
     </header>
@@ -184,18 +183,18 @@
 
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black tracking-tight">Setup Interview Workspace</h2>
-                <p class="text-neutral-400 text-sm">Provide your target job context to initialize an adaptive premium voice or text session.</p>
+                <h2 class="text-3xl font-black tracking-tight">Set Up Your Interview</h2>
+                <p class="text-neutral-400 text-sm">Add the job details below to start a personalized voice or text interview.</p>
             </div>
 
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
                 <div class="space-y-2">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
+                    <label for="job-desc-input" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
                     <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description details here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
                 </div>
 
                 <div class="space-y-2.5">
-                    <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Your Background Profile</label>
+                    <span class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Your Background Profile</span>
                     <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
                         <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">📁 Upload PDF</button>
                         <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
@@ -242,11 +241,11 @@
 
                 <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-neutral-300">Enable AI Audio Output Agent</span>
+                        <label for="voice-synthesis-toggle" class="text-sm font-medium text-neutral-300">Enable AI Voice (Text-to-Speech)</label>
                         <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded cursor-pointer">
                     </div>
                     <div class="flex items-center justify-between pt-2 border-t border-neutral-900/50">
-                        <span class="text-xs font-bold tracking-wider text-neutral-500 uppercase">Interviewer Voice:</span>
+                        <label for="voice-select-dropdown" class="text-xs font-bold tracking-wider text-neutral-500 uppercase">Interviewer Voice:</label>
                         <select id="voice-select-dropdown" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#FFE500] cursor-pointer max-w-[180px] truncate">
                             <option value="">Loading voices...</option>
                         </select>
@@ -255,7 +254,7 @@
 
                 <div class="space-y-1">
                     <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview </button>
-                    <span class="text-[10px] text-neutral-500 tracking-wide block text-center font-medium select-none">Adaptive free sessions run on a strict 5:00 minute cognitive stamina window limit.</span>
+                    <span class="text-[10px] text-neutral-500 tracking-wide block text-center font-medium select-none">Free sessions are limited to 5 minutes.</span>
                 </div>
             </div>
         </div>
@@ -264,7 +263,7 @@
             <div class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 flex items-center justify-between gap-4 font-mono select-none">
                 <div class="flex items-center space-x-2 shrink-0">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Interviewer Capacity:</span>
+                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Time Remaining:</span>
                 </div>
                 <div class="w-full bg-neutral-950 h-2 border border-neutral-800/80 rounded-full overflow-hidden">
                     <div id="stamina-timer-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000" style="width: 100%"></div>
@@ -277,9 +276,9 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-neutral-900 pb-4 gap-4 sm:gap-0">
                 <div>
                     <h3 class="text-xl sm:text-2xl font-black text-white">Live AI Interview Panel</h3>
-                    <p class="text-[10px] sm:text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is gathering data matrices...</p>
+                    <p class="text-[10px] sm:text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is getting ready...</p>
                 </div>
-                <button onclick="finishAndWrapInterview()" class="w-full sm:w-auto text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-3 sm:py-2 rounded-xl font-bold transition-all text-center">✕ Abort Session</button>
+                <button onclick="finishAndWrapInterview()" class="w-full sm:w-auto text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-3 sm:py-2 rounded-xl font-bold transition-all text-center">✕ End Session</button>
             </div>
 
             <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden min-h-[140px] flex flex-col justify-center">
@@ -291,7 +290,7 @@
             <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                     <div class="space-y-0.5">
-                        <label class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Response Turn</label>
+                        <label for="sim-user-response-box" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Answer</label>
                         <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> on desktop to submit</span>
                     </div>
                     
@@ -323,8 +322,13 @@
     <div id="printable-report" class="space-y-8 bg-[#0a0a0a] p-2 md:p-6 rounded-2xl">
 
         <div class="border-b border-neutral-900 pb-5 text-center">
-            <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Evaluation Report Card</span>
-            <h2 class="text-3xl font-black text-white mt-1">Interview Diagnostic Feedback</h2>
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Your Results</span>
+            <h2 class="text-3xl font-black text-white mt-1">Interview Feedback</h2>
+        </div>
+
+        <div id="results-signin-nudge" class="hidden bg-[#FFE500]/10 border border-[#FFE500]/30 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <span class="text-neutral-200">💾 Sign in free to save this report and track your progress over time.</span>
+            <button type="button" onclick="triggerInlineAuthWall('signup')" class="shrink-0 bg-[#FFE500] hover:bg-[#ebd300] text-black font-bold px-4 py-2 rounded-lg text-xs transition-all cursor-pointer">Sign Up Free →</button>
         </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -353,12 +357,12 @@
             </div>
 
             <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Core Deficiencies to Remediate:</h4>
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Areas to Improve:</h4>
                 <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
             </div>
             
             <div class="border-t border-neutral-900 pt-6">
-                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Interaction Timeline:</h4>
+                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Transcript:</h4>
                 <div class="space-y-4" id="transcript-deck-target"></div>
             </div>
         </div> <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer shadow-lg">Return to Dashboard</button>       </div>
@@ -368,12 +372,12 @@
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
             <div class="space-y-2">
                 <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-lg font-black animate-pulse">⚠️</div>
-                <h4 class="text-lg font-black text-white tracking-tight">Abort Active Session?</h4>
+                <h4 class="text-lg font-black text-white tracking-tight">End This Session?</h4>
                 <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost.</p>
             </div>
             <div class="flex gap-3">
                 <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">Keep Practicing</button>
-                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, Abort 🏁</button>
+                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, End Session</button>
             </div>
         </div>
     </div>
@@ -385,21 +389,21 @@
                 <span class="text-3xl animate-pulse">🚨</span>
             </div>
             <div class="space-y-2">
-                <h3 class="text-2xl font-black tracking-tight text-white uppercase font-mono">Cognitive Capacity Blown</h3>
-                <p class="text-rose-400 text-xs font-bold font-mono tracking-wider uppercase">Stamina Clock Severed • Session Terminated</p>
+                <h3 class="text-2xl font-black tracking-tight text-white uppercase font-mono">Time's Up</h3>
+                <p class="text-rose-400 text-xs font-bold font-mono tracking-wider uppercase">Session Ended — Time Limit Reached</p>
                 <p class="text-neutral-400 text-sm max-w-xs mx-auto pt-1 leading-relaxed">
-                    You failed to present concise technical signal within the allocated time boundary context.
+                    You ran out of time before finishing. Here's your feedback based on what you completed.
                 </p>
             </div>
             <div class="inline-flex items-center space-x-2 bg-neutral-950 border border-neutral-900 px-4 py-2 rounded-xl text-xs font-mono text-neutral-500">
-                <span>Compiling diagnostic metrics panel in</span>
+                <span>Preparing your results in</span>
                 <span id="timeout-redirect-countdown" class="text-white font-black">3</span>s
             </div>
         </div>
     </div>
     <div id="beta-limit-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 text-center shadow-2xl relative">
-            <button type="button" onclick="closeBetaLimitModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+            <button type="button" onclick="closeBetaLimitModal()" aria-label="Close" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
             
             <div class="space-y-3">
                 <div class="w-14 h-14 bg-[#FFE500]/10 border border-[#FFE500]/20 text-[#FFE500] rounded-full flex items-center justify-center mx-auto text-2xl font-black mb-2 shadow-[0_0_15px_rgba(255,229,0,0.1)]">🚀</div>
@@ -421,7 +425,7 @@
     </div>
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md items-center justify-center p-4 overflow-y-auto">
         <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
-            <button type="button" onclick="closePaywallModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+            <button type="button" onclick="closePaywallModal()" aria-label="Close" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1">
                 <h3 class="text-2xl font-black tracking-tight text-white">Choose Your Workspace Tier</h3>
@@ -795,7 +799,7 @@
         }
 
         function toggleVoiceSpeechInput() {
-            if(!speechRecognitionEngine) { alert("Speech recognition unsupported."); return; }
+            if(!speechRecognitionEngine) { showCustomAlert("Speech recognition isn't supported in this browser.", "warning"); return; }
             if(!isMicrophoneListening) { try { speechRecognitionEngine.start(); } catch(err) { speechRecognitionEngine.stop(); } } 
             else { speechRecognitionEngine.stop(); }
         }
@@ -918,7 +922,7 @@
         function handleFileSelection(e) {
             const f = e.target.files[0];
             if(f) {
-                document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning context vectors...</p>`;
+                document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Reading your resume...</p>`;
                 
                 extractTextFromPDF(f).then(txt => {
                     extractedPdfTextState = txt;
@@ -927,7 +931,7 @@
                     document.getElementById('resume-file-card-preview').classList.remove('hidden');
                     executePreflightResumeScreening(txt);
                 }).catch(err => {
-                    alert("Engine failed processing PDF context structure: " + err.message);
+                    showCustomAlert("Couldn't process that PDF: " + err.message, "error");
                     resetFileSelectionState();
                 });
             }
@@ -975,7 +979,7 @@
             const critiqueMsg = document.getElementById('preflight-audit-critique-msg');
                 if (critiqueMsg) {
                     if (data.sectionCritiques && data.sectionCritiques.length > 0) {
-                        critiqueMsg.innerHTML = '<ul class="list-disc pl-4 space-y-2 mt-2 text-rose-300 font-medium italic text-[11px]">' + 
+                        critiqueMsg.innerHTML = '<ul class="list-disc pl-4 space-y-2 mt-2 text-rose-300 font-medium italic text-sm">' + 
                             data.sectionCritiques.map(c => `<li>${c}</li>`).join('') + 
                             '</ul>';
                     } else {
@@ -1015,7 +1019,7 @@
             document.getElementById('history-modal').classList.remove('hidden');
             const container = document.getElementById('history-rows-container');
             const dashboardWrapper = document.getElementById('analytics-dashboard-wrapper');
-            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Aggregating historical performance data...</p>`;
+            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Loading your session history...</p>`;
 
             try {
                 // Fetch all data, oldest to newest so the graph goes left to right
@@ -1027,7 +1031,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    container.innerHTML = `<p class="text-xs text-neutral-600 font-medium italic">No past simulation logs found on profile.</p>`;
+                    container.innerHTML = `<p class="text-xs text-neutral-600 font-medium italic">You haven't completed any sessions yet.</p>`;
                     dashboardWrapper.classList.add('hidden');
                     return;
                 }
@@ -1105,7 +1109,7 @@
                     const transcriptDeck = Array.isArray(row.transcript) ? row.transcript : [];
                     const atsScore = row.resume_screening_score || 0;
 
-                    let displayTitle = "Job Simulation Record";
+                    let displayTitle = "Interview Session";
                     if (row.job_description) {
                         const cleanLines = row.job_description.split('\n').filter(line => line.trim().length > 0);
                         if (cleanLines.length > 0) {
@@ -1121,10 +1125,10 @@
                         else if (msg.role === 'user' && questionBuffer && !msg.content.includes("SYSTEM NOTE:")) {
                             transcriptHtml += `
                                 <div class="bg-neutral-950 p-3 rounded-lg border border-neutral-900 space-y-2">
-                                    <p class="text-[10px] font-mono text-neutral-500 font-bold uppercase">Parameter Asked:</p>
+                                    <p class="text-[10px] font-mono text-neutral-500 font-bold uppercase">Question:</p>
                                     <p class="text-xs text-neutral-300 font-bold leading-relaxed">${questionBuffer}</p>
                                     <div class="bg-neutral-900/50 p-2.5 rounded border border-neutral-800">
-                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Input:</p>
+                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Answer:</p>
                                         <p class="text-xs text-neutral-400 font-normal leading-relaxed mt-0.5">${msg.content}</p>
                                     </div>
                                 </div>`;
@@ -1286,7 +1290,7 @@
             window.speechSynthesis.cancel();
             if(isMicrophoneListening) toggleVoiceSpeechInput();
             
-            document.getElementById('sim-status-indicator').innerText = "⏱️ Time limit reached! Forcing sudden death compilation...";
+            document.getElementById('sim-status-indicator').innerText = "⏱️ Time's up — finalizing your results...";
             renderAITypingBubble();
             
             document.getElementById('sim-user-response-box').disabled = true;
@@ -1305,34 +1309,29 @@
                     if (session) { headers['Authorization'] = `Bearer ${session.access_token}`; }
                 }
 
-                // Look for your fetch call and add the tier property to the body
-const response = await fetch('/api/interview', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        // Ensure you are passing your required context variables here
-        jobDescription: globalJobDescContext, 
-        resume: globalResumeContext,
-        chatHistory: runningChatHistoryLedger,
-        tier: window.currentUserTier || 'free',
-        
-        // 🚨 ADD THIS EXACT LINE:
-        isHintRequest: true 
-    })
-});
+                const response = await fetch('/api/interview', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        jobDescription: globalJobDescContext,
+                        resume: globalResumeContext,
+                        chatHistory: runningChatHistoryLedger,
+                        tier: window.currentUserTier || 'free'
+                    })
+                });
                 const data = await response.json();
                 latestEvaluationReportCache = data;
                 
                 if (latestEvaluationReportCache.brutallyHonestReview) {
-                    latestEvaluationReportCache.brutallyHonestReview = "⚠️ PARTIAL STAMINA EVALUATION: " + latestEvaluationReportCache.brutallyHonestReview;
+                    latestEvaluationReportCache.brutallyHonestReview = "⚠️ Partial evaluation (time ran out): " + latestEvaluationReportCache.brutallyHonestReview;
                 }
 
                 executeFinalReportCompilation();
             } catch (err) {
-                console.error("Failed compiling sudden death metrics:", err);
+                console.error("Failed compiling final report after timeout:", err);
                 latestEvaluationReportCache = {
-                    score: 45, verdict: "STAMINA TIMEOUT",
-                    brutallyHonestReview: "The interview was stopped due to the free tier time limit.",
+                    score: 45, verdict: "TIME EXPIRED",
+                    brutallyHonestReview: "Your session ended because you reached the time limit. Here's feedback based on what you completed.",
                     gapsToFix: []
                 };
                 executeFinalReportCompilation();
@@ -1340,13 +1339,12 @@ const response = await fetch('/api/interview', {
         }
 
         async function startLiveSimulation() {
-            // 1. Session Auth Check
-            if (supabaseClientInstance) {
-                const { data: { session } } = await supabaseClientInstance.auth.getSession();
-                if (!session) { triggerInlineAuthWall('signin'); return; }
-            }
+            // Anonymous visitors can start a session immediately so they get real
+            // value before being asked to create an account. Sign-in is only
+            // required to save history afterward, and by the server-side paywall
+            // check that /api/interview already performs on its own.
 
-            // 2. Beta Block
+            // 1. Beta Block
             if (window.realTier === 'free' && getSessionCount() >= 3) { 
                 const limitModal = document.getElementById('beta-limit-overlay');
                 if (limitModal) limitModal.classList.remove('hidden');
@@ -1457,7 +1455,7 @@ const response = await fetch('/api/interview', {
                     return;
                 }
                 
-                if (!response.ok) throw new Error(data.details || data.error || "Sync loss.");
+                if (!response.ok) throw new Error(data.details || data.error || "Connection lost.");
 
                 if (data.isConcluded) {
                     clearInterval(countdownTimerIntervalInstance); 
@@ -1473,7 +1471,7 @@ const response = await fetch('/api/interview', {
 
                     // Update status text
                     const statusIndicator = document.getElementById('sim-status-indicator');
-                    if (statusIndicator) statusIndicator.innerText = "Compiling diagnostic report...";
+                    if (statusIndicator) statusIndicator.innerText = "Finalizing your results...";
                     
                     // Safely hide the input controls so the user can't keep typing
                     const inputSection = document.getElementById('sim-user-response-box');
@@ -1492,11 +1490,11 @@ const response = await fetch('/api/interview', {
                 let aiMsgText = data.aiMessage;
                 runningChatHistoryLedger.push({ role: "assistant", content: aiMsgText });
                 document.getElementById('sim-active-question-text').innerText = aiMsgText;
-                document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
+                document.getElementById('sim-status-indicator').innerText = "Your Turn — Go Ahead";
                 speakTextAloud(aiMsgText);
 
             } catch (err) {
-                console.error(err); alert("Sync drop: " + err.message);
+                console.error(err); showCustomAlert("Connection issue — please try again: " + err.message, "error");
             } finally {
                 document.getElementById('submit-turn-btn').disabled = false;
             }
@@ -1573,13 +1571,13 @@ const response = await fetch('/api/interview', {
                 runningChatHistoryLedger.push({ role: "assistant", content: genuineInterviewerMessage });
                 
                 document.getElementById('sim-active-question-text').innerText = genuineInterviewerMessage;
-                document.getElementById('sim-status-indicator').innerText = "Active Connection Live (Hint Applied)";
+                document.getElementById('sim-status-indicator').innerText = "Your Turn — Go Ahead (Hint Applied)";
                 speakTextAloud(genuineInterviewerMessage);
 
             } catch (err) {
                 console.error(err);
-                alert("Failed fetching lifeline hint data: " + err.message);
-                document.getElementById('sim-status-indicator').innerText = "Active Connection Live";
+                showCustomAlert("Couldn't fetch a hint right now: " + err.message, "error");
+                document.getElementById('sim-status-indicator').innerText = "Your Turn — Go Ahead";
             } finally {
                 if (submitBtn) submitBtn.disabled = false;
                 if (hintBtn) hintBtn.disabled = false;
@@ -1608,12 +1606,24 @@ const response = await fetch('/api/interview', {
             executeFinalReportCompilation();
         }
 
-        function executeFinalReportCompilation() {
+        async function executeFinalReportCompilation() {
             try {
                 clearInterval(countdownTimerIntervalInstance);
                 window.speechSynthesis.cancel(); 
                 if(isMicrophoneListening) toggleVoiceSpeechInput();
                 window.scrollTo({top: 0, behavior: 'smooth'});
+
+                // Non-blocking: let signed-out visitors know they can save this
+                // report by signing up, without gating the report itself.
+                const signinNudge = document.getElementById('results-signin-nudge');
+                if (signinNudge) {
+                    if (supabaseClientInstance) {
+                        const { data: { session } } = await supabaseClientInstance.auth.getSession();
+                        signinNudge.classList.toggle('hidden', !!session);
+                    } else {
+                        signinNudge.classList.remove('hidden');
+                    }
+                }
                 
                 if (!globalJobDescContext) globalJobDescContext = document.getElementById('job-desc-input').value.trim();
                 if (!globalResumeContext) globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
@@ -1693,10 +1703,10 @@ const response = await fetch('/api/interview', {
                             else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE:")) {
                                 targetDeck.innerHTML += `
                                     <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
-                                        <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Interviewer Evaluation Parameter:</p>
+                                        <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Question:</p>
                                         <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
                                         <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900 mt-2">
-                                            <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Registered Response:</span>
+                                            <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Answer:</span>
                                             <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
                                         </div>
                                     </div>`;
@@ -1723,7 +1733,7 @@ const response = await fetch('/api/interview', {
     let c = b.innerHTML;
 
     if (!a) {
-        alert("Error: Could not find the report wrapper.");
+        showCustomAlert("Something went wrong generating the report. Please refresh and try again.", "error");
         return;
     }
     
@@ -1761,7 +1771,7 @@ const response = await fetch('/api/interview', {
         b.disabled = false;
     }).catch(err => {
         console.error("PDF Engine Error:", err);
-        alert("Failed to generate PDF. Check the browser console for details.");
+        showCustomAlert("Couldn't generate the PDF. Please try again.", "error");
         b.innerHTML = c;
         b.disabled = false;
     });
@@ -1841,7 +1851,7 @@ const response = await fetch('/api/interview', {
                 zone.addEventListener('drop', (ev) => {
                     ev.preventDefault(); const f = ev.dataTransfer.files[0];
                     if (f && f.type === "application/pdf") {
-                        document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Scanning drop matrices...</p>`;
+                        document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Reading your resume...</p>`;
                         
                         extractTextFromPDF(f).then(txt => {
                             extractedPdfTextState = txt;
@@ -1850,10 +1860,10 @@ const response = await fetch('/api/interview', {
                             document.getElementById('resume-file-card-preview').classList.remove('hidden');
                             executePreflightResumeScreening(txt);
                         }).catch(err => {
-                            alert("Drop read failure: " + err.message);
+                            showCustomAlert("Couldn't read that file: " + err.message, "error");
                             resetFileSelectionState();
                         });
-                    } else { alert("Please drop a valid PDF document file."); }
+                    } else { showCustomAlert("Please drop a valid PDF file.", "warning"); }
                 });
             }
         });
