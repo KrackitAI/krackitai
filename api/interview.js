@@ -128,6 +128,54 @@ function sanitizeJson(rawContent) {
         .trim();
 }
 
+// ---------------------------------------------------------------------------
+// Known Groq/gpt-oss quirk: the model occasionally represents its structured
+// JSON output internally as a "tool call" even though no tools were
+// requested, and Groq's endpoint rejects the mismatch with a 400
+// "Tool choice is none, but model called a tool" (code: tool_use_failed)
+// error. This is a documented, ongoing issue with the gpt-oss model family
+// on Groq, not a bug in this prompt or schema.
+//
+// Critically, the model's actual generation is usually still present and
+// valid inside `error.error.failed_generation`, shaped as
+// {"name": "<schema name>", "arguments": {...the real response...}}. So
+// instead of just failing the turn (or spending an extra call retrying
+// blind), we recover the real answer directly from the error first, and
+// only fall back to a genuine one-time retry if that recovery isn't
+// possible.
+// ---------------------------------------------------------------------------
+async function callGroqWithRecovery(groq, params, attempt = 1) {
+    try {
+        const response = await groq.chat.completions.create(params);
+        return JSON.parse(sanitizeJson(response.choices[0].message.content));
+    } catch (err) {
+        const isToolUseFailed = err?.status === 400 && err?.error?.error?.code === 'tool_use_failed';
+
+        if (isToolUseFailed) {
+            const failedGeneration = err?.error?.error?.failed_generation;
+            if (failedGeneration) {
+                try {
+                    const recovered = JSON.parse(failedGeneration);
+                    if (recovered && recovered.arguments && typeof recovered.arguments === 'object') {
+                        console.warn("ATS ENGINE: Recovered valid response from a tool_use_failed wrapper error (no retry needed).");
+                        return recovered.arguments;
+                    }
+                } catch (parseErr) {
+                    console.warn("ATS ENGINE: Could not parse failed_generation, falling back to retry:", parseErr.message);
+                }
+            }
+
+            // Recovery wasn't possible — try exactly once more before giving up.
+            if (attempt < 2) {
+                console.warn("ATS ENGINE: tool_use_failed with no recoverable payload, retrying once...");
+                return callGroqWithRecovery(groq, params, attempt + 1);
+            }
+        }
+
+        throw err;
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: "Method not allowed." });
@@ -294,7 +342,7 @@ You must output a raw JSON object matching this schema exactly:
 }`;
 
         // ─── STAGE 4: EXECUTE GROQ COMPILATION PIPELINE ─────────────────
-        const groqCompletionResponse = await groq.chat.completions.create({
+        const groqCallParams = {
             model: GROQ_MODEL,
             messages: [{ role: "system", content: systemPrompt }, ...chatHistory],
             temperature: 0.15,
@@ -304,9 +352,9 @@ You must output a raw JSON object matching this schema exactly:
                 type: "json_schema",
                 json_schema: { name: "interview_turn", strict: true, schema: REPORT_SCHEMA }
             }
-        });
+        };
 
-        const parsedReportObjectPayload = JSON.parse(sanitizeJson(groqCompletionResponse.choices[0].message.content));
+        const parsedReportObjectPayload = await callGroqWithRecovery(groq, groqCallParams);
 
         // ─── STAGE 4b: DETERMINISTIC SCORING ENGINE ─────────────────────
         if (parsedReportObjectPayload.isConcluded === true && parsedReportObjectPayload.rubric) {
