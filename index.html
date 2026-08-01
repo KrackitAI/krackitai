@@ -188,9 +188,69 @@
             </div>
 
             <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
-                <div class="space-y-2">
+
+                <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
+                    <button type="button" id="mode-toggle-generic-btn" onclick="switchInterviewMode('generic')" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">📋 General Practice</button>
+                    <button type="button" id="mode-toggle-company-btn" onclick="switchInterviewMode('company')" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">🏢 Company-Specific</button>
+                </div>
+
+                <div id="generic-jd-section" class="space-y-2">
                     <label for="job-desc-input" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
                     <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description details here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                </div>
+
+                <div id="company-round-section" class="hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label for="company-select" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Company</label>
+                            <select id="company-select" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500] cursor-pointer">
+                                <option value="google">Google</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label for="company-level-select" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Level</label>
+                            <select id="company-level-select" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500] cursor-pointer">
+                                <option value="L3">L3 (New Grad / Entry)</option>
+                                <option value="L4" selected>L4 (Mid-Level)</option>
+                                <option value="L5">L5 (Senior)</option>
+                                <option value="L6">L6 (Staff)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="company-role-select" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Role</label>
+                        <select id="company-role-select" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-3 text-sm text-neutral-200 focus:outline-none focus:border-[#FFE500] cursor-pointer">
+                            <option value="swe">Software Engineer</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Interview Round</span>
+                        <div class="grid grid-cols-2 gap-2" id="round-selector-grid">
+                            <button type="button" data-round="phone_screen" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-neutral-950 border-2 border-neutral-800 hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="block font-bold text-xs text-neutral-200">📞 Phone Screen</span>
+                                <span class="block text-[10px] text-neutral-500 mt-0.5">2 questions · ~50 min</span>
+                            </button>
+                            <button type="button" data-round="onsite_coding" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-neutral-950 border-2 border-neutral-800 hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="block font-bold text-xs text-neutral-200">💻 Onsite Coding</span>
+                                <span class="block text-[10px] text-neutral-500 mt-0.5">1 problem + follow-up · 45 min</span>
+                            </button>
+                            <button type="button" data-round="system_design" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-neutral-950 border-2 border-neutral-800 hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="block font-bold text-xs text-neutral-200">🏗️ System Design</span>
+                                <span class="block text-[10px] text-neutral-500 mt-0.5">1 scenario · 45 min</span>
+                            </button>
+                            <button type="button" data-round="googleyness" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-neutral-950 border-2 border-neutral-800 hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="block font-bold text-xs text-neutral-200">🤝 Googleyness & Leadership</span>
+                                <span class="block text-[10px] text-neutral-500 mt-0.5">4 behavioral Qs · 45 min</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-neutral-950/60 border border-neutral-800/60 rounded-xl p-3 flex items-start gap-2">
+                        <span class="text-sm shrink-0">ℹ️</span>
+                        <p class="text-[10px] text-neutral-500 leading-relaxed">Modeled on publicly reported interview format and structure — not verified against any company's actual internal process. Treat this as realistic practice, not a guaranteed preview of your real interview.</p>
+                    </div>
                 </div>
 
                 <div class="space-y-2.5">
@@ -667,6 +727,68 @@
         let runningChatHistoryLedger = [];
         let globalJobDescContext = '';
         let globalResumeContext = '';
+
+        // Company-round practice mode. null when using the generic JD flow.
+        // Set by switchInterviewMode()/selectCompanyRound() before a session
+        // starts, and read by buildInterviewRequestBody() so every fetch call
+        // to /api/interview stays in sync automatically instead of each call
+        // site needing to remember to include these fields itself.
+        window.interviewInputMode = 'generic';
+        window.selectedCompanyRoundType = null;
+        let globalCompanyModeContext = null;
+
+        function switchInterviewMode(mode) {
+            window.interviewInputMode = mode;
+            const genericBtn = document.getElementById('mode-toggle-generic-btn');
+            const companyBtn = document.getElementById('mode-toggle-company-btn');
+            const genericSection = document.getElementById('generic-jd-section');
+            const companySection = document.getElementById('company-round-section');
+
+            if (mode === 'company') {
+                genericSection.classList.add('hidden');
+                companySection.classList.remove('hidden');
+                genericBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                companyBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+            } else {
+                companySection.classList.add('hidden');
+                genericSection.classList.remove('hidden');
+                companyBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                genericBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
+            }
+        }
+
+        function selectCompanyRound(btn) {
+            document.querySelectorAll('.round-select-btn').forEach(el => {
+                el.classList.remove('border-[#FFE500]', 'bg-neutral-900');
+                el.classList.add('border-neutral-800');
+            });
+            btn.classList.remove('border-neutral-800');
+            btn.classList.add('border-[#FFE500]', 'bg-neutral-900');
+            window.selectedCompanyRoundType = btn.dataset.round;
+        }
+
+        // Single source of truth for every /api/interview request body, so
+        // company-mode fields (or their absence) can never drift out of sync
+        // between the main turn fetch, the hint fetch, and the timeout fetch.
+        function buildInterviewRequestBody(chatHistoryToSend, extraFields = {}) {
+            const body = {
+                resume: globalResumeContext,
+                chatHistory: chatHistoryToSend,
+                tier: window.currentUserTier || 'free',
+                ...extraFields
+            };
+            if (globalCompanyModeContext) {
+                Object.assign(body, globalCompanyModeContext);
+                // A pasted JD still wins over the synthetic one if the user
+                // provided both — the backend already implements this rule,
+                // this just avoids sending an empty string that would
+                // otherwise short-circuit that check.
+                if (globalJobDescContext) body.jobDescription = globalJobDescContext;
+            } else {
+                body.jobDescription = globalJobDescContext;
+            }
+            return JSON.stringify(body);
+        }
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
         let latestEvaluationReportCache = null;
@@ -1312,12 +1434,7 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({
-                        jobDescription: globalJobDescContext,
-                        resume: globalResumeContext,
-                        chatHistory: runningChatHistoryLedger,
-                        tier: window.currentUserTier || 'free'
-                    })
+                    body: buildInterviewRequestBody(runningChatHistoryLedger)
                 });
                 const data = await response.json();
                 latestEvaluationReportCache = data;
@@ -1354,13 +1471,29 @@
             const tier = window.currentUserTier || 'free';
 
             // 3. THE SOFT GATE: Compile Context
-            globalJobDescContext = document.getElementById('job-desc-input').value.trim();
             globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            // The JD is the only strict requirement now
-            if(!globalJobDescContext || globalJobDescContext.length < 50) { 
-                showCustomAlert("Please paste a valid Job Description to calibrate the AI interviewer.", "warning"); 
-                return; 
+            if (window.interviewInputMode === 'company') {
+                // Company-round mode: no JD required (the backend synthesizes
+                // one from company+role+level), but a round must be picked.
+                globalJobDescContext = document.getElementById('job-desc-input').value.trim(); // still respected if present
+                if (!window.selectedCompanyRoundType) {
+                    showCustomAlert("Please pick an interview round to practice.", "warning");
+                    return;
+                }
+                globalCompanyModeContext = {
+                    company: document.getElementById('company-select').value,
+                    companyRole: document.getElementById('company-role-select').value,
+                    roundType: window.selectedCompanyRoundType,
+                    targetLevel: document.getElementById('company-level-select').value
+                };
+            } else {
+                globalCompanyModeContext = null;
+                globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+                if(!globalJobDescContext || globalJobDescContext.length < 50) { 
+                    showCustomAlert("Please paste a valid Job Description to calibrate the AI interviewer.", "warning"); 
+                    return; 
+                }
             }
 
             // If they skipped the Keyword Defense (Resume), tell the AI to do a general interview
@@ -1445,7 +1578,7 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
+                    body: buildInterviewRequestBody(runningChatHistoryLedger)
                 });
 
                 const data = await response.json();
@@ -1549,12 +1682,7 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({
-                        jobDescription: globalJobDescContext,
-                        resume: globalResumeContext,
-                        chatHistory: temporaryPayloadHistory,
-                        isHintRequest: true // 🚨 THIS FIXES THE HINT GENERATION BUG 🚨
-                    })
+                    body: buildInterviewRequestBody(temporaryPayloadHistory, { isHintRequest: true })
                 });
 
                 const data = await response.json();
@@ -1904,11 +2032,25 @@
             if (!startBtn) return;
 
             function evaluateLoadoutReadiness() {
-                const jdText = (document.getElementById('job-desc-input')?.value || '').trim();
                 const currentResume = currentUploadMode === 'upload' ? extractedPdfTextState : (document.getElementById('resume-paste-input')?.value || '').trim();
-
-                const jdReady = jdText.length > 50;
                 const resumeReady = currentResume && currentResume.length > 100;
+
+                if (window.interviewInputMode === 'company') {
+                    if (window.selectedCompanyRoundType && resumeReady) {
+                        startBtn.innerHTML = 'Start Company Interview Round ⚡';
+                        startBtn.className = 'w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black text-lg py-4 rounded-xl shadow-[0_0_20px_rgba(255,229,0,0.3)] transition-all transform hover:scale-[1.01] cursor-pointer block mt-4';
+                    } else if (window.selectedCompanyRoundType) {
+                        startBtn.innerHTML = 'Add Your Resume to Start';
+                        startBtn.className = 'w-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-lg py-4 rounded-xl transition-all cursor-pointer border border-neutral-600 block mt-4';
+                    } else {
+                        startBtn.innerHTML = 'Pick a Round to Start';
+                        startBtn.className = 'w-full bg-neutral-900 text-neutral-600 font-bold text-lg py-4 rounded-xl cursor-not-allowed border border-neutral-800 block mt-4';
+                    }
+                    return;
+                }
+
+                const jdText = (document.getElementById('job-desc-input')?.value || '').trim();
+                const jdReady = jdText.length > 50;
 
                 if (jdReady && resumeReady) {
                     // FULL LOADOUT: JD + Resume
