@@ -4,236 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy | Krackit AI</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { ink: '#0D0F14', surface: '#161923', surface2: '#1E2230', hairline: '#2B3040', ink100: '#EDEFF4', ink400: '#9297AB', signal: '#C9A24B', signaldim: '#8C7638' },
+                    fontFamily: { display: ['Fraunces', 'serif'], sans: ['"IBM Plex Sans"', 'sans-serif'], mono: ['"IBM Plex Mono"', 'monospace'] }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-neutral-950 text-neutral-400 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-ink text-ink400 font-sans antialiased min-h-screen flex flex-col selection:bg-signal selection:text-ink">
 
-    <nav class="w-full border-b border-neutral-900 bg-neutral-950/80 backdrop-blur-md p-4 sticky top-0 z-50">
+    <nav class="w-full border-b border-hairline bg-ink/80 backdrop-blur-md px-6 py-4 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto flex items-center">
-            <a href="/" class="text-xl font-black text-white flex items-center space-x-1 hover:opacity-80 transition-opacity">
-                <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
+            <a href="/" class="text-xl font-black tracking-tight flex items-center space-x-1 hover:opacity-80 transition-opacity">
+                <span class="font-display font-medium text-ink100">Krackit</span><span class="text-signal">.</span>
             </a>
         </div>
     </nav>
 
     <main class="flex-grow w-full max-w-4xl mx-auto px-6 py-12">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 md:p-12 shadow-xl">
+        <div class="bg-surface border border-hairline rounded-2xl p-8 md:p-12 shadow-xl text-sm leading-relaxed">
             
-            <h1 class="text-3xl font-black text-white mb-2 uppercase tracking-wide">Privacy Policy</h1>
-            <p class="text-sm text-neutral-500 mb-8 font-mono">Last updated: June 09, 2026</p>
+            <h1 class="text-3xl md:text-4xl font-display font-medium text-ink100 mb-2 tracking-tight">Privacy Policy</h1>
+            <p class="text-xs text-ink400 mb-8 font-mono">Last updated: June 09, 2026</p>
 
-            <p class="mb-6 leading-relaxed">This Privacy Notice for Krackit ("we," "us," or "our"), describes how and why we might access, collect, store, use, and/or share ("process") your personal information when you use our services ("Services"), including when you:</p>
+            <p class="mb-6">This Privacy Notice for Krackit ("we," "us," or "our"), describes how and why we might access, collect, store, use, and/or share ("process") your personal information when you use our services ("Services"), including when you:</p>
             
             <ul class="list-disc ml-6 mb-8 space-y-2">
-                <li>Visit our website at <a href="https://krackitai.vercel.app" class="text-[#FFE500] hover:underline">https://krackitai.vercel.app</a> or any website of ours that links to this Privacy Notice.</li>
+                <li>Visit our website at <a href="https://krackitai.vercel.app" class="text-signal hover:underline">https://krackitai.vercel.app</a> or any website of ours that links to this Privacy Notice.</li>
                 <li>Use Krackit. Krackit is an adaptive AI-driven mock interview platform designed to help technical engineering candidates prepare for real-world employment screens. The platform utilizes browser cache local storage to track baseline session usage, processes written inputs, and integrates with the browser's native Web Speech API to ingest voice communication streams. Subscription payment transactions and billing processing are securely managed by a third-party merchant gateway provider (Lemon Squeezy).</li>
-                <li>Engage with us in other related ways, including any marketing or events.</li>
             </ul>
             
-            <p class="mb-8"><strong>Questions or concerns?</strong> Reading this Privacy Notice will help you understand your privacy rights and choices. We are responsible for making decisions about how your personal information is processed. If you do not agree with our policies and practices, please do not use our Services. If you still have any questions or concerns, please contact us at <a href="mailto:krackitai@gmail.com" class="text-[#FFE500] hover:underline">krackitai@gmail.com</a>.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">1. What Information Do We Collect?</h2>
-            <h3 class="text-lg font-semibold text-white mt-6 mb-2">Personal information you disclose to us</h3>
-            <p class="mb-4"><strong>In Short:</strong> We collect personal information that you provide to us.</p>
-            <p class="mb-4">We collect personal information that you voluntarily provide to us when you register on the Services, express an interest in obtaining information about us or our products and Services, when you participate in activities on the Services, or otherwise when you contact us.</p>
-            <p class="mb-4"><strong>Personal Information Provided by You.</strong> The personal information that we collect depends on the context of your interactions with us and the Services, the choices you make, and the products and features you use. The personal information we collect may include the following:</p>
+            <h2 class="text-xl font-display font-medium text-ink100 mt-10 mb-4 tracking-wide border-b border-hairline pb-2">1. What Information Do We Collect?</h2>
+            <p class="mb-4"><strong class="text-ink100">Personal information you disclose to us.</strong> We collect personal information that you voluntarily provide to us when you register on the Services, express an interest in obtaining information about us, or when you participate in activities on the Services. The personal information we collect may include:</p>
             <ul class="list-disc ml-6 mb-6 space-y-2">
-                <li>Email addresses</li>
-                <li>Passwords</li>
-                <li>Usernames</li>
+                <li>Email addresses and Passwords</li>
                 <li>Contact or authentication data</li>
-                <li>Billing addresses</li>
-                <li>Debit/credit card numbers</li>
             </ul>
-            <p class="mb-4"><strong>Sensitive Information.</strong> When necessary, with your consent or as otherwise permitted by applicable law, we process the following categories of sensitive information: financial data and credit worthiness data.</p>
-            <p class="mb-4"><strong>Payment Data.</strong> We may collect data necessary to process your payment if you choose to make purchases, such as your payment instrument number, and the security code associated with your payment instrument. All payment data is handled and stored by Lemon Squeezy. You may find their privacy notice link here: <a href="https://www.lemonsqueezy.com/privacy" target="_blank" class="text-[#FFE500] hover:underline">https://www.lemonsqueezy.com/privacy</a>.</p>
-            <p class="mb-4"><strong>Social Media Login Data.</strong> We may provide you with the option to register with us using your existing social media account details, like your Facebook, X, or other social media account. If you choose to register in this way, we will collect certain profile information about you from the social media provider.</p>
+            <p class="mb-8"><strong class="text-ink100">Payment Data.</strong> We may collect data necessary to process your payment if you choose to make purchases. All payment data is handled and stored by Lemon Squeezy. You may find their privacy notice link here: <a href="https://www.lemonsqueezy.com/privacy" target="_blank" class="text-signal hover:underline">https://www.lemonsqueezy.com/privacy</a>.</p>
 
-            <h3 class="text-lg font-semibold text-white mt-6 mb-2">Information automatically collected</h3>
-            <p class="mb-4"><strong>In Short:</strong> Some information — such as your Internet Protocol (IP) address and/or browser and device characteristics — is collected automatically when you visit our Services.</p>
-            <p class="mb-4">We automatically collect certain information when you visit, use, or navigate the Services. This information does not reveal your specific identity but may include device and usage information, such as your IP address, browser and device characteristics, operating system, language preferences, referring URLs, device name, country, location, and information about how and when you use our Services. This information is primarily needed to maintain the security and operation of our Services, and for our internal analytics and reporting purposes.</p>
-            <p class="mb-4">The information we collect includes:</p>
-            <ul class="list-disc ml-6 mb-8 space-y-2">
-                <li><strong>Log and Usage Data.</strong> Log and usage data is service-related, diagnostic, usage, and performance information our servers automatically collect when you access or use our Services and which we record in log files.</li>
-            </ul>
+            <h2 class="text-xl font-display font-medium text-ink100 mt-10 mb-4 tracking-wide border-b border-hairline pb-2">2. How Do We Process Your Information?</h2>
+            <p class="mb-8">We process your personal information for a variety of reasons, depending on how you interact with our Services, including: To facilitate account creation and authentication; to deliver and facilitate delivery of services to the user; to process payments; and to protect our Services.</p>
 
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">2. How Do We Process Your Information?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We process your information to provide, improve, and administer our Services, communicate with you, for security and fraud prevention, and to comply with law. We may also process your information for other purposes only with your prior explicit consent.</p>
-            <p class="mb-4">We process your personal information for a variety of reasons, depending on how you interact with our Services, including:</p>
-            <ul class="list-disc ml-6 mb-8 space-y-2">
-                <li><strong>To facilitate account creation and authentication and otherwise manage user accounts.</strong></li>
-                <li><strong>To deliver and facilitate delivery of services to the user.</strong></li>
-                <li><strong>To send administrative information to you.</strong></li>
-                <li><strong>To fulfill and manage your orders.</strong></li>
-                <li><strong>To request feedback.</strong></li>
-                <li><strong>To protect our Services.</strong></li>
-                <li><strong>To identify usage trends.</strong></li>
-                <li><strong>To save or protect an individual's vital interest.</strong></li>
-            </ul>
+            <h2 class="text-xl font-display font-medium text-ink100 mt-10 mb-4 tracking-wide border-b border-hairline pb-2">3. Do We Offer AI-Based Products?</h2>
+            <p class="mb-8">As part of our Services, we offer products powered by artificial intelligence. Your input (resume data, job descriptions, and interview responses) will be shared with and processed by our AI Service Providers (including Groq) to enable your use of our AI Products. All personal information processed using our AI Products is handled in line with our Privacy Notice.</p>
 
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">3. What Legal Bases Do We Rely On To Process Your Information?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We only process your personal information when we believe it is necessary and we have a valid legal reason (i.e., legal basis) to do so under applicable law.</p>
-            <h3 class="text-lg font-semibold text-white mt-6 mb-2">If you are located in the EU or UK, this section applies to you.</h3>
-            <p class="mb-4">The General Data Protection Regulation (GDPR) and UK GDPR require us to explain the valid legal bases we rely on in order to process your personal information:</p>
-            <ul class="list-disc ml-6 mb-6 space-y-2">
-                <li><strong>Consent.</strong> We may process your information if you have given us permission to use your personal information for a specific purpose. You can withdraw your consent at any time.</li>
-                <li><strong>Performance of a Contract.</strong> We may process your personal information when we believe it is necessary to fulfill our contractual obligations to you.</li>
-                <li><strong>Legitimate Interests.</strong> We may process your information when we believe it is reasonably necessary to achieve our legitimate business interests and those interests do not outweigh your interests and fundamental rights.</li>
-                <li><strong>Legal Obligations.</strong> We may process your information where we believe it is necessary for compliance with our legal obligations.</li>
-                <li><strong>Vital Interests.</strong> We may process your information where we believe it is necessary to protect your vital interests or the vital interests of a third party.</li>
-            </ul>
-            <h3 class="text-lg font-semibold text-white mt-6 mb-2">If you are located in Canada, this section applies to you.</h3>
-            <p class="mb-8">We may process your information if you have given us specific permission (express consent) to use your personal information for a specific purpose, or in situations where your permission can be inferred (implied consent). You can withdraw your consent at any time. In some exceptional cases, we may be legally permitted under applicable law to process your information without your consent, such as for investigations, fraud detection, or if it is clearly in the interests of an individual and consent cannot be obtained in a timely way.</p>
+            <h2 class="text-xl font-display font-medium text-ink100 mt-10 mb-4 tracking-wide border-b border-hairline pb-2">4. AI Processing and Model Training</h2>
+            <p class="mb-8 border-l-4 border-signal pl-4 bg-signal/10 py-4 pr-4 rounded-r-lg">
+                <strong class="text-ink100 block mb-1">Our Commitment to AI Privacy:</strong>
+                Krackit AI utilizes third-party Large Language Models (LLMs) to power our core interview simulation features. When you provide text, upload resumes, or use voice input, this data is transmitted securely to our AI providers solely for the purpose of generating your real-time interview experience.<br><br>
+                We explicitly do not use your personal data, resumes, or interview transcripts to train, retrain, or improve foundation AI models. Your data is processed in transit to provide the service and is not stored by our AI vendors for machine learning purposes.
+            </p>
 
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">4. When and With Whom Do We Share Your Personal Information?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We may share information in specific situations described in this section and/or with the following categories of third parties.</p>
-            <p class="mb-4"><strong>Vendors, Consultants, and Other Third-Party Service Providers.</strong> We may share your data with third-party vendors, service providers, contractors, or agents ("third parties") who perform services for us or on our behalf and require access to such information to do that work. The categories of third parties we may share personal information with are as follows:</p>
-            <ul class="list-disc ml-6 mb-6 space-y-2">
-                <li>Cloud Computing Services</li>
-                <li>Data Storage Service Providers</li>
-                <li>Payment Processors (Lemon Squeezy)</li>
-                <li>User Account Registration & Authentication Services</li>
-                <li>Website Hosting Service Providers</li>
-            </ul>
-            <p class="mb-4">We also may need to share your personal information in the following situations:</p>
-            <ul class="list-disc ml-6 mb-8 space-y-2">
-                <li><strong>Business Transfers.</strong> We may share or transfer your information in connection with, or during negotiations of, any merger, sale of company assets, financing, or acquisition of all or a portion of our business to another company.</li>
-            </ul>
+            <h2 class="text-xl font-display font-medium text-ink100 mt-10 mb-4 tracking-wide border-b border-hairline pb-2">5. Do United States Residents Have Specific Privacy Rights?</h2>
+            <p class="mb-4">If you are a resident of California or other specific US states, you may have the right to request access to and receive details about the personal information we maintain about you. We have not sold or shared any personal information to third parties for a business or commercial purpose in the preceding twelve (12) months.</p>
 
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">5. Do We Offer Artificial Intelligence-Based Products?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We offer products, features, or tools powered by artificial intelligence, machine learning, or similar technologies.</p>
-            <p class="mb-4">As part of our Services, we offer products, features, or tools powered by artificial intelligence, machine learning, or similar technologies (collectively, "AI Products"). We provide the AI Products through third-party service providers ("AI Service Providers"), including Groq. Your input, output, and personal information will be shared with and processed by these AI Service Providers to enable your use of our AI Products.</p>
-            <p class="mb-4">Our AI Products are designed for the following functions: AI applications, Natural language processing, and Text analysis. All personal information processed using our AI Products is handled in line with our Privacy Notice and our agreement with third parties.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">6. How Do We Handle Your Social Logins?</h2>
-            <p class="mb-4"><strong>In Short:</strong> If you choose to register or log in to our Services using a social media account, we may have access to certain information about you.</p>
-            <p class="mb-8">Our Services offer you the ability to register and log in using your third-party social media account details. Where you choose to do this, we will receive certain profile information about you from your social media provider. We will use the information we receive only for the purposes that are described in this Privacy Notice. We do not control, and are not responsible for, other uses of your personal information by your third-party social media provider.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">7. How Long Do We Keep Your Information?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We keep your information for as long as necessary to fulfill the purposes outlined in this Privacy Notice unless otherwise required by law.</p>
-            <p class="mb-8">We will only keep your personal information for as long as it is necessary for the purposes set out in this Privacy Notice, unless a longer retention period is required or permitted by law. No purpose in this notice will require us keeping your personal information for longer than the period of time in which users have an account with us. When we have no ongoing legitimate business need to process your personal information, we will either delete or anonymize such information.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">8. How Do We Keep Your Information Safe?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We aim to protect your personal information through a system of organizational and technical security measures.</p>
-            <p class="mb-8">We have implemented appropriate and reasonable technical and organizational security measures designed to protect the security of any personal information we process. However, despite our safeguards, no electronic transmission over the Internet or information storage technology can be guaranteed to be 100% secure, so we cannot promise or guarantee that hackers, cybercriminals, or other unauthorized third parties will not be able to improperly collect, access, steal, or modify your information.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">9. Do We Collect Information From Minors?</h2>
-            <p class="mb-4"><strong>In Short:</strong> We do not knowingly collect data from or market to children under 18 years of age.</p>
-            <p class="mb-8">We do not knowingly collect, solicit data from, or market to children under 18 years of age. By using the Services, you represent that you are at least 18. If we learn that personal information from users less than 18 years of age has been collected, we will deactivate the account and take reasonable measures to promptly delete such data from our records.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">10. What Are Your Privacy Rights?</h2>
-            <p class="mb-4"><strong>In Short:</strong> Depending on your state of residence in the US or in some regions (such as the EEA, UK, Switzerland, and Canada), you have rights that allow you greater access to and control over your personal information. You may review, change, or terminate your account at any time.</p>
-            <p class="mb-4">In some regions (like the EEA, UK, Switzerland, and Canada), you have certain rights under applicable data protection laws. These may include the right (i) to request access and obtain a copy of your personal information, (ii) to request rectification or erasure; (iii) to restrict the processing of your personal information; (iv) if applicable, to data portability; and (v) not to be subject to automated decision-making. You can make such a request by contacting us at <a href="mailto:krackitai@gmail.com" class="text-[#FFE500] hover:underline">krackitai@gmail.com</a>.</p>
-            <p class="mb-4"><strong>Withdrawing your consent:</strong> If we are relying on your consent to process your personal information, you have the right to withdraw your consent at any time.</p>
-            <p class="mb-4"><strong>Opting out of marketing:</strong> You can unsubscribe from our marketing and promotional communications at any time by clicking the unsubscribe link in the emails.</p>
-            <p class="mb-4"><strong>Account Information:</strong> If you would at any time like to review or change the information in your account or terminate your account, you can log in to your account settings or contact us.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">11. Controls For Do-Not-Track Features</h2>
-            <p class="mb-8">Most web browsers and some mobile operating systems and mobile applications include a Do-Not-Track ("DNT") feature or setting you can activate to signal your privacy preference not to have data about your online browsing activities monitored and collected. At this stage, no uniform technology standard for recognizing and implementing DNT signals has been finalized. As such, we do not currently respond to DNT browser signals.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">12. Do United States Residents Have Specific Privacy Rights?</h2>
-            <p class="mb-4"><strong>In Short:</strong> If you are a resident of California, Colorado, Connecticut, Delaware, Florida, Indiana, Iowa, Kentucky, Maryland, Minnesota, Montana, Nebraska, New Hampshire, New Jersey, Oregon, Rhode Island, Tennessee, Texas, Utah, or Virginia, you may have the right to request access to and receive details about the personal information we maintain about you and how we have processed it, correct inaccuracies, get a copy of, or delete your personal information.</p>
-            
-            <h3 class="text-lg font-semibold text-white mt-6 mb-4">Categories of Personal Information We Collect</h3>
-            <div class="overflow-x-auto mb-6 border border-neutral-800 rounded-lg">
+            <div class="overflow-x-auto mb-8 border border-hairline rounded-lg mt-6">
                 <table class="w-full text-left text-sm">
-                    <thead class="bg-neutral-900 border-b border-neutral-800 text-white">
+                    <thead class="bg-surface2 border-b border-hairline text-ink100">
                         <tr>
                             <th class="p-4 font-semibold">Category</th>
                             <th class="p-4 font-semibold">Examples</th>
                             <th class="p-4 font-semibold text-center">Collected</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-neutral-800 bg-neutral-950/50">
+                    <tbody class="divide-y divide-hairline bg-surface/50">
                         <tr>
                             <td class="p-4">A. Identifiers</td>
-                            <td class="p-4">Contact details, such as real name, alias, postal address, unique personal identifier, online identifier, IP address, email address, and account name</td>
+                            <td class="p-4">Contact details, such as email address and account name</td>
+                            <td class="p-4 text-center">YES</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4">B. Commercial information</td>
+                            <td class="p-4">Transaction information and purchase history</td>
                             <td class="p-4 text-center">NO</td>
                         </tr>
                         <tr>
-                            <td class="p-4">B. Personal information as defined in the California Customer Records statute</td>
-                            <td class="p-4">Name, contact information, education, employment, employment history, and financial information</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">C. Protected classification characteristics</td>
-                            <td class="p-4">Gender, age, date of birth, race and ethnicity, national origin, marital status, and other demographic data</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">D. Commercial information</td>
-                            <td class="p-4">Transaction information, purchase history, financial details, and payment information</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">E. Biometric information</td>
-                            <td class="p-4">Fingerprints and voiceprints</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">F. Internet or other similar network activity</td>
-                            <td class="p-4">Browsing history, search history, online behavior, interest data, and interactions with websites</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">G. Geolocation data</td>
-                            <td class="p-4">Device location</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">H. Audio, electronic, sensory, or similar information</td>
-                            <td class="p-4">Images and audio, video or call recordings created in connection with our business activities</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">I. Professional or employment-related information</td>
-                            <td class="p-4">Business contact details, work history, and professional qualifications</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">J. Education Information</td>
-                            <td class="p-4">Student records and directory information</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4">K. Inferences drawn from collected personal information</td>
-                            <td class="p-4">Inferences to create a profile or summary about an individual’s preferences and characteristics</td>
-                            <td class="p-4 text-center">NO</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 text-white font-semibold">L. Sensitive personal Information</td>
-                            <td class="p-4 text-white">Account login information</td>
-                            <td class="p-4 text-center text-[#FFE500] font-bold">YES</td>
+                            <td class="p-4 text-ink100 font-semibold">C. Sensitive personal Information</td>
+                            <td class="p-4 text-ink100">Account login information</td>
+                            <td class="p-4 text-center text-signal font-bold">YES</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <p class="mb-4">We only collect sensitive personal information, as defined by applicable privacy laws or the purposes allowed by law or with your consent. Sensitive personal information may be used, or disclosed to a service provider or contractor, for additional, specified purposes. We do not collect or process sensitive personal information for the purpose of inferring characteristics about you.</p>
-            <p class="mb-4">We have not sold or shared any personal information to third parties for a business or commercial purpose in the preceding twelve (12) months.</p>
-            <p class="mb-8"><strong>California "Shine The Light" Law:</strong> California Civil Code Section 1798.83 permits our users who are California residents to request and obtain from us, once a year and free of charge, information about categories of personal information (if any) we disclosed to third parties for direct marketing purposes and the names and addresses of all third parties with which we shared personal information in the immediately preceding calendar year.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">13. AI Processing and Model Training</h2>
-            <p class="mb-8 border-l-4 border-[#FFE500] pl-4 bg-[#FFE500]/5 py-3 pr-3 rounded-r-lg">
-                <strong class="text-white block mb-1">Our Commitment to AI Privacy:</strong>
-                Krackit AI utilizes third-party Large Language Models (LLMs), including those provided by Groq, to power our core interview simulation features. When you provide text, upload resumes, or use voice input, this data is transmitted securely to our AI providers solely for the purpose of generating your real-time interview experience.<br><br>
-                We explicitly do not use your personal data, resumes, or interview transcripts to train, retrain, or improve foundation AI models. Your data is processed in transit to provide the service and is not stored by our AI vendors for machine learning purposes.
-            </p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">14. Do We Make Updates to This Notice?</h2>
-            <p class="mb-8"><strong>In Short:</strong> Yes, we will update this notice as necessary to stay compliant with relevant laws. The updated version will be indicated by an updated "Revised" date at the top of this Privacy Notice. We encourage you to review this Privacy Notice frequently to be informed of how we are protecting your information.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">15. How Can You Contact Us About This Notice?</h2>
-            <p class="mb-8">If you have questions or comments about this notice, you may email us at <a href="mailto:krackitai@gmail.com" class="text-[#FFE500] hover:underline">krackitai@gmail.com</a>.</p>
-
-            <h2 class="text-xl font-bold text-white mt-10 mb-4 uppercase tracking-wide border-b border-neutral-800 pb-2">16. How Can You Review, Update, or Delete the Data We Collect From You?</h2>
-            <p class="mb-8">Based on the applicable laws of your country or state of residence in the US, you may have the right to request access to the personal information we collect from you, details about how we have processed it, correct inaccuracies, or delete your personal information. You may also have the right to withdraw your consent to our processing of your personal information. These rights may be limited in some circumstances by applicable law. To request to review, update, or delete your personal information, please visit or contact us at: <a href="mailto:krackitai@gmail.com" class="text-[#FFE500] hover:underline font-semibold">krackitai@gmail.com</a>.</p>
+            <h2 class="text-xl font-display font-medium text-ink100 mt-10 mb-4 tracking-wide border-b border-hairline pb-2">6. Contact Us</h2>
+            <p class="mb-2">If you have questions or comments about this notice, you may email us at:</p>
+            <p class="mb-8"><strong>Krackit</strong><br><a href="mailto:krackitai@gmail.com" class="text-signal hover:underline font-semibold">krackitai@gmail.com</a></p>
 
         </div>
     </main>
 
-    <footer class="w-full border-t border-neutral-900 py-8 mt-12 text-center text-xs text-neutral-600">
-        © 2026 Krackit AI. All rights reserved.
+    <footer class="w-full border-t border-hairline bg-surface py-8 mt-12 text-center text-xs text-ink400">
+        &copy; 2026 Krackit AI. All rights reserved.
     </footer>
 
 </body>
