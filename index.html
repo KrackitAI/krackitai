@@ -1092,7 +1092,17 @@
        async function executePreflightResumeScreening(rawText) {
             const statusIndicator = document.getElementById('resume-preflight-status-indicator');
             const alertBox = document.getElementById('preflight-audit-alert-box');
-            
+
+            // Don't fire the request at all until there's actually a resume to
+            // score — this was previously sending an empty resumeText (e.g. when
+            // the JD box triggers auto-scan before a resume has been added),
+            // getting a legitimate 400 back, and then displaying "Screening
+            // Offline" as if the service itself were down.
+            if (!rawText || rawText.trim().length < 50) {
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-ink400 tracking-wider">Add Your Resume to Scan</span>`;
+                return;
+            }
+
             // 🔥 GRAB THE JOB DESCRIPTION TEXT
             const currentJobDesc = document.getElementById('job-desc-input').value.trim();
             
@@ -1159,7 +1169,7 @@
 
             } catch (err) {
                 console.error(err);
-                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-ink400 tracking-wider">Screening Offline</span>`;
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">Scan Failed — Try Again</span>`;
             }
         }
 
