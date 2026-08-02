@@ -164,7 +164,7 @@ ${requirementsSummary}
 
 TASK 1 (CANDIDATE TIMELINE): Parse the candidate's chronological work experience. For each role, extract "company", "startDate" (YYYY-MM), "endDate", "isCurrent", and a concise array of "skillsUsed" in that specific role. DO NOT extract full sentences or bullet points.
 
-TASK 2 (CRITIQUE): Provide a brutal, section-by-section critique calling out weak bullet points, missing quantifiable metrics, poor phrasing, and any of the fixed required skills above that appear absent from this candidate's background.
+TASK 2 (CRITIQUE): Provide a brutal, section-by-section critique. Return this as MULTIPLE SEPARATE array elements — one distinct issue per element, roughly 4-8 elements total. Each element must be ONE SHORT, SPECIFIC point (1-2 sentences max), such as a single weak bullet point, one missing quantifiable metric, one instance of poor phrasing, or one absent required skill. Do NOT combine several issues into a single long paragraph inside one array element — that defeats the purpose of returning an array. If the candidate's resume genuinely has very few issues, return fewer elements rather than padding, but never collapse multiple distinct issues into one.
 
 CANDIDATE RESUME TEXT:
 ${resumeText}
