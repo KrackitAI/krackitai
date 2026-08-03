@@ -7,6 +7,36 @@
     <title>Krackit - Adaptive AI Interview Coach</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        // Design token system. `ink`/`surface`/`hairline` replace the old flat
+        // black + neutral-900/950 scale; `signal` replaces the neon #C9A24B
+        // accent with a muted, deliberately-used brass tone. Existing Tailwind
+        // defaults (rose/emerald for pass-fail states, etc.) are left intact.
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#0D0F14',
+                        surface: '#161923',
+                        surface2: '#1E2230',
+                        hairline: '#2B3040',
+                        ink100: '#EDEFF4',
+                        ink400: '#9297AB',
+                        signal: '#C9A24B',
+                        signaldim: '#8C7638',
+                    },
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['"IBM Plex Sans"', 'sans-serif'],
+                        mono: ['"IBM Plex Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -27,23 +57,23 @@
     })
 </script>
 </head>
-<body class="bg-[#0a0a0a] text-white min-h-screen font-sans antialiased selection:bg-[#FFE500] selection:text-black scroll-smooth relative">
+<body class="bg-ink text-ink100 min-h-screen font-sans antialiased selection:bg-signal selection:text-ink scroll-smooth relative">
     <div id="custom-alert-container" class="fixed top-5 right-5 z-[9999] flex flex-col space-y-3 pointer-events-none"></div>
-<div class="bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white shadow-md relative z-50">
-    🚀 Krackit AI is currently in Closed Beta. Enjoy full premium features unlocked for a limited time!
+<div class="bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-ink100 shadow-md relative z-50">
+    Krackit is currently in closed beta — full premium features are unlocked for a limited time.
 </div>
     <div id="homepage-secure-overlay-wall" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
-            <button type="button" onclick="closeInlineAuthWall()" aria-label="Close" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+        <div class="bg-surface2 border border-hairline rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
+            <button type="button" onclick="closeInlineAuthWall()" aria-label="Close" class="absolute top-4 right-4 text-ink400 hover:text-ink100 font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1 select-none">
-                <h2 class="text-3xl font-black tracking-tight">Krackit<span class="text-[#FFE500]">⚡</span></h2>
-                <p class="text-neutral-400 text-xs">Unlock your adaptive interview simulator</p>
+                <h2 class="text-3xl font-display font-medium tracking-tight">Krackit<span class="text-signal">.</span></h2>
+                <p class="text-ink400 text-xs">Unlock your adaptive interview simulator</p>
             </div>
 
-            <div class="flex gap-2 p-1 bg-neutral-950 border border-neutral-800 rounded-xl w-full">
-                <button id="overlay-tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer">Sign In</button>
-                <button id="overlay-tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer">Sign Up</button>
+            <div class="flex gap-2 p-1 bg-surface border border-hairline rounded-xl w-full">
+                <button id="overlay-tab-signin-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80 transition-all cursor-pointer">Sign In</button>
+                <button id="overlay-tab-signup-btn" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer">Sign Up</button>
             </div>
 
             <div id="overlay-auth-error-box" class="hidden bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-xl text-xs">
@@ -52,32 +82,32 @@
 
             <div class="space-y-4">
                 <div class="space-y-1.5">
-                    <label for="overlay-auth-email" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Email Address</label>
-                    <input type="email" id="overlay-auth-email" placeholder="name@domain.com" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+                    <label for="overlay-auth-email" class="text-xs font-bold tracking-wider text-ink400 uppercase">Email Address</label>
+                    <input type="email" id="overlay-auth-email" placeholder="name@domain.com" class="w-full bg-surface border border-hairline rounded-xl px-4 py-3 text-sm text-ink100 placeholder-neutral-700 focus:outline-none focus:border-signal">
                 </div>
                 <div class="space-y-1.5">
-                    <label for="overlay-auth-password" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Password</label>
-                    <input type="password" id="overlay-auth-password" placeholder="••••••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-700 focus:outline-none focus:border-[#FFE500]">
+                    <label for="overlay-auth-password" class="text-xs font-bold tracking-wider text-ink400 uppercase">Password</label>
+                    <input type="password" id="overlay-auth-password" placeholder="••••••••" class="w-full bg-surface border border-hairline rounded-xl px-4 py-3 text-sm text-ink100 placeholder-neutral-700 focus:outline-none focus:border-signal">
                 </div>
 
                 <div id="overlay-action-signin-container" class="block">
-                    <button id="overlay-submit-signin-btn" type="button" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">Sign In to Account →</button>
+                    <button id="overlay-submit-signin-btn" type="button" class="w-full bg-signal hover:bg-signaldim text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">Sign In to Account →</button>
                 </div>
                 <div id="overlay-action-signup-container" class="hidden">
-                    <button id="overlay-submit-signup-btn" type="button" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">Create Free Account ⚡</button>
+                    <button id="overlay-submit-signup-btn" type="button" class="w-full bg-white hover:bg-neutral-200 text-black font-black py-3.5 rounded-xl text-sm tracking-wide transition-all cursor-pointer">Create Free Account</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <nav class="border-b border-neutral-950 px-6 py-4 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-40 select-none">
+    <nav class="border-b border-neutral-950 px-6 py-4 flex items-center justify-between bg-ink/80 backdrop-blur-md sticky top-0 z-40 select-none">
         <div class="flex items-center space-x-8">
             <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex items-center space-x-2 font-black text-xl tracking-tight cursor-pointer">
-                <span>Krackit</span><span class="text-[#FFE500]">⚡</span>
+                <span class="font-display font-medium">Krackit</span><span class="text-signal">.</span>
             </div>
-            <div class="hidden md:flex items-center space-x-6 text-xs font-bold tracking-wide uppercase text-neutral-400">
-                <button onclick="scrollToWorkspaceSetup()" class="hover:text-white transition-colors cursor-pointer">Workspace</button>
-                <button onclick="revealPastSessionsModal()" class="hover:text-white transition-colors cursor-pointer">Past Sessions</button>
+            <div class="hidden md:flex items-center space-x-6 text-xs font-bold tracking-wide uppercase text-ink400">
+                <button onclick="scrollToWorkspaceSetup()" class="hover:text-ink100 transition-colors cursor-pointer">Workspace</button>
+                <button onclick="revealPastSessionsModal()" class="hover:text-ink100 transition-colors cursor-pointer">Past Sessions</button>
             </div>
         </div>
         
@@ -88,31 +118,31 @@
     </nav>
 
     <div id="history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-end">
-        <div class="bg-neutral-950 border-l border-neutral-900 w-full max-w-2xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col">
+        <div class="bg-surface border-l border-hairline w-full max-w-2xl h-full p-6 space-y-6 shadow-2xl overflow-y-auto flex flex-col">
             
-            <div class="flex items-center justify-between border-b border-neutral-900 pb-4 shrink-0">
+            <div class="flex items-center justify-between border-b border-hairline pb-4 shrink-0">
                 <div>
-                    <h3 class="text-xl font-black text-white">Performance Analytics</h3>
-                    <p class="text-neutral-500 text-xs">Track your technical growth and recurring blind spots.</p>
+                    <h3 class="text-xl font-black text-ink100">Performance Analytics</h3>
+                    <p class="text-ink400 text-xs">Track your technical growth and recurring blind spots.</p>
                 </div>
-                <button type="button" onclick="closeHistoryModal()" class="text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕ Close</button>
+                <button type="button" onclick="closeHistoryModal()" class="text-ink400 hover:text-ink100 font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕ Close</button>
             </div>
 
             <div id="analytics-dashboard-wrapper" class="hidden space-y-4 shrink-0">
-                <div class="bg-neutral-900/20 border border-neutral-900 rounded-xl p-4">
-                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 mb-3">Score Over Time</h4>
+                <div class="bg-surface2/20 border border-hairline rounded-xl p-4">
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-ink400 mb-3">Score Over Time</h4>
                     <div class="w-full h-40">
                         <canvas id="scoreTrendChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-rose-950/10 border border-rose-900/30 rounded-xl p-4">
-                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-rose-500 mb-2">🚨 Recurring Weaknesses</h4>
-                    <ul id="recurring-gaps-list" class="space-y-2 text-xs text-neutral-300"></ul>
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-rose-500 mb-2">Recurring Weaknesses</h4>
+                    <ul id="recurring-gaps-list" class="space-y-2 text-xs text-ink100"></ul>
                 </div>
             </div>
 
             <div class="flex-1 flex flex-col min-h-0">
-                <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500 pb-3 border-b border-neutral-900 shrink-0">Session History</h4>
+                <h4 class="text-[10px] font-mono font-bold uppercase tracking-widest text-ink400 pb-3 border-b border-hairline shrink-0">Session History</h4>
                 <div id="history-rows-container" class="space-y-3 pt-3 overflow-y-auto pr-1"></div>
             </div>
 
@@ -121,13 +151,13 @@
 
     <header id="marketing-hero-section" class="max-w-4xl mx-auto px-4 pt-20 pb-16 text-center space-y-8 select-none">
         <div class="space-y-4">
-            <span class="mx-auto bg-neutral-900 border border-neutral-800 text-[10px] text-neutral-400 font-mono tracking-widest uppercase px-3 py-1.5 rounded-full block w-max shadow-inner">
-                ⚡ Adaptive AI Interview Practice
+            <span class="mx-auto bg-surface2 border border-hairline text-[10px] text-ink400 font-mono tracking-widest uppercase px-3 py-1.5 rounded-full block w-max shadow-inner">
+                Adaptive AI Interview Practice
             </span>
-            <h1 class="text-5xl md:text-6xl font-black tracking-tight text-white max-w-3xl mx-auto leading-[1.1]">
-                Technical interviews are <span class="text-[#FFE500]">passed</span>, not just studied.
+            <h1 class="font-display font-medium text-5xl md:text-6xl tracking-tight text-ink100 max-w-3xl mx-auto leading-[1.08]">
+                Technical interviews are <span class="text-signal">passed</span>, not just studied.
             </h1>
-            <p class="text-neutral-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium">
+            <p class="text-ink400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium">
                 Stop guessing if you are prepared. Upload your background profile and let an adaptive AI agent uncover structural gaps before real managers do.
             </p>
         </div>
@@ -135,44 +165,44 @@
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <div class="pt-8 max-w-md mx-auto w-full">
             <div class="flex items-center space-x-4 mb-4">
-                <div class="h-px bg-neutral-900 flex-1"></div>
-                <span class="text-[10px] text-neutral-500 font-mono uppercase tracking-widest">Or join the launch list</span>
-                <div class="h-px bg-neutral-900 flex-1"></div>
+                <div class="h-px bg-surface2 flex-1"></div>
+                <span class="text-[10px] text-ink400 font-mono uppercase tracking-widest">Or join the launch list</span>
+                <div class="h-px bg-surface2 flex-1"></div>
             </div>
             
-            <div class="flex items-center bg-neutral-950 border border-neutral-800 rounded-xl p-1 shadow-inner focus-within:border-[#FFE500] focus-within:ring-1 focus-within:ring-[#FFE500]/20 transition-all">
-                <input type="email" id="waitlist-email-input" placeholder="name@college.edu" class="flex-1 bg-transparent border-none text-sm text-neutral-200 px-4 py-2.5 focus:outline-none placeholder-neutral-600">
-                <button onclick="submitWaitlist()" class="bg-neutral-900 hover:bg-neutral-800 text-[#FFE500] font-bold text-xs px-5 py-2.5 rounded-lg transition-colors cursor-pointer border border-neutral-800">
-                    Notify Me ⚡
+            <div class="flex items-center bg-surface border border-hairline rounded-xl p-1 shadow-inner focus-within:border-signal focus-within:ring-1 focus-within:ring-signal/20 transition-all">
+                <input type="email" id="waitlist-email-input" placeholder="name@college.edu" class="flex-1 bg-transparent border-none text-sm text-ink100 px-4 py-2.5 focus:outline-none placeholder-neutral-600">
+                <button onclick="submitWaitlist()" class="bg-surface2 hover:bg-hairline text-signal font-bold text-xs px-5 py-2.5 rounded-lg transition-colors cursor-pointer border border-hairline">
+                    Notify Me
                 </button>
             </div>
             <p id="waitlist-success-msg" class="hidden text-xs text-emerald-400 font-medium mt-3 transition-all animate-pulse">
                 ✓ Secured! We'll email you when Krackit officially launches.
             </p>
         </div>
-            <button onclick="scrollToWorkspaceSetup()" class="w-full sm:w-auto bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-4 rounded-xl text-sm tracking-wide shadow-xl shadow-[#FFE500]/5 transition-all cursor-pointer">
+            <button onclick="scrollToWorkspaceSetup()" class="w-full sm:w-auto bg-signal hover:bg-signaldim text-black font-black px-8 py-4 rounded-xl text-sm tracking-wide shadow-xl shadow-[#C9A24B]/5 transition-all cursor-pointer">
                 Start My Free Interview →
             </button>
-            <button onclick="revealPastSessionsModal()" class="w-full sm:w-auto bg-neutral-900/60 hover:bg-neutral-800/80 border border-neutral-800 text-neutral-300 font-bold px-7 py-4 rounded-xl text-sm transition-all cursor-pointer">
+            <button onclick="revealPastSessionsModal()" class="w-full sm:w-auto bg-surface2/60 hover:bg-hairline/80 border border-hairline text-ink100 font-bold px-7 py-4 rounded-xl text-sm transition-all cursor-pointer">
                 Review Performance Records
             </button>
         </div>
 
        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left max-w-3xl mx-auto">
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
-                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                <span class="text-sm font-bold text-white block tracking-tight">Adaptive Drilling</span>
-                <p class="text-neutral-500 text-xs leading-relaxed">Adapts to your answers in real time and pushes back on vague responses with deeper follow-up questions.</p>
+            <div class="bg-surface2/30 border border-hairline rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
+                <svg class="w-5 h-5 text-ink400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                <span class="text-sm font-bold text-ink100 block tracking-tight">Adaptive Drilling</span>
+                <p class="text-ink400 text-xs leading-relaxed">Adapts to your answers in real time and pushes back on vague responses with deeper follow-up questions.</p>
             </div>
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
-                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                <span class="text-sm font-bold text-white block tracking-tight">ATS Screening</span>
-                <p class="text-neutral-500 text-xs leading-relaxed">Scans your resume against the job description to flag missing keywords and score your match instantly.</p>
+            <div class="bg-surface2/30 border border-hairline rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
+                <svg class="w-5 h-5 text-ink400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="text-sm font-bold text-ink100 block tracking-tight">ATS Screening</span>
+                <p class="text-ink400 text-xs leading-relaxed">Scans your resume against the job description to flag missing keywords and score your match instantly.</p>
             </div>
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
-                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                <span class="text-sm font-bold text-white block tracking-tight">Audio Synthesis</span>
-                <p class="text-neutral-500 text-xs leading-relaxed">Switch on realistic AI voice for a more natural, conversational interview experience.</p>
+            <div class="bg-surface2/30 border border-hairline rounded-xl p-5 space-y-2 hover:border-neutral-700 transition-colors">
+                <svg class="w-5 h-5 text-ink400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                <span class="text-sm font-bold text-ink100 block tracking-tight">Audio Synthesis</span>
+                <p class="text-ink400 text-xs leading-relaxed">Switch on realistic AI voice for a more natural, conversational interview experience.</p>
             </div>
         </div>
     </header>
@@ -183,135 +213,195 @@
 
         <div id="input-screen" class="w-full max-w-2xl mx-auto space-y-8">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black tracking-tight">Set Up Your Interview</h2>
-                <p class="text-neutral-400 text-sm">Add the job details below to start a personalized voice or text interview.</p>
+                <h2 class="font-display font-medium text-3xl tracking-tight">Set Up Your Interview</h2>
+                <p class="text-ink400 text-sm">Add the job details below to start a personalized voice or text interview.</p>
             </div>
 
-            <div class="space-y-5 bg-neutral-900/20 p-6 md:p-8 rounded-2xl border border-neutral-900 backdrop-blur-sm shadow-2xl">
-                <div class="space-y-2">
-                    <label for="job-desc-input" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Target Job Description</label>
-                    <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description details here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+            <div class="space-y-5 bg-surface2/20 p-6 md:p-8 rounded-2xl border border-hairline backdrop-blur-sm shadow-2xl">
+
+                <div class="flex gap-2 p-1 bg-surface border border-hairline rounded-xl w-full">
+                    <button type="button" id="mode-toggle-generic-btn" onclick="switchInterviewMode('generic')" class="flex-1 py-2 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80 transition-all cursor-pointer">General Practice</button>
+                    <button type="button" id="mode-toggle-company-btn" onclick="switchInterviewMode('company')" class="flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer">Company-Specific</button>
+                </div>
+
+                <div id="generic-jd-section" class="space-y-2">
+                    <label for="job-desc-input" class="text-xs font-bold tracking-wider text-ink400 uppercase">Target Job Description</label>
+                    <textarea id="job-desc-input" rows="4" placeholder="Paste the job requirements description details here..." class="w-full bg-surface border border-hairline rounded-xl px-4 py-3 text-sm text-ink100 placeholder-neutral-600 focus:outline-none focus:border-signal resize-none"></textarea>
+                </div>
+
+                <div id="company-round-section" class="hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label for="company-select" class="text-xs font-bold tracking-wider text-ink400 uppercase">Company</label>
+                            <select id="company-select" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
+                                <option value="google">Google</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label for="company-level-select" class="text-xs font-bold tracking-wider text-ink400 uppercase">Target Level</label>
+                            <select id="company-level-select" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
+                                <option value="L3">L3 (New Grad / Entry)</option>
+                                <option value="L4" selected>L4 (Mid-Level)</option>
+                                <option value="L5">L5 (Senior)</option>
+                                <option value="L6">L6 (Staff)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="company-role-select" class="text-xs font-bold tracking-wider text-ink400 uppercase">Role</label>
+                        <select id="company-role-select" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
+                            <option value="swe">Software Engineer</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-bold tracking-wider text-ink400 uppercase block">Interview Round</span>
+                        <div class="grid grid-cols-2 gap-2" id="round-selector-grid">
+                            <button type="button" data-round="phone_screen" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">01</span><span class="font-bold text-xs text-ink100">Phone Screen</span></span>
+                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">2 questions · ~50 min</span>
+                            </button>
+                            <button type="button" data-round="onsite_coding" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">02</span><span class="font-bold text-xs text-ink100">Onsite Coding</span></span>
+                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">1 problem + follow-up · 45 min</span>
+                            </button>
+                            <button type="button" data-round="system_design" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">03</span><span class="font-bold text-xs text-ink100">System Design</span></span>
+                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">1 scenario · 45 min</span>
+                            </button>
+                            <button type="button" data-round="googleyness" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">04</span><span class="font-bold text-xs text-ink100">Googleyness &amp; Leadership</span></span>
+                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">4 behavioral Qs · 45 min</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface/60 border border-hairline/60 rounded-xl p-3 flex items-start gap-2">
+                        <span class="text-sm shrink-0">ℹ️</span>
+                        <p class="text-[10px] text-ink400 leading-relaxed">Modeled on publicly reported interview format and structure — not verified against any company's actual internal process. Treat this as realistic practice, not a guaranteed preview of your real interview.</p>
+                    </div>
                 </div>
 
                 <div class="space-y-2.5">
-                    <span class="text-xs font-bold tracking-wider text-neutral-400 uppercase block">Your Background Profile</span>
-                    <div class="flex gap-2 w-full p-1 bg-neutral-950 border border-neutral-800 rounded-xl max-w-xs">
-                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80">📁 Upload PDF</button>
-                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400">📝 Paste Text</button>
+                    <span class="text-xs font-bold tracking-wider text-ink400 uppercase block">Your Background Profile</span>
+                    <div class="flex gap-2 w-full p-1 bg-surface border border-hairline rounded-xl max-w-xs">
+                        <button id="toggle-upload-btn" onclick="switchUploadMode('upload')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80">Upload PDF</button>
+                        <button id="toggle-paste-btn" onclick="switchUploadMode('paste')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-ink400">Paste Text</button>
                     </div>
 
-                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all">
+                    <div id="resume-upload-zone" class="w-full bg-[#111] border-2 border-dashed border-hairline hover:border-signal rounded-xl p-8 text-center cursor-pointer select-none transition-all">
                         <input id="pdf-input" type="file" accept=".pdf" class="hidden" onchange="handleFileSelection(event)">
                         <div id="upload-zone-status" class="space-y-1">
-                            <p class="text-sm font-bold text-neutral-200">Drop resume PDF file here</p>
-                            <p class="text-xs text-neutral-500">or click to browse local files (Max 5MB)</p>
+                            <p class="text-sm font-bold text-ink100">Drop resume PDF file here</p>
+                            <p class="text-xs text-ink400">or click to browse local files (Max 5MB)</p>
                         </div>
                     </div>
 
-                    <div id="resume-file-card-preview" class="hidden w-full bg-neutral-950 border border-neutral-800 rounded-xl p-4 flex items-center justify-between shadow-inner">
+                    <div id="resume-file-card-preview" class="hidden w-full bg-surface border border-hairline rounded-xl p-4 flex items-center justify-between shadow-inner">
                         <div class="flex items-center space-x-3 min-w-0">
-                            <div class="bg-neutral-900 text-[#FFE500] p-2.5 rounded-lg border border-neutral-800 select-none">
+                            <div class="bg-surface2 text-signal p-2.5 rounded-lg border border-hairline select-none">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             </div>
                             <div class="min-w-0 space-y-0.5">
-                                <p id="preview-file-title" class="text-xs font-black text-neutral-200 truncate pr-2">resume.pdf</p>
+                                <p id="preview-file-title" class="text-xs font-black text-ink100 truncate pr-2">resume.pdf</p>
                             </div>
                         </div>
-                        <button type="button" onclick="resetFileSelectionState()" class="text-xs bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-rose-400 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer select-none">Remove</button>
+                        <button type="button" onclick="resetFileSelectionState()" class="text-xs bg-surface2 hover:bg-hairline border border-hairline text-ink400 hover:text-rose-400 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer select-none">Remove</button>
                     </div>
 
                     <div id="resume-paste-zone" class="hidden">
-                        <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                        <textarea id="resume-paste-input" rows="4" placeholder="Paste your detailed resume text profile here..." class="w-full bg-surface border border-hairline rounded-xl px-4 py-3 text-sm text-ink100 placeholder-neutral-600 focus:outline-none focus:border-signal resize-none"></textarea>
                     </div>
 
                     <div class="flex items-center space-x-1.5 px-1" id="resume-preflight-status-indicator"></div>
 
-                    <div id="preflight-audit-alert-box" class="hidden w-full bg-neutral-900/60 border border-neutral-800 rounded-xl p-3.5 flex items-start justify-between gap-4">
+                    <div id="preflight-audit-alert-box" class="hidden w-full bg-surface2/60 border border-hairline rounded-xl p-3.5 flex items-start justify-between gap-4">
                         <div class="space-y-1">
-                            <span class="text-[9px] font-mono font-black uppercase text-neutral-500 tracking-widest block">Immediate ATS Screening Audit:</span>
-                            <p id="preflight-audit-critique-msg" class="text-xs text-neutral-300 font-medium italic leading-normal"></p>
+                            <span class="text-[9px] font-mono font-black uppercase text-ink400 tracking-widest block">Immediate ATS Screening Audit:</span>
+                            <p id="preflight-audit-critique-msg" class="text-xs text-ink100 font-medium italic leading-normal"></p>
                             <div id="preflight-missing-keywords-holder" class="flex flex-wrap gap-1.5 pt-1"></div>
                         </div>
                         <div class="text-center font-mono shrink-0">
-                            <span class="text-[9px] font-black text-neutral-500 uppercase block tracking-wider">ATS Score</span>
+                            <span class="text-[9px] font-black text-ink400 uppercase block tracking-wider">ATS Score</span>
                             <span id="preflight-audit-score-badge" class="text-xl font-black block mt-0.5">0</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 space-y-3">
+                <div class="bg-surface p-4 rounded-xl border border-hairline space-y-3">
                     <div class="flex items-center justify-between">
-                        <label for="voice-synthesis-toggle" class="text-sm font-medium text-neutral-300">Enable AI Voice (Text-to-Speech)</label>
-                        <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#FFE500] rounded cursor-pointer">
+                        <label for="voice-synthesis-toggle" class="text-sm font-medium text-ink100">Enable AI Voice (Text-to-Speech)</label>
+                        <input type="checkbox" id="voice-synthesis-toggle" checked class="w-4 h-4 accent-[#C9A24B] rounded cursor-pointer">
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-neutral-900/50">
-                        <label for="voice-select-dropdown" class="text-xs font-bold tracking-wider text-neutral-500 uppercase">Interviewer Voice:</label>
-                        <select id="voice-select-dropdown" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#FFE500] cursor-pointer max-w-[180px] truncate">
+                    <div class="flex items-center justify-between pt-2 border-t border-hairline/50">
+                        <label for="voice-select-dropdown" class="text-xs font-bold tracking-wider text-ink400 uppercase">Interviewer Voice:</label>
+                        <select id="voice-select-dropdown" class="bg-surface2 border border-hairline text-ink100 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-signal cursor-pointer max-w-[180px] truncate">
                             <option value="">Loading voices...</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="space-y-1">
-                    <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview </button>
-                    <span class="text-[10px] text-neutral-500 tracking-wide block text-center font-medium select-none">Free sessions are limited to 5 minutes.</span>
+                    <button id="generate-btn" onclick="startLiveSimulation()" class="w-full bg-signal hover:bg-signaldim text-black font-black py-4 rounded-xl text-base tracking-wide shadow-xl transition-all">Start Dynamic Mock Interview </button>
+                    <span class="text-[10px] text-ink400 tracking-wide block text-center font-medium select-none">Free sessions are limited to 5 minutes.</span>
                 </div>
             </div>
         </div>
 
         <div id="simulator-screen" class="hidden space-y-6">
-            <div class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 flex items-center justify-between gap-4 font-mono select-none">
+            <div class="w-full bg-surface2 border border-hairline rounded-xl p-3 flex items-center justify-between gap-4 font-mono select-none">
                 <div class="flex items-center space-x-2 shrink-0">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Time Remaining:</span>
+                    <span class="text-[10px] font-bold text-ink400 uppercase tracking-wider">Time Remaining:</span>
                 </div>
-                <div class="w-full bg-neutral-950 h-2 border border-neutral-800/80 rounded-full overflow-hidden">
-                    <div id="stamina-timer-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000" style="width: 100%"></div>
+                <div class="w-full bg-surface h-2 border border-hairline/80 rounded-full overflow-hidden">
+                    <div id="stamina-timer-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-[#C9A24B] transition-all duration-1000" style="width: 100%"></div>
                 </div>
-                <div id="stamina-digital-clock" class="text-xs font-black text-[#FFE500] tracking-widest shrink-0 bg-neutral-950 px-2.5 py-1 rounded-md border border-neutral-800/60">
+                <div id="stamina-digital-clock" class="text-xs font-black text-signal tracking-widest shrink-0 bg-surface px-2.5 py-1 rounded-md border border-hairline/60">
                     05:00
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-neutral-900 pb-4 gap-4 sm:gap-0">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-hairline pb-4 gap-4 sm:gap-0">
                 <div>
-                    <h3 class="text-xl sm:text-2xl font-black text-white">Live AI Interview Panel</h3>
-                    <p class="text-[10px] sm:text-xs text-[#FFE500] font-mono animate-pulse" id="sim-status-indicator">Interviewer is getting ready...</p>
+                    <h3 class="text-xl sm:text-2xl font-black text-ink100">Live AI Interview Panel</h3>
+                    <p class="text-[10px] sm:text-xs text-signal font-mono animate-pulse" id="sim-status-indicator">Interviewer is getting ready...</p>
                 </div>
-                <button onclick="finishAndWrapInterview()" class="w-full sm:w-auto text-xs bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-rose-400 px-4 py-3 sm:py-2 rounded-xl font-bold transition-all text-center">✕ End Session</button>
+                <button onclick="finishAndWrapInterview()" class="w-full sm:w-auto text-xs bg-surface hover:bg-surface2 border border-hairline text-rose-400 px-4 py-3 sm:py-2 rounded-xl font-bold transition-all text-center">✕ End Session</button>
             </div>
 
-            <div class="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-6 relative overflow-hidden min-h-[140px] flex flex-col justify-center">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FFE500]"></div>
-                <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
-                <div id="sim-active-question-text" class="text-lg font-bold text-white leading-relaxed"></div>
+            <div class="bg-surface2/30 border border-hairline rounded-2xl p-6 relative overflow-hidden min-h-[140px] flex flex-col justify-center">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-signal"></div>
+                <span class="text-[10px] font-mono font-bold text-ink400 uppercase tracking-widest block mb-2">Interviewer Question / Follow-up:</span>
+                <div id="sim-active-question-text" class="text-lg font-bold text-ink100 leading-relaxed"></div>
             </div>
 
-            <div class="space-y-4 bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl">
+            <div class="space-y-4 bg-surface2/10 border border-hairline p-6 rounded-2xl">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                     <div class="space-y-0.5">
-                        <label for="sim-user-response-box" class="text-xs font-bold tracking-wider text-neutral-400 uppercase">Your Answer</label>
-                        <span class="text-[10px] text-neutral-600 block font-medium select-none">Press <kbd class="bg-neutral-950 border border-neutral-800 px-1 py-0.5 rounded font-mono text-neutral-400">Ctrl + Enter</kbd> on desktop to submit</span>
+                        <label for="sim-user-response-box" class="text-xs font-bold tracking-wider text-ink400 uppercase">Your Answer</label>
+                        <span class="text-[10px] text-ink400 block font-medium select-none">Press <kbd class="bg-surface border border-hairline px-1 py-0.5 rounded font-mono text-ink400">Ctrl + Enter</kbd> on desktop to submit</span>
                     </div>
                     
                     <div class="flex items-center space-x-2 w-full sm:w-auto">
-                        <button id="hint-request-btn" onclick="executeCandidateHintRetrieval()" class="flex-1 sm:flex-none justify-center bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 hover:border-amber-500/50 text-xs text-amber-400 px-3.5 py-3 sm:py-2 rounded-xl flex items-center space-x-1.5 transition-all cursor-pointer font-medium select-none">
-                            <span>💡 Hint</span>
+                        <button id="hint-request-btn" onclick="executeCandidateHintRetrieval()" class="flex-1 sm:flex-none justify-center bg-surface2 border border-hairline hover:bg-hairline hover:border-amber-500/50 text-xs text-amber-400 px-3.5 py-3 sm:py-2 rounded-xl flex items-center space-x-1.5 transition-all cursor-pointer font-medium select-none">
+                            <span>Hint</span>
                             <span id="hint-tracker-badge" class="bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold">Free: 1</span>
                         </button>
 
-                        <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="flex-1 sm:flex-none justify-center bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-xs text-neutral-200 px-4 py-3 sm:py-2 rounded-xl flex items-center space-x-2 transition-all">
+                        <button id="mic-toggle-btn" onclick="toggleVoiceSpeechInput()" class="flex-1 sm:flex-none justify-center bg-surface2 border border-hairline hover:bg-hairline text-xs text-ink100 px-4 py-3 sm:py-2 rounded-xl flex items-center space-x-2 transition-all">
                             <span class="w-2 h-2 rounded-full bg-red-500" id="mic-pulse-dot"></span>
                             <span id="mic-action-label" class="whitespace-nowrap"> Speak Answer</span>
                         </button>
                     </div>
                 </div>
 
-                <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or click 'Speak Answer' to speak out loud..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-[#FFE500] resize-none"></textarea>
+                <textarea id="sim-user-response-box" rows="4" placeholder="Type your full technical answer here or click 'Speak Answer' to speak out loud..." class="w-full bg-surface border border-hairline rounded-xl px-4 py-3 text-sm text-ink100 placeholder-neutral-600 focus:outline-none focus:border-signal resize-none"></textarea>
 
-                <div class="flex flex-col-reverse sm:flex-row justify-between items-center text-[11px] text-neutral-500 select-none gap-4">
+                <div class="flex flex-col-reverse sm:flex-row justify-between items-center text-[11px] text-ink400 select-none gap-4">
                     <div id="response-char-counter" class="font-mono w-full sm:w-auto text-center sm:text-left">0 characters written</div>
-                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="w-full sm:w-auto bg-[#FFE500] hover:bg-[#ebd300] text-black font-black px-8 py-4 sm:py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Submit Answer →</button>
+                    <button id="submit-turn-btn" onclick="submitCandidateResponseTurn()" class="w-full sm:w-auto bg-signal hover:bg-signaldim text-black font-black px-8 py-4 sm:py-3 rounded-xl text-sm shadow-md transition-all cursor-pointer">Submit Answer →</button>
                 </div>
             </div>
         </div>
@@ -319,65 +409,65 @@
         <div id="results-screen" class="hidden space-y-8">
             
     
-    <div id="printable-report" class="space-y-8 bg-[#0a0a0a] p-2 md:p-6 rounded-2xl">
+    <div id="printable-report" class="space-y-8 bg-ink p-2 md:p-6 rounded-2xl">
 
-        <div class="border-b border-neutral-900 pb-5 text-center">
-            <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#FFE500]">Your Results</span>
-            <h2 class="text-3xl font-black text-white mt-1">Interview Feedback</h2>
+        <div class="border-b border-hairline pb-5 text-center">
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-signal">Your Results</span>
+            <h2 class="font-display font-medium text-3xl text-ink100 mt-1">Interview Feedback</h2>
         </div>
 
-        <div id="results-signin-nudge" class="hidden bg-[#FFE500]/10 border border-[#FFE500]/30 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-            <span class="text-neutral-200">💾 Sign in free to save this report and track your progress over time.</span>
-            <button type="button" onclick="triggerInlineAuthWall('signup')" class="shrink-0 bg-[#FFE500] hover:bg-[#ebd300] text-black font-bold px-4 py-2 rounded-lg text-xs transition-all cursor-pointer">Sign Up Free →</button>
+        <div id="results-signin-nudge" class="hidden bg-signal/10 border border-signal/30 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <span class="text-ink100">Sign in free to save this report and track your progress over time.</span>
+            <button type="button" onclick="triggerInlineAuthWall('signup')" class="shrink-0 bg-signal hover:bg-signaldim text-black font-bold px-4 py-2 rounded-lg text-xs transition-all cursor-pointer">Sign Up Free →</button>
         </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Interview Score</span>
-                    <h3 class="text-4xl font-black text-white" id="report-score-target">0</h3>
-                    <span class="text-[10px] font-medium text-neutral-500 block">live communication metrics</span>
+                <div class="bg-surface2/40 border border-hairline p-5 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-ink400 font-bold block">Interview Score</span>
+                    <h3 class="text-4xl font-mono font-semibold text-ink100 tabular-nums" id="report-score-target">0</h3>
+                    <span class="text-[10px] font-medium text-ink400 block">live communication metrics</span>
                 </div>
 
-                <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Resume ATS Score</span>
-                    <h3 class="text-4xl font-black text-white" id="report-resume-score-target">0</h3>
-                    <span class="text-[10px] font-medium text-neutral-500 block">pre-flight baseline screening</span>
+                <div class="bg-surface2/40 border border-hairline p-5 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-ink400 font-bold block">Resume ATS Score</span>
+                    <h3 class="text-4xl font-mono font-semibold text-ink100 tabular-nums" id="report-resume-score-target">0</h3>
+                    <span class="text-[10px] font-medium text-ink400 block">pre-flight baseline screening</span>
                 </div>
 
-                <div class="bg-neutral-900/40 border border-neutral-800 p-5 rounded-2xl text-center flex flex-col justify-center items-center space-y-2">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold block">Hiring Verdict</span>
+                <div class="bg-surface2/40 border border-hairline p-5 rounded-2xl text-center flex flex-col justify-center items-center space-y-2">
+                    <span class="text-[10px] font-mono tracking-widest uppercase text-ink400 font-bold block">Hiring Verdict</span>
                     <div id="report-verdict-badge" class="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide">PENDING</div>
                 </div>
             </div>
 
-            <div class="bg-neutral-900/20 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4 relative overflow-hidden">
+            <div class="bg-surface2/20 border border-hairline rounded-2xl p-6 md:p-8 space-y-4 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-red-500" id="report-accent-bar"></div>
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Unvarnished Technical Critique:</h4>
-                <blockquote id="report-critique-target" class="text-neutral-200 text-sm leading-relaxed font-medium italic">Analyzing response logs...</blockquote>
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-ink400">Unvarnished Technical Critique:</h4>
+                <blockquote id="report-critique-target" class="text-ink100 text-sm leading-relaxed font-medium italic">Analyzing response logs...</blockquote>
             </div>
 
-            <div class="bg-neutral-900/10 border border-neutral-900 p-6 rounded-2xl space-y-3">
-                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-neutral-400">Areas to Improve:</h4>
-                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-neutral-300 pl-1"></ul>
+            <div class="bg-surface2/10 border border-hairline p-6 rounded-2xl space-y-3">
+                <h4 class="text-xs font-mono font-black uppercase tracking-wider text-ink400">Areas to Improve:</h4>
+                <ul id="report-gaps-list-target" class="space-y-2 text-sm text-ink100 pl-1"></ul>
             </div>
             
-            <div class="border-t border-neutral-900 pt-6">
-                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-neutral-500 mb-4">Full Transcript:</h4>
+            <div class="border-t border-hairline pt-6">
+                <h4 class="text-xs font-mono font-black uppercase tracking-widest text-ink400 mb-4">Full Transcript:</h4>
                 <div class="space-y-4" id="transcript-deck-target"></div>
             </div>
-        </div> <button onclick="window.location.reload()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer shadow-lg">Return to Dashboard</button>       </div>
+        </div> <button onclick="window.location.reload()" class="w-full bg-surface2 hover:bg-hairline border border-hairline text-ink100 font-bold py-4 rounded-xl text-sm transition-colors cursor-pointer shadow-lg">Return to Dashboard</button>       </div>
     </main>
 
     <div id="cancel-confirmation-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
+        <div class="bg-surface border border-hairline rounded-2xl w-full max-w-sm p-6 space-y-6 text-center shadow-2xl">
             <div class="space-y-2">
-                <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto text-lg font-black animate-pulse">⚠️</div>
-                <h4 class="text-lg font-black text-white tracking-tight">End This Session?</h4>
-                <p class="text-neutral-400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost.</p>
+                <div class="w-12 h-12 bg-rose-950/40 border border-rose-900/50 text-rose-400 rounded-full flex items-center justify-center mx-auto font-mono text-lg font-black">!</div>
+                <h4 class="text-lg font-black text-ink100 tracking-tight">End This Session?</h4>
+                <p class="text-ink400 text-xs leading-relaxed px-2">Your current interview progress will be permanently lost.</p>
             </div>
             <div class="flex gap-3">
-                <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">Keep Practicing</button>
-                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, End Session</button>
+                <button type="button" onclick="dismissCancellationModal()" class="flex-1 py-3 text-xs font-bold rounded-xl bg-surface2 hover:bg-hairline border border-hairline text-ink100 transition-colors cursor-pointer">Keep Practicing</button>
+                <button type="button" onclick="confirmAbruptSessionExit()" class="flex-1 py-3 text-xs font-black rounded-xl bg-rose-600 hover:bg-rose-500 text-ink100 transition-colors cursor-pointer shadow-lg shadow-rose-600/10">Yes, End Session</button>
             </div>
         </div>
     </div>
@@ -386,111 +476,111 @@
         <div class="max-w-md w-full text-center space-y-6">
             <div class="w-20 h-20 bg-rose-950/30 border border-rose-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(244,63,94,0.1)] relative">
                 <span class="absolute inset-0 rounded-full bg-rose-500/10 animate-ping"></span>
-                <span class="text-3xl animate-pulse">🚨</span>
+                <span class="font-mono text-2xl font-bold text-rose-400">!</span>
             </div>
             <div class="space-y-2">
-                <h3 class="text-2xl font-black tracking-tight text-white uppercase font-mono">Time's Up</h3>
+                <h3 class="text-2xl font-black tracking-tight text-ink100 uppercase font-mono">Time's Up</h3>
                 <p class="text-rose-400 text-xs font-bold font-mono tracking-wider uppercase">Session Ended — Time Limit Reached</p>
-                <p class="text-neutral-400 text-sm max-w-xs mx-auto pt-1 leading-relaxed">
+                <p class="text-ink400 text-sm max-w-xs mx-auto pt-1 leading-relaxed">
                     You ran out of time before finishing. Here's your feedback based on what you completed.
                 </p>
             </div>
-            <div class="inline-flex items-center space-x-2 bg-neutral-950 border border-neutral-900 px-4 py-2 rounded-xl text-xs font-mono text-neutral-500">
+            <div class="inline-flex items-center space-x-2 bg-surface border border-hairline px-4 py-2 rounded-xl text-xs font-mono text-ink400">
                 <span>Preparing your results in</span>
-                <span id="timeout-redirect-countdown" class="text-white font-black">3</span>s
+                <span id="timeout-redirect-countdown" class="text-ink100 font-black">3</span>s
             </div>
         </div>
     </div>
     <div id="beta-limit-overlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none animate-[fadeIn_0.2s_ease-out]">
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 text-center shadow-2xl relative">
-            <button type="button" onclick="closeBetaLimitModal()" aria-label="Close" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+        <div class="bg-surface border border-hairline rounded-2xl w-full max-w-md p-6 md:p-8 space-y-6 text-center shadow-2xl relative">
+            <button type="button" onclick="closeBetaLimitModal()" aria-label="Close" class="absolute top-4 right-4 text-ink400 hover:text-ink100 font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
             
             <div class="space-y-3">
-                <div class="w-14 h-14 bg-[#FFE500]/10 border border-[#FFE500]/20 text-[#FFE500] rounded-full flex items-center justify-center mx-auto text-2xl font-black mb-2 shadow-[0_0_15px_rgba(255,229,0,0.1)]">🚀</div>
-                <h3 class="text-2xl font-black text-white tracking-tight">Beta Limit Reached</h3>
-                <p class="text-neutral-400 text-sm leading-relaxed px-2">
+                <div class="w-14 h-14 bg-signal/10 border border-signal/20 text-signal rounded-full flex items-center justify-center mx-auto font-display text-2xl font-medium mb-2">+</div>
+                <h3 class="text-2xl font-black text-ink100 tracking-tight">Beta Limit Reached</h3>
+                <p class="text-ink400 text-sm leading-relaxed px-2">
                     You have used your 3 free beta interviews! Thank you for testing Krackit AI. Your feedback is crucial for our launch.
                 </p>
             </div>
             
             <div class="flex flex-col gap-3 pt-2">
-                <a href="https://tally.so/r/XxQj4e" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 text-sm font-black rounded-xl bg-[#FFE500] hover:bg-[#ebd300] text-black transition-all cursor-pointer shadow-lg shadow-[#FFE500]/10 block">
-                    💬 Leave Feedback
+                <a href="https://tally.so/r/XxQj4e" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 text-sm font-black rounded-xl bg-signal hover:bg-signaldim text-black transition-all cursor-pointer shadow-lg shadow-[#C9A24B]/10 block">
+                    Leave Feedback
                 </a>
-                <button type="button" onclick="closeBetaLimitModal()" class="w-full py-3 text-sm font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 transition-colors cursor-pointer">
+                <button type="button" onclick="closeBetaLimitModal()" class="w-full py-3 text-sm font-bold rounded-xl bg-surface2 hover:bg-hairline border border-hairline text-ink100 transition-colors cursor-pointer">
                     Return to Dashboard
                 </button>
             </div>
         </div>
     </div>
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
-            <button type="button" onclick="closePaywallModal()" aria-label="Close" class="absolute top-4 right-4 text-neutral-500 hover:text-white font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
+        <div class="bg-surface border border-hairline rounded-2xl w-full max-w-5xl p-6 md:p-8 space-y-6 shadow-2xl relative m-auto">
+            <button type="button" onclick="closePaywallModal()" aria-label="Close" class="absolute top-4 right-4 text-ink400 hover:text-ink100 font-mono text-sm font-bold transition-colors cursor-pointer select-none">✕</button>
 
             <div class="text-center space-y-1">
-                <h3 class="text-2xl font-black tracking-tight text-white">Choose Your Workspace Tier</h3>
-                <p class="text-neutral-400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
+                <h3 class="text-2xl font-black tracking-tight text-ink100">Choose Your Workspace Tier</h3>
+                <p class="text-ink400 text-xs">Accelerate your technical preparation with production-grade interview analytics.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
                 
-                <div class="bg-neutral-900/40 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
+                <div class="bg-surface2/40 border border-hairline/80 rounded-xl p-5 flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <div>
-                            <span class="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-widest block">Basic Sandbox</span>
-                            <h4 class="text-xl font-bold text-neutral-300 mt-0.5">Free Account</h4>
+                            <span class="text-[10px] font-mono font-bold text-ink400 uppercase tracking-widest block">Basic Sandbox</span>
+                            <h4 class="text-xl font-bold text-ink100 mt-0.5">Free Account</h4>
                         </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-400">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>3 total practice sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>5-minute session limit</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500]">✓</span> <span>Standard ATS screening</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Audio voice synthesis</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-neutral-600">✕</span> <span class="text-neutral-500 line-through">Unvarnished deficiency audits</span></li>
+                        <ul class="space-y-2.5 text-xs text-ink400">
+                            <li class="flex items-center space-x-2"><span class="text-signal">✓</span> <span>3 total practice sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-signal">✓</span> <span>5-minute session limit</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-signal">✓</span> <span>Standard ATS screening</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-ink400">✕</span> <span class="text-ink400 line-through">Audio voice synthesis</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-ink400">✕</span> <span class="text-ink400 line-through">Unvarnished deficiency audits</span></li>
                         </ul>
                     </div>
-                    <button type="button" onclick="closePaywallModal()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
+                    <button type="button" onclick="closePaywallModal()" class="w-full bg-surface2 hover:bg-hairline border border-hairline text-ink100 text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer">Continue Practicing</button>
                 </div>
 
-                <div class="bg-neutral-900 border border-[#FFE500]/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-[0_0_30px_rgba(255,229,0,0.05)] lg:scale-105 z-10">
-                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-[#FFE500] text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
+                <div class="bg-surface2 border border-signal/50 rounded-xl p-5 flex flex-col justify-between space-y-6 relative shadow-lg shadow-black/40 lg:scale-105 z-10">
+                    <div class="absolute -top-3 right-0 left-0 mx-auto w-max bg-signal text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full select-none shadow-md">Recommended</div>
                     <div class="space-y-4">
                         <div>
-                            <span class="text-[10px] font-mono font-bold text-[#FFE500] uppercase tracking-widest block">Complete Suite</span>
+                            <span class="text-[10px] font-mono font-bold text-signal uppercase tracking-widest block">Complete Suite</span>
                             <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Pro</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $19 monthly</span>
+                                <h4 class="text-xl font-black text-ink100">Krackit Pro</h4>
+                                <span class="text-xs text-ink400 font-medium">/ $19 monthly</span>
                             </div>
                         </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-200">
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span><strong>Unlimited</strong> interview sessions</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>20-minute session duration</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Hyper-realistic voice processing</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Unvarnished, brutally honest audits</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-[#FFE500] font-bold">⚡</span> <span>Reveals exact missing ATS keywords</span></li>
+                        <ul class="space-y-2.5 text-xs text-ink100">
+                            <li class="flex items-center space-x-2"><span class="text-signal font-bold">→</span> <span><strong>Unlimited</strong> interview sessions</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-signal font-bold">→</span> <span>20-minute session duration</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-signal font-bold">→</span> <span>Hyper-realistic voice processing</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-signal font-bold">→</span> <span>Unvarnished, brutally honest audits</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-signal font-bold">→</span> <span>Reveals exact missing ATS keywords</span></li>
                         </ul>
                     </div>
-                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-[#FFE500] hover:bg-[#ebd300] text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#FFE500]/10 cursor-pointer">Upgrade to Pro →</button>
+                    <button type="button" onclick="initiatePremiumCheckout('pro')" class="w-full bg-signal hover:bg-signaldim text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-[#C9A24B]/10 cursor-pointer">Upgrade to Pro →</button>
                 </div>
 
-                <div class="bg-neutral-950 border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
+                <div class="bg-surface border border-neutral-700 rounded-xl p-5 flex flex-col justify-between space-y-6 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
                     <div class="space-y-4 relative z-10">
                         <div>
-                            <span class="text-[10px] font-mono font-bold text-neutral-300 uppercase tracking-widest block">Power User</span>
+                            <span class="text-[10px] font-mono font-bold text-ink100 uppercase tracking-widest block">Power User</span>
                             <div class="flex items-baseline space-x-1 mt-0.5">
-                                <h4 class="text-xl font-black text-white">Krackit Elite</h4>
-                                <span class="text-xs text-neutral-400 font-medium">/ $39 monthly</span>
+                                <h4 class="text-xl font-black text-ink100">Krackit Elite</h4>
+                                <span class="text-xs text-ink400 font-medium">/ $39 monthly</span>
                             </div>
                         </div>
-                        <ul class="space-y-2.5 text-xs text-neutral-300">
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Advanced 70B AI Engine</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Custom FAANG Personas</span></li>
-                            <li class="flex items-center space-x-2"><span class="text-white font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
-                            <li class="flex items-center space-x-2 text-neutral-500 italic mt-2 border-t border-neutral-800 pt-2">Plus all Krackit Pro features</li>
+                        <ul class="space-y-2.5 text-xs text-ink100">
+                            <li class="flex items-center space-x-2"><span class="text-ink100 font-bold">✓</span> <span><strong>45-minute marathon sessions</strong></span></li>
+                            <li class="flex items-center space-x-2"><span class="text-ink100 font-bold">✓</span> <span>Advanced 70B AI Engine</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-ink100 font-bold">✓</span> <span>Custom FAANG Personas</span></li>
+                            <li class="flex items-center space-x-2"><span class="text-ink100 font-bold">✓</span> <span>Unlimited conceptual hint lifelines</span></li>
+                            <li class="flex items-center space-x-2 text-ink400 italic mt-2 border-t border-hairline pt-2">Plus all Krackit Pro features</li>
                         </ul>
                     </div>
-                    <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10 cursor-pointer">Upgrade to Elite ⚡</button>
+                    <button type="button" onclick="initiatePremiumCheckout('elite')" class="w-full bg-white hover:bg-neutral-200 text-black text-xs font-black py-3 rounded-xl text-center block transition-all tracking-wide shadow-md shadow-white/10 relative z-10 cursor-pointer">Upgrade to Elite</button>
                 </div>
 
             </div>
@@ -508,23 +598,23 @@
 
             const alertBox = document.createElement('div');
             
-            let bgClass = 'bg-neutral-900 border-neutral-800 text-neutral-200';
-            let icon = '🔔';
+            let bgClass = 'bg-surface2 border-hairline text-ink100';
+            let dotClass = 'bg-ink400';
 
             if (type === 'error') {
                 bgClass = 'bg-rose-950/90 border-rose-900 text-rose-300';
-                icon = '🚨';
+                dotClass = 'bg-rose-400';
             } else if (type === 'success') {
                 bgClass = 'bg-emerald-950/90 border-emerald-900 text-emerald-300';
-                icon = '✅';
+                dotClass = 'bg-emerald-400';
             } else if (type === 'warning') {
                 bgClass = 'bg-amber-950/90 border-amber-900 text-amber-300';
-                icon = '⚠️';
+                dotClass = 'bg-amber-400';
             }
 
             alertBox.className = `flex items-center space-x-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md transform transition-all duration-300 translate-x-full opacity-0 ${bgClass}`;
             alertBox.innerHTML = `
-                <span class="text-lg">${icon}</span>
+                <span class="w-2 h-2 rounded-full shrink-0 ${dotClass}"></span>
                 <p class="text-sm font-medium font-sans">${message}</p>
             `;
 
@@ -560,8 +650,8 @@
                     window.currentUserTier = 'free';
                     if (profileHolder) {
                         profileHolder.innerHTML = `
-                            <button onclick="triggerInlineAuthWall('signin')" class="text-neutral-400 hover:text-white font-bold px-3 py-1.5 transition-colors cursor-pointer">Login</button>
-                            <button onclick="triggerInlineAuthWall('signup')" class="bg-[#FFE500] text-black font-black px-4 py-1.5 rounded-xl hover:bg-[#ebd300] transition-colors cursor-pointer">Sign Up ⚡</button>
+                            <button onclick="triggerInlineAuthWall('signin')" class="text-ink400 hover:text-ink100 font-bold px-3 py-1.5 transition-colors cursor-pointer">Login</button>
+                            <button onclick="triggerInlineAuthWall('signup')" class="bg-signal text-black font-black px-4 py-1.5 rounded-xl hover:bg-signaldim transition-colors cursor-pointer">Sign Up</button>
                         `;
                     }
                 } else {
@@ -577,8 +667,8 @@
                     if (overlayWall) overlayWall.classList.add('hidden');
                     if (profileHolder) {
                         profileHolder.innerHTML = `
-                            <span class="text-neutral-400 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-xl font-mono select-none">${session.user.email}</span>
-                            <button onclick="triggerUserLogoutPipeline()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-rose-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer transition-colors">Logout</button>
+                            <span class="text-ink400 bg-surface border border-hairline px-3 py-1.5 rounded-xl font-mono select-none">${session.user.email}</span>
+                            <button onclick="triggerUserLogoutPipeline()" class="bg-surface2 hover:bg-hairline border border-hairline text-rose-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer transition-colors">Logout</button>
                         `;
                     }
                 }
@@ -620,13 +710,13 @@
             if (errorBox) errorBox.classList.add('hidden');
 
             if (targetMode === 'signin') {
-                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
-                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80 transition-all cursor-pointer";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer";
                 if (formSignIn) formSignIn.className = "block";
                 if (formSignUp) formSignUp.className = "hidden";
             } else {
-                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-white bg-neutral-900 border border-neutral-800/80 transition-all cursor-pointer";
-                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-neutral-400 transition-all cursor-pointer";
+                if (btnSignUp) btnSignUp.className = "flex-1 py-2 text-xs font-bold rounded-lg text-ink100 bg-surface2 border border-hairline/80 transition-all cursor-pointer";
+                if (btnSignIn) btnSignIn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer";
                 if (formSignUp) formSignUp.className = "block";
                 if (formSignIn) formSignIn.className = "hidden";
             }
@@ -667,6 +757,68 @@
         let runningChatHistoryLedger = [];
         let globalJobDescContext = '';
         let globalResumeContext = '';
+
+        // Company-round practice mode. null when using the generic JD flow.
+        // Set by switchInterviewMode()/selectCompanyRound() before a session
+        // starts, and read by buildInterviewRequestBody() so every fetch call
+        // to /api/interview stays in sync automatically instead of each call
+        // site needing to remember to include these fields itself.
+        window.interviewInputMode = 'generic';
+        window.selectedCompanyRoundType = null;
+        let globalCompanyModeContext = null;
+
+        function switchInterviewMode(mode) {
+            window.interviewInputMode = mode;
+            const genericBtn = document.getElementById('mode-toggle-generic-btn');
+            const companyBtn = document.getElementById('mode-toggle-company-btn');
+            const genericSection = document.getElementById('generic-jd-section');
+            const companySection = document.getElementById('company-round-section');
+
+            if (mode === 'company') {
+                genericSection.classList.add('hidden');
+                companySection.classList.remove('hidden');
+                genericBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer";
+                companyBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80 transition-all cursor-pointer";
+            } else {
+                companySection.classList.add('hidden');
+                genericSection.classList.remove('hidden');
+                companyBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer";
+                genericBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80 transition-all cursor-pointer";
+            }
+        }
+
+        function selectCompanyRound(btn) {
+            document.querySelectorAll('.round-select-btn').forEach(el => {
+                el.classList.remove('border-signal', 'bg-surface2');
+                el.classList.add('border-hairline');
+            });
+            btn.classList.remove('border-hairline');
+            btn.classList.add('border-signal', 'bg-surface2');
+            window.selectedCompanyRoundType = btn.dataset.round;
+        }
+
+        // Single source of truth for every /api/interview request body, so
+        // company-mode fields (or their absence) can never drift out of sync
+        // between the main turn fetch, the hint fetch, and the timeout fetch.
+        function buildInterviewRequestBody(chatHistoryToSend, extraFields = {}) {
+            const body = {
+                resume: globalResumeContext,
+                chatHistory: chatHistoryToSend,
+                tier: window.currentUserTier || 'free',
+                ...extraFields
+            };
+            if (globalCompanyModeContext) {
+                Object.assign(body, globalCompanyModeContext);
+                // A pasted JD still wins over the synthetic one if the user
+                // provided both — the backend already implements this rule,
+                // this just avoids sending an empty string that would
+                // otherwise short-circuit that check.
+                if (globalJobDescContext) body.jobDescription = globalJobDescContext;
+            } else {
+                body.jobDescription = globalJobDescContext;
+            }
+            return JSON.stringify(body);
+        }
         let speechRecognitionEngine = null;
         let isMicrophoneListening = false;
         let latestEvaluationReportCache = null;
@@ -695,7 +847,7 @@
 
             // Show unlimited badge for paying users
             if (tier === 'pro' || tier === 'elite') {
-                target.innerHTML = `<span class="bg-[#FFE500]/20 text-[#FFE500] border border-[#FFE500]/50 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-[0_0_10px_rgba(255,229,0,0.1)]">⚡ ${tier.toUpperCase()} PLAN ACTIVE</span>`;
+                target.innerHTML = `<span class="bg-signal/20 text-signal border border-signal/50 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">${tier.toUpperCase()} PLAN ACTIVE</span>`;
                 return;
             }
 
@@ -707,9 +859,9 @@
             } else {
                 target.innerHTML = `
                     <div class="flex items-center space-x-4">
-                        <span class="bg-neutral-900 border border-neutral-800 text-neutral-400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span>
-                            <span>Beta Sessions Remaining: <span class="text-white">${rem}</span>/3</span>
+                        <span class="bg-surface2 border border-hairline text-ink400 text-[10px] font-mono px-2.5 py-1.5 rounded-lg font-bold select-none flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 bg-signal rounded-full animate-pulse"></span>
+                            <span>Beta Sessions Remaining: <span class="text-ink100">${rem}</span>/3</span>
                         </span>
                     </div>
                 `;
@@ -779,8 +931,8 @@
             instance.onend = () => {
                 isMicrophoneListening = false;
                 if (document.getElementById('mic-toggle-btn')) {
-                    document.getElementById('mic-toggle-btn').className = "bg-neutral-900 border border-neutral-800 text-xs text-neutral-200 px-4 py-2 rounded-xl flex items-center space-x-2";
-                    document.getElementById('mic-action-label').innerText = "🎤 Speak Answer";
+                    document.getElementById('mic-toggle-btn').className = "bg-surface2 border border-hairline text-xs text-ink100 px-4 py-2 rounded-xl flex items-center space-x-2";
+                    document.getElementById('mic-action-label').innerText = "Speak Answer";
                 }
             };
 
@@ -869,8 +1021,8 @@
 
         function switchUploadMode(mode) {
             currentUploadMode = mode;
-            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
-            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-[#FFE500] bg-neutral-900 border border-neutral-800/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-neutral-400";
+            document.getElementById('toggle-upload-btn').className = mode === 'upload' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-ink400";
+            document.getElementById('toggle-paste-btn').className = mode === 'paste' ? "flex-1 py-1.5 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80" : "flex-1 py-1.5 text-xs font-bold rounded-lg text-ink400";
             
             const alertBox = document.getElementById('preflight-audit-alert-box');
             const statusIndicator = document.getElementById('resume-preflight-status-indicator');
@@ -911,10 +1063,10 @@
             document.getElementById('resume-preflight-status-indicator').innerHTML = '';
             
             const zone = document.getElementById('resume-upload-zone');
-            zone.className = "w-full bg-[#111] border-2 border-dashed border-neutral-800 hover:border-[#FFE500] rounded-xl p-8 text-center cursor-pointer select-none transition-all";
+            zone.className = "w-full bg-[#111] border-2 border-dashed border-hairline hover:border-signal rounded-xl p-8 text-center cursor-pointer select-none transition-all";
             document.getElementById('upload-zone-status').innerHTML = `
-                <p class="text-sm font-bold text-neutral-200">Drop resume PDF file here</p>
-                <p class="text-xs text-neutral-500">or click to browse local files (Max 5MB)</p>
+                <p class="text-sm font-bold text-ink100">Drop resume PDF file here</p>
+                <p class="text-xs text-ink400">or click to browse local files (Max 5MB)</p>
             `;
             zone.classList.remove('hidden');
         }
@@ -922,7 +1074,7 @@
         function handleFileSelection(e) {
             const f = e.target.files[0];
             if(f) {
-                document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Reading your resume...</p>`;
+                document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-ink400 font-mono animate-pulse">Reading your resume...</p>`;
                 
                 extractTextFromPDF(f).then(txt => {
                     extractedPdfTextState = txt;
@@ -940,7 +1092,17 @@
        async function executePreflightResumeScreening(rawText) {
             const statusIndicator = document.getElementById('resume-preflight-status-indicator');
             const alertBox = document.getElementById('preflight-audit-alert-box');
-            
+
+            // Don't fire the request at all until there's actually a resume to
+            // score — this was previously sending an empty resumeText (e.g. when
+            // the JD box triggers auto-scan before a resume has been added),
+            // getting a legitimate 400 back, and then displaying "Screening
+            // Offline" as if the service itself were down.
+            if (!rawText || rawText.trim().length < 50) {
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-ink400 tracking-wider">Add Your Resume to Scan</span>`;
+                return;
+            }
+
             // 🔥 GRAB THE JOB DESCRIPTION TEXT
             const currentJobDesc = document.getElementById('job-desc-input').value.trim();
             
@@ -996,7 +1158,7 @@
                     // Fully reveal the exact keywords extracted from the JD to everyone!
                     if (data.missingKeywords && data.missingKeywords.length > 0) {
                         data.missingKeywords.forEach(word => {
-                            keywordsHolder.innerHTML += `<span class="bg-neutral-900 border border-neutral-800 text-[9px] font-mono text-neutral-400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
+                            keywordsHolder.innerHTML += `<span class="bg-surface2 border border-hairline text-[9px] font-mono text-ink400 px-2 py-0.5 rounded-md font-semibold tracking-wide">+ Missing: ${word}</span>`;
                         });
                     } else {
                         keywordsHolder.innerHTML = `<span class="text-[9px] text-emerald-500 font-mono italic mt-1">No critical keywords missing from the JD!</span>`;
@@ -1007,7 +1169,7 @@
 
             } catch (err) {
                 console.error(err);
-                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-neutral-600 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-neutral-500 tracking-wider">Screening Offline</span>`;
+                if (statusIndicator) statusIndicator.innerHTML = `<span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span><span class="text-[10px] font-mono uppercase font-bold text-rose-400 tracking-wider">Scan Failed — Try Again</span>`;
             }
         }
 
@@ -1019,7 +1181,7 @@
             document.getElementById('history-modal').classList.remove('hidden');
             const container = document.getElementById('history-rows-container');
             const dashboardWrapper = document.getElementById('analytics-dashboard-wrapper');
-            container.innerHTML = `<p class="text-xs text-neutral-500 font-mono animate-pulse">Loading your session history...</p>`;
+            container.innerHTML = `<p class="text-xs text-ink400 font-mono animate-pulse">Loading your session history...</p>`;
 
             try {
                 // Fetch all data, oldest to newest so the graph goes left to right
@@ -1031,7 +1193,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    container.innerHTML = `<p class="text-xs text-neutral-600 font-medium italic">You haven't completed any sessions yet.</p>`;
+                    container.innerHTML = `<p class="text-xs text-ink400 font-medium italic">You haven't completed any sessions yet.</p>`;
                     dashboardWrapper.classList.add('hidden');
                     return;
                 }
@@ -1062,11 +1224,11 @@
                         datasets: [{
                             label: 'Technical Score / 100',
                             data: chartScores,
-                            borderColor: '#FFE500',
+                            borderColor: '#C9A24B',
                             backgroundColor: 'rgba(255, 229, 0, 0.1)',
                             borderWidth: 2,
                             pointBackgroundColor: '#0a0a0a',
-                            pointBorderColor: '#FFE500',
+                            pointBorderColor: '#C9A24B',
                             pointBorderWidth: 2,
                             pointRadius: 4,
                             fill: true,
@@ -1094,7 +1256,7 @@
                         gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`;
                     });
                 } else {
-                    gapsList.innerHTML = `<li class="text-neutral-500 italic">No recurring weaknesses detected yet.</li>`;
+                    gapsList.innerHTML = `<li class="text-ink400 italic">No recurring weaknesses detected yet.</li>`;
                 }
 
                 // --- RENDER OLD LOGBOOK (Newest First) ---
@@ -1124,41 +1286,41 @@
                         if (msg.role === 'assistant') { questionBuffer = msg.content; }
                         else if (msg.role === 'user' && questionBuffer && !msg.content.includes("SYSTEM NOTE:")) {
                             transcriptHtml += `
-                                <div class="bg-neutral-950 p-3 rounded-lg border border-neutral-900 space-y-2">
-                                    <p class="text-[10px] font-mono text-neutral-500 font-bold uppercase">Question:</p>
-                                    <p class="text-xs text-neutral-300 font-bold leading-relaxed">${questionBuffer}</p>
-                                    <div class="bg-neutral-900/50 p-2.5 rounded border border-neutral-800">
-                                        <p class="text-[9px] font-mono text-neutral-400 uppercase font-semibold">Your Answer:</p>
-                                        <p class="text-xs text-neutral-400 font-normal leading-relaxed mt-0.5">${msg.content}</p>
+                                <div class="bg-surface p-3 rounded-lg border border-hairline space-y-2">
+                                    <p class="text-[10px] font-mono text-ink400 font-bold uppercase">Question:</p>
+                                    <p class="text-xs text-ink100 font-bold leading-relaxed">${questionBuffer}</p>
+                                    <div class="bg-surface2/50 p-2.5 rounded border border-hairline">
+                                        <p class="text-[9px] font-mono text-ink400 uppercase font-semibold">Your Answer:</p>
+                                        <p class="text-xs text-ink400 font-normal leading-relaxed mt-0.5">${msg.content}</p>
                                     </div>
                                 </div>`;
                         }
                     });
 
                     container.innerHTML += `
-                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl transition-all overflow-hidden mb-3">
-                            <div onclick="toggleHistoryItemAccordion(${idx})" class="p-4 flex items-center justify-between cursor-pointer hover:bg-neutral-900/80 transition-colors select-none">
+                        <div class="bg-surface2/40 border border-hairline rounded-xl transition-all overflow-hidden mb-3">
+                            <div onclick="toggleHistoryItemAccordion(${idx})" class="p-4 flex items-center justify-between cursor-pointer hover:bg-surface2/80 transition-colors select-none">
                                 <div class="space-y-1 min-w-0 pr-2">
                                     <div class="flex items-center space-x-2">
-                                        <span class="text-[10px] font-mono font-bold text-neutral-500">${dateStr}</span>
+                                        <span class="text-[10px] font-mono font-bold text-ink400">${dateStr}</span>
                                         <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${passed ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-900/30' : 'bg-rose-950/60 text-rose-400 border border-rose-900/30'}">${verdictStr}</span>
                                     </div>
-                                    <h4 class="text-xs font-bold text-neutral-300 truncate max-w-[240px]">${displayTitle}</h4>
+                                    <h4 class="text-xs font-bold text-ink100 truncate max-w-[240px]">${displayTitle}</h4>
                                 </div>
                                 <div class="flex items-center space-x-3 font-mono">
-                                    <span class="text-base font-black text-white">${row.score}<span class="text-[10px] text-neutral-500 font-normal">/100</span></span>
-                                    <span id="history-arrow-${idx}" class="text-neutral-500 text-xs transition-transform duration-200">▼</span>
+                                    <span class="text-base font-black text-ink100">${row.score}<span class="text-[10px] text-ink400 font-normal">/100</span></span>
+                                    <span id="history-arrow-${idx}" class="text-ink400 text-xs transition-transform duration-200">▼</span>
                                 </div>
                             </div>
 
-                            <div id="history-body-${idx}" class="hidden border-t border-neutral-900 p-4 bg-neutral-950/50 space-y-4 text-xs">
+                            <div id="history-body-${idx}" class="hidden border-t border-hairline p-4 bg-surface/50 space-y-4 text-xs">
                                 <div class="space-y-1 relative pl-3 border-l-2 ${passed ? 'border-emerald-500' : 'border-rose-500'}">
-                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Unvarnished AI Critique:</h5>
-                                    <p class="text-neutral-300 font-medium italic leading-relaxed">"${row.brutally_honest_review}"</p>
+                                    <h5 class="text-[10px] font-mono font-black uppercase text-ink400 tracking-wider">Unvarnished AI Critique:</h5>
+                                    <p class="text-ink100 font-medium italic leading-relaxed">"${row.brutally_honest_review}"</p>
                                 </div>
-                                <div class="space-y-2 pt-2 border-t border-neutral-900">
-                                    <h5 class="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider">Interaction Timeline:</h5>
-                                    <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">${transcriptHtml || '<p class="text-neutral-600 italic">No timeline entries generated.</p>'}</div>
+                                <div class="space-y-2 pt-2 border-t border-hairline">
+                                    <h5 class="text-[10px] font-mono font-black uppercase text-ink400 tracking-wider">Interaction Timeline:</h5>
+                                    <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">${transcriptHtml || '<p class="text-ink400 italic">No timeline entries generated.</p>'}</div>
                                 </div>
                             </div>
                         </div>
@@ -1219,7 +1381,7 @@
                     .insert([payload])
                     .select(); 
 
-                if (error) { console.error("🚨 DATABASE REJECTION:", error.message); }
+                if (error) { console.error("DATABASE REJECTION:", error.message); }
             } catch (err) {
                 console.error("History sync error:", err);
             }
@@ -1252,7 +1414,7 @@
     
     if (progressFill) {
         progressFill.style.width = "100%";
-        progressFill.className = "h-full bg-gradient-to-r from-amber-500 to-[#FFE500] transition-all duration-1000";
+        progressFill.className = "h-full bg-gradient-to-r from-amber-500 to-[#C9A24B] transition-all duration-1000";
     }
 
     countdownTimerIntervalInstance = setInterval(() => {
@@ -1275,7 +1437,7 @@
             // Turn red in the final 60 seconds
             if (remainingInterviewSecondsBalance <= 60) {
                 progressFill.className = "h-full bg-gradient-to-r from-rose-600 to-red-500 transition-all duration-1000";
-                if (clockDisplay) clockDisplay.className = "text-xs font-black text-rose-500 tracking-widest shrink-0 bg-neutral-950 px-2.5 py-1 rounded-md border border-rose-900 animate-pulse";
+                if (clockDisplay) clockDisplay.className = "text-xs font-black text-rose-500 tracking-widest shrink-0 bg-surface px-2.5 py-1 rounded-md border border-rose-900 animate-pulse";
             }
         }
 
@@ -1312,18 +1474,13 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({
-                        jobDescription: globalJobDescContext,
-                        resume: globalResumeContext,
-                        chatHistory: runningChatHistoryLedger,
-                        tier: window.currentUserTier || 'free'
-                    })
+                    body: buildInterviewRequestBody(runningChatHistoryLedger)
                 });
                 const data = await response.json();
                 latestEvaluationReportCache = data;
                 
                 if (latestEvaluationReportCache.brutallyHonestReview) {
-                    latestEvaluationReportCache.brutallyHonestReview = "⚠️ Partial evaluation (time ran out): " + latestEvaluationReportCache.brutallyHonestReview;
+                    latestEvaluationReportCache.brutallyHonestReview = "Partial evaluation (time ran out): " + latestEvaluationReportCache.brutallyHonestReview;
                 }
 
                 executeFinalReportCompilation();
@@ -1354,13 +1511,29 @@
             const tier = window.currentUserTier || 'free';
 
             // 3. THE SOFT GATE: Compile Context
-            globalJobDescContext = document.getElementById('job-desc-input').value.trim();
             globalResumeContext = currentUploadMode === 'upload' ? extractedPdfTextState : document.getElementById('resume-paste-input').value.trim();
 
-            // The JD is the only strict requirement now
-            if(!globalJobDescContext || globalJobDescContext.length < 50) { 
-                showCustomAlert("Please paste a valid Job Description to calibrate the AI interviewer.", "warning"); 
-                return; 
+            if (window.interviewInputMode === 'company') {
+                // Company-round mode: no JD required (the backend synthesizes
+                // one from company+role+level), but a round must be picked.
+                globalJobDescContext = document.getElementById('job-desc-input').value.trim(); // still respected if present
+                if (!window.selectedCompanyRoundType) {
+                    showCustomAlert("Please pick an interview round to practice.", "warning");
+                    return;
+                }
+                globalCompanyModeContext = {
+                    company: document.getElementById('company-select').value,
+                    companyRole: document.getElementById('company-role-select').value,
+                    roundType: window.selectedCompanyRoundType,
+                    targetLevel: document.getElementById('company-level-select').value
+                };
+            } else {
+                globalCompanyModeContext = null;
+                globalJobDescContext = document.getElementById('job-desc-input').value.trim();
+                if(!globalJobDescContext || globalJobDescContext.length < 50) { 
+                    showCustomAlert("Please paste a valid Job Description to calibrate the AI interviewer.", "warning"); 
+                    return; 
+                }
             }
 
             // If they skipped the Keyword Defense (Resume), tell the AI to do a general interview
@@ -1384,7 +1557,7 @@
                     badgeElement.className = "bg-amber-950/80 text-amber-300 border border-amber-900 text-[9px] px-1.5 py-0.5 rounded-md font-bold";
                 } else {
                     badgeElement.innerText = `${tier.toUpperCase()} HINTS: ${tier === 'elite' ? '∞' : remainingFreeHintsCount}`;
-                    badgeElement.className = "bg-[#FFE500]/20 text-[#FFE500] border border-[#FFE500]/50 text-[9px] px-1.5 py-0.5 rounded-md font-black tracking-widest";
+                    badgeElement.className = "bg-signal/20 text-signal border border-signal/50 text-[9px] px-1.5 py-0.5 rounded-md font-black tracking-widest";
                 }
             }
 
@@ -1445,7 +1618,7 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ jobDescription: globalJobDescContext, resume: globalResumeContext, chatHistory: runningChatHistoryLedger })
+                    body: buildInterviewRequestBody(runningChatHistoryLedger)
                 });
 
                 const data = await response.json();
@@ -1530,7 +1703,7 @@
             const badge = document.getElementById('hint-tracker-badge');
             if (badge) {
                 badge.innerText = `Hints Used: ${runningSessionHintsUsedTotal}`;
-                badge.className = "bg-neutral-950 text-neutral-500 border border-neutral-800 text-[9px] px-1.5 py-0.5 rounded-md font-bold tracking-widest";
+                badge.className = "bg-surface text-ink400 border border-hairline text-[9px] px-1.5 py-0.5 rounded-md font-bold tracking-widest";
             }
 
             const temporaryPayloadHistory = [...runningChatHistoryLedger];
@@ -1549,12 +1722,7 @@
                 const response = await fetch('/api/interview', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({
-                        jobDescription: globalJobDescContext,
-                        resume: globalResumeContext,
-                        chatHistory: temporaryPayloadHistory,
-                        isHintRequest: true // 🚨 THIS FIXES THE HINT GENERATION BUG 🚨
-                    })
+                    body: buildInterviewRequestBody(temporaryPayloadHistory, { isHintRequest: true })
                 });
 
                 const data = await response.json();
@@ -1661,7 +1829,7 @@
                     if (gapsList) {
                         gapsList.innerHTML = '';
                         if (!report.gapsToFix || !Array.isArray(report.gapsToFix) || report.gapsToFix.length === 0) {
-                            gapsList.innerHTML = `<li class="text-neutral-500 italic text-xs">No specific structural gaps recorded by the AI.</li>`;
+                            gapsList.innerHTML = `<li class="text-ink400 italic text-xs">No specific structural gaps recorded by the AI.</li>`;
                         } else {
                             report.gapsToFix.forEach(gap => { 
                                 gapsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-rose-500 font-bold">✕</span><span>${gap}</span></li>`; 
@@ -1678,7 +1846,7 @@
                                 highlightsList.innerHTML += `<li class="flex items-start space-x-2"><span class="text-emerald-500 font-bold">✓</span><span>${item}</span></li>`;
                             });
                         } else {
-                            highlightsList.innerHTML = `<li class="text-neutral-500 italic text-xs pt-1">No specific highlights recorded for this session.</li>`;
+                            highlightsList.innerHTML = `<li class="text-ink400 italic text-xs pt-1">No specific highlights recorded for this session.</li>`;
                         }
                     }
 
@@ -1702,12 +1870,12 @@
                             } 
                             else if (msg.role === 'user' && questionBufferText && !msg.content.includes("SYSTEM NOTE:")) {
                                 targetDeck.innerHTML += `
-                                    <div class="bg-neutral-900/30 border border-neutral-800 rounded-xl p-5 space-y-3">
-                                        <p class="text-xs font-mono font-bold text-neutral-500 uppercase tracking-wider">Question:</p>
-                                        <h4 class="text-sm font-bold text-neutral-200 leading-relaxed">${questionBufferText}</h4>
-                                        <div class="bg-neutral-950 p-4 rounded-lg border border-neutral-900 mt-2">
-                                            <span class="text-[10px] font-mono text-neutral-400 font-bold uppercase tracking-wide block mb-1">Your Answer:</span>
-                                            <p class="text-sm text-neutral-300 font-normal leading-relaxed">${msg.content}</p>
+                                    <div class="bg-surface2/30 border border-hairline rounded-xl p-5 space-y-3">
+                                        <p class="text-xs font-mono font-bold text-ink400 uppercase tracking-wider">Question:</p>
+                                        <h4 class="text-sm font-bold text-ink100 leading-relaxed">${questionBufferText}</h4>
+                                        <div class="bg-surface p-4 rounded-lg border border-hairline mt-2">
+                                            <span class="text-[10px] font-mono text-ink400 font-bold uppercase tracking-wide block mb-1">Your Answer:</span>
+                                            <p class="text-sm text-ink100 font-normal leading-relaxed">${msg.content}</p>
                                         </div>
                                     </div>`;
                             }
@@ -1716,7 +1884,7 @@
                     
                     // If the loop finished but printed nothing, show a fallback
                     if (targetDeck.innerHTML === '') {
-                        targetDeck.innerHTML = '<p class="text-sm text-neutral-500 italic">No interaction history recorded for this session.</p>';
+                        targetDeck.innerHTML = '<p class="text-sm text-ink400 italic">No interaction history recorded for this session.</p>';
                     }
                 }
                 
@@ -1835,7 +2003,7 @@
                         
                         const preflightStatus = document.getElementById('resume-preflight-status-indicator');
                         if (preflightStatus) {
-                            preflightStatus.innerHTML = `<span class="w-1.5 h-1.5 bg-[#FFE500] rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-[#FFE500] tracking-wider">Cross-referencing JD Keywords...</span>`;
+                            preflightStatus.innerHTML = `<span class="w-1.5 h-1.5 bg-signal rounded-full animate-pulse"></span><span class="text-[10px] font-mono uppercase font-bold text-signal tracking-wider">Cross-referencing JD Keywords...</span>`;
                         }
                         
                         // Wait 1.5 seconds after they stop typing to fire the API
@@ -1846,12 +2014,12 @@
             const zone = document.getElementById('resume-upload-zone');
             if(zone) {
                 zone.addEventListener('click', () => document.getElementById('pdf-input').click());
-                ['dragenter', 'dragover'].forEach(e => zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.style.borderColor = '#FFE500'; }, false));
+                ['dragenter', 'dragover'].forEach(e => zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.style.borderColor = '#C9A24B'; }, false));
                 ['dragleave', 'drop'].forEach(e => zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.style.borderColor = '#262626'; }, false));
                 zone.addEventListener('drop', (ev) => {
                     ev.preventDefault(); const f = ev.dataTransfer.files[0];
                     if (f && f.type === "application/pdf") {
-                        document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-neutral-400 font-mono animate-pulse">Reading your resume...</p>`;
+                        document.getElementById('upload-zone-status').innerHTML = `<p class="text-xs text-ink400 font-mono animate-pulse">Reading your resume...</p>`;
                         
                         extractTextFromPDF(f).then(txt => {
                             extractedPdfTextState = txt;
@@ -1904,24 +2072,38 @@
             if (!startBtn) return;
 
             function evaluateLoadoutReadiness() {
-                const jdText = (document.getElementById('job-desc-input')?.value || '').trim();
                 const currentResume = currentUploadMode === 'upload' ? extractedPdfTextState : (document.getElementById('resume-paste-input')?.value || '').trim();
-
-                const jdReady = jdText.length > 50;
                 const resumeReady = currentResume && currentResume.length > 100;
+
+                if (window.interviewInputMode === 'company') {
+                    if (window.selectedCompanyRoundType && resumeReady) {
+                        startBtn.innerHTML = 'Start Company Interview Round';
+                        startBtn.className = 'w-full bg-signal hover:bg-signaldim text-black font-black text-lg py-4 rounded-xl shadow-lg shadow-black/40 transition-all transform hover:scale-[1.01] cursor-pointer block mt-4';
+                    } else if (window.selectedCompanyRoundType) {
+                        startBtn.innerHTML = 'Add Your Resume to Start';
+                        startBtn.className = 'w-full bg-neutral-800 hover:bg-neutral-700 text-ink100 font-bold text-lg py-4 rounded-xl transition-all cursor-pointer border border-neutral-600 block mt-4';
+                    } else {
+                        startBtn.innerHTML = 'Pick a Round to Start';
+                        startBtn.className = 'w-full bg-surface2 text-ink400 font-bold text-lg py-4 rounded-xl cursor-not-allowed border border-hairline block mt-4';
+                    }
+                    return;
+                }
+
+                const jdText = (document.getElementById('job-desc-input')?.value || '').trim();
+                const jdReady = jdText.length > 50;
 
                 if (jdReady && resumeReady) {
                     // FULL LOADOUT: JD + Resume
-                    startBtn.innerHTML = 'Start Targeted Mock Interview ⚡';
-                    startBtn.className = 'w-full bg-[#FFE500] hover:bg-[#ebd300] text-black font-black text-lg py-4 rounded-xl shadow-[0_0_20px_rgba(255,229,0,0.3)] transition-all transform hover:scale-[1.01] cursor-pointer block mt-4';
+                    startBtn.innerHTML = 'Start Targeted Mock Interview';
+                    startBtn.className = 'w-full bg-signal hover:bg-signaldim text-black font-black text-lg py-4 rounded-xl shadow-lg shadow-black/40 transition-all transform hover:scale-[1.01] cursor-pointer block mt-4';
                 } else if (jdReady) {
                     // PARTIAL LOADOUT: JD only
                     startBtn.innerHTML = 'Start General Practice';
-                    startBtn.className = 'w-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-lg py-4 rounded-xl transition-all cursor-pointer border border-neutral-600 block mt-4';
+                    startBtn.className = 'w-full bg-neutral-800 hover:bg-neutral-700 text-ink100 font-bold text-lg py-4 rounded-xl transition-all cursor-pointer border border-neutral-600 block mt-4';
                 } else {
                     // EMPTY LOADOUT: Nothing pasted yet
                     startBtn.innerHTML = 'Paste Job Description to Start';
-                    startBtn.className = 'w-full bg-neutral-900 text-neutral-600 font-bold text-lg py-4 rounded-xl cursor-not-allowed border border-neutral-800 block mt-4';
+                    startBtn.className = 'w-full bg-surface2 text-ink400 font-bold text-lg py-4 rounded-xl cursor-not-allowed border border-hairline block mt-4';
                 }
             }
 
@@ -1929,7 +2111,7 @@
             setInterval(evaluateLoadoutReadiness, 500);
         });
     </script>
-   <footer class="w-full border-t border-neutral-900 bg-neutral-950 py-8 mt-16 text-sm text-neutral-500">
+   <footer class="w-full border-t border-hairline bg-surface py-8 mt-16 text-sm text-ink400">
         <div class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
             
             <div class="mb-4 md:mb-0">
@@ -1937,14 +2119,14 @@
             </div>
 
             <div class="flex space-x-6">
-                <a href="/terms.html" class="hover:text-white transition-colors duration-200">Terms of Service</a>
-                <a href="/privacy.html" class="hover:text-white transition-colors duration-200">Privacy Policy</a>
-                <a href="/contact.html" class="hover:text-white transition-colors duration-200">Contact Us</a>
+                <a href="/terms.html" class="hover:text-ink100 transition-colors duration-200">Terms of Service</a>
+                <a href="/privacy.html" class="hover:text-ink100 transition-colors duration-200">Privacy Policy</a>
+                <a href="/contact.html" class="hover:text-ink100 transition-colors duration-200">Contact Us</a>
             </div>
 
         </div>
-       <a href="https://tally.so/r/XxQj4e" target="_blank" rel="noopener noreferrer" class="fixed bottom-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-sm z-50">
-    💬 Leave Feedback
+       <a href="https://tally.so/r/XxQj4e" target="_blank" rel="noopener noreferrer" class="fixed bottom-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-ink100 font-semibold py-2 px-4 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-sm z-50">
+    Leave Feedback
 </a>
     </footer>
    
