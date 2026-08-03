@@ -219,7 +219,7 @@
 
             <div class="space-y-5 bg-surface2/20 p-6 md:p-8 rounded-2xl border border-hairline backdrop-blur-sm shadow-2xl">
 
-                <div class="flex gap-2 p-1 bg-surface border border-hairline rounded-xl w-full">
+                <div id="mode-toggle-row" class="flex gap-2 p-1 bg-surface border border-hairline rounded-xl w-full">
                     <button type="button" id="mode-toggle-generic-btn" onclick="switchInterviewMode('generic')" class="flex-1 py-2 text-xs font-bold rounded-lg text-signal bg-surface2 border border-hairline/80 transition-all cursor-pointer">General Practice</button>
                     <button type="button" id="mode-toggle-company-btn" onclick="switchInterviewMode('company')" class="flex-1 py-2 text-xs font-bold rounded-lg text-ink400 transition-all cursor-pointer">Company-Specific</button>
                 </div>
@@ -758,6 +758,12 @@
         let globalJobDescContext = '';
         let globalResumeContext = '';
 
+        // FEATURE FLAG: flip this back to true once more companies are added.
+        // Setting it false hides the mode toggle entirely (so the page behaves
+        // exactly like the pre-company-mode version) without deleting any of
+        // the underlying company/round code, config, or JS logic below.
+        const COMPANY_ROUND_MODE_ENABLED = false;
+
         // Company-round practice mode. null when using the generic JD flow.
         // Set by switchInterviewMode()/selectCompanyRound() before a session
         // starts, and read by buildInterviewRequestBody() so every fetch call
@@ -767,7 +773,13 @@
         window.selectedCompanyRoundType = null;
         let globalCompanyModeContext = null;
 
+        if (!COMPANY_ROUND_MODE_ENABLED) {
+            const toggleRow = document.getElementById('mode-toggle-row');
+            if (toggleRow) toggleRow.classList.add('hidden');
+        }
+
         function switchInterviewMode(mode) {
+            if (mode === 'company' && !COMPANY_ROUND_MODE_ENABLED) return; // flag is off, ignore
             window.interviewInputMode = mode;
             const genericBtn = document.getElementById('mode-toggle-generic-btn');
             const companyBtn = document.getElementById('mode-toggle-company-btn');
