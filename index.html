@@ -803,67 +803,116 @@
         // prompts/rubrics live exclusively in interview.js.
         const COMPANY_DISPLAY_META = {
             google: {
-                roleValue: 'swe',
-                roleLabel: 'Software Engineer',
-                rounds: [
-                    { value: 'phone_screen', label: 'Phone Screen', meta: '2 questions · ~50 min' },
-                    { value: 'onsite_coding', label: 'Onsite Coding', meta: '1 problem + follow-up · 45 min' },
-                    { value: 'system_design', label: 'System Design', meta: '1 scenario · 45 min' },
-                    { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
-                ]
+                roles: {
+                    swe: {
+                        roleLabel: 'Software Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                            { value: 'onsite_coding', label: 'Onsite Coding', meta: '1 problem + follow-up · 45 min' },
+                            { value: 'system_design', label: 'System Design', meta: '1 scenario · 45 min' },
+                            { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
+                        ]
+                    },
+                    mle: {
+                        roleLabel: 'Machine Learning Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                            { value: 'onsite_coding', label: 'Onsite Coding & Algorithms', meta: '1-2 problems · 45-60 min' },
+                            { value: 'applied_ml', label: 'Applied Machine Learning', meta: 'Theory & Tradeoffs · 45-60 min' },
+                            { value: 'ml_system_design', label: 'ML System Design', meta: 'End-to-End Pipeline · 45-60 min' },
+                            { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
+                        ]
+                    }
+                }
             },
             amazon: {
-                roleValue: 'sde',
-                roleLabel: 'Software Development Engineer',
-                rounds: [
-                    { value: 'phone_screen', label: 'Technical Phone Screen', meta: '3 questions · ~50 min' },
-                    { value: 'onsite_coding', label: 'Onsite Technical Round', meta: '3 questions · 45 min' },
-                    { value: 'system_design', label: 'System Design', meta: '1 scenario · 45 min' },
-                    { value: 'leadership_principles', label: 'Leadership Principles (Bar Raiser)', meta: '4 behavioral Qs · ~50 min' }
-                ]
+                roles: {
+                    sde: {
+                        roleLabel: 'Software Development Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1 coding + 1 LP · ~50 min' },
+                            { value: 'onsite_coding', label: 'Onsite Technical Round', meta: '1 coding + 1 LP · 45 min' },
+                            { value: 'system_design', label: 'System Design', meta: '1 scenario + 1 LP · 45 min' },
+                            { value: 'leadership_principles', label: 'Leadership Principles (Bar Raiser)', meta: '4 behavioral Qs · ~50 min' }
+                        ]
+                    }
+                }
             },
             microsoft: {
-                roleValue: 'swe',
-                roleLabel: 'Software Engineer',
-                rounds: [
-                    { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
-                    { value: 'onsite_coding', label: 'Onsite Data Structures & Algorithms', meta: '1-2 problems + behavioral · 45-60 min' },
-                    { value: 'system_design', label: 'System & Low-Level Design (LLD/HLD)', meta: '1 scenario · 45-60 min' },
-                    { value: 'behavioral_aa', label: 'As Appropriate (AA) / Hiring Manager', meta: 'Leadership & Culture Fit · 45-60 min' }
-                ]
+                roles: {
+                    swe: {
+                        roleLabel: 'Software Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                            { value: 'onsite_coding', label: 'Onsite Data Structures & Algorithms', meta: '1-2 problems + behavioral · 45-60 min' },
+                            { value: 'system_design', label: 'System & Low-Level Design', meta: '1 scenario · 45-60 min' },
+                            { value: 'behavioral_aa', label: 'As Appropriate (AA) / Hiring Manager', meta: 'Leadership & Culture Fit · 45-60 min' }
+                        ]
+                    }
+                }
             },
             meta: {
-                roleValue: 'swe',
-                roleLabel: 'Software Engineer',
-                rounds: [
-                    { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45 min' },
-                    { value: 'ninja_coding', label: 'Ninja (Onsite Coding)', meta: '2 problems · 45 min' },
-                    { value: 'pirate_design', label: 'Pirate (System Design)', meta: '1 scenario · 45 min' },
-                    { value: 'jedi_behavioral', label: 'Jedi (Behavioral)', meta: 'Culture & Impact · 45 min' }
-                ]
+                roles: {
+                    swe: {
+                        roleLabel: 'Software Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45 min' },
+                            { value: 'ninja_coding', label: 'Ninja (Onsite Coding)', meta: '2 problems · 45 min' },
+                            { value: 'pirate_design', label: 'Pirate (System Design)', meta: '1 scenario · 45 min' },
+                            { value: 'jedi_behavioral', label: 'Jedi (Behavioral)', meta: 'Culture & Impact · 45 min' }
+                        ]
+                    }
+                }
             }
         };
 
         function renderCompanyRoundOptions() {
-            const company = document.getElementById('company-select').value;
-            const meta = COMPANY_DISPLAY_META[company];
-            if (!meta) return;
-
-            document.getElementById('company-role-select').innerHTML =
-                `<option value="${meta.roleValue}">${meta.roleLabel}</option>`;
-
+            const companySelect = document.getElementById('company-select');
+            const roleSelect = document.getElementById('company-role-select');
             const grid = document.getElementById('round-selector-grid');
-            grid.innerHTML = meta.rounds.map((r, i) => `
-                <button type="button" data-round="${r.value}" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
-                    <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">${String(i + 1).padStart(2, '0')}</span><span class="font-bold text-xs text-ink100">${r.label}</span></span>
-                    <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">${r.meta}</span>
-                </button>
-            `).join('');
 
-            // Switching companies invalidates whatever round was previously
-            // selected (round keys aren't shared across companies), so clear
-            // it rather than silently carrying over a stale/invalid value.
-            window.selectedCompanyRoundType = null;
+            if (!companySelect || !roleSelect || !grid) return;
+
+            const companyKey = companySelect.value.toLowerCase();
+            const companyMeta = COMPANY_DISPLAY_META[companyKey];
+
+            if (!companyMeta || !companyMeta.roles) return;
+
+            // 1. Rebuild the Role Select Dropdown for the chosen company
+            roleSelect.innerHTML = Object.entries(companyMeta.roles).map(([roleKey, roleData]) => 
+                `<option value="${roleKey}">${roleData.roleLabel}</option>`
+            ).join('');
+
+            // 2. Helper function to render round cards for whatever role is currently selected
+            const renderRoundsForActiveRole = () => {
+                const currentRoleKey = roleSelect.value;
+                const roleMeta = companyMeta.roles[currentRoleKey];
+
+                if (!roleMeta || !roleMeta.rounds) {
+                    grid.innerHTML = '<p class="text-xs text-ink400 col-span-2">No rounds available for this role.</p>';
+                    window.selectedCompanyRoundType = null;
+                    return;
+                }
+
+                grid.innerHTML = roleMeta.rounds.map((r, i) => `
+                    <button type="button" data-round="${r.value}" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                        <span class="flex items-baseline gap-2">
+                            <span class="font-mono text-[10px] text-ink400">${String(i + 1).padStart(2, '0')}</span>
+                            <span class="font-bold text-xs text-ink100">${r.label}</span>
+                        </span>
+                        <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">${r.meta}</span>
+                    </button>
+                `).join('');
+
+                // Clear stale round selection state whenever role or company changes
+                window.selectedCompanyRoundType = null;
+            };
+
+            // 3. Render rounds immediately for the default role
+            renderRoundsForActiveRole();
+
+            // 4. Attach event handler so changing the role dropdown hot-swaps the round cards
+            roleSelect.onchange = renderRoundsForActiveRole;
         }
 
         // Populate the selectors once on load so Google's rounds are ready
