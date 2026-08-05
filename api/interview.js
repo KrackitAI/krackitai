@@ -89,6 +89,68 @@ const RUBRIC_WEIGHTS = {
 // still apply unchanged). Only the round-specific fields below differ.
 // ---------------------------------------------------------------------------
 const COMPANY_PROFILES = {
+    amazon: {
+        displayName: "Amazon",
+        roles: {
+            sde: {
+                displayName: "Software Development Engineer",
+                syntheticJDByLevel: {
+                    entry: "Software Development Engineer I, Amazon (SDE1, entry-level/new grad). Strong coding fundamentals across data structures and algorithms, and the ability to speak concretely about past work using Amazon's Leadership Principles.",
+                    mid:   "Software Development Engineer II, Amazon (SDE2, mid-level, 2-5 years experience). Solid coding fundamentals, ownership of features end-to-end, growing system design judgment, and concrete examples demonstrating Amazon's Leadership Principles.",
+                    senior:"Senior Software Development Engineer, Amazon (SDE3, senior level). Strong system design and architectural judgment, independent ownership of ambiguous large-scale problems, and higher-stakes, cross-team examples of Amazon's Leadership Principles in action.",
+                    lead:  "Principal/Senior Manager SDE, Amazon (L6+). Cross-team technical leadership and organization-wide impact, with Leadership Principles examples expected at organizational scale, not just project scale."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 3000, // ~50 min
+                        sourceNote: "HIGH confidence: multiple independent sources (Exponent, AccelaCoach, ApexInterviewer, all 2026-dated) consistently describe a 45-60 min single round blending one coding problem with 1-2 Leadership Principle questions, not a pure-coding screen like Google's. MEDIUM confidence on exact question difficulty, which varies by team.",
+                        promptBlock: `ROUND TYPE: Amazon Technical Phone Screen (this REPLACES the standard 5-question format).
+- This round is NOT pure coding. Amazon's actual reported format blends technical and behavioral: start with ONE Leadership Principle question (pick from: Customer Obsession, Ownership, Bias for Action, or Deliver Results — common early-loop picks), then move to ONE coding problem, medium difficulty.
+- For the Leadership Principle question, expect and probe for the STAR structure (Situation, Task, Action, Result). If the candidate's answer is vague or lacks a quantified result, follow up and push for specifics — real Amazon interviewers are reported to do exactly this rather than accept a surface-level story.
+- For the coding problem, evaluate correctness and clarity the same way a standard technical screen would.
+- Keep the tone professional and thorough, not adversarial — this is a screening round, not the hardest interview in the loop.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness and complexity analysis of the coding solution. "jd_alignment" = specificity and quality of the Leadership Principle story (concrete situation, individual contribution clearly separated from team's, quantified result). "communication_clarity" = whether they used a clear STAR structure for the LP answer and clarified the coding problem before diving in.`
+                    },
+                    onsite_coding: {
+                        label: "Onsite Technical Round",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 2700, // 45 min
+                        sourceNote: "HIGH confidence on the blended format (multiple sources explicitly state 'even for technical roles, expect at least half of your time on LP-based questions'). MEDIUM confidence on exact coding difficulty and problem style, which isn't standardized across teams.",
+                        promptBlock: `ROUND TYPE: Amazon Onsite Technical Round (this REPLACES the standard 5-question format).
+- Structure this the way Amazon's actual loop is reported to run: open with ONE Leadership Principle question (pick one different from any already covered this session if you have that context — Dive Deep, Have Backbone; Disagree and Commit, and Invent and Simplify are commonly reported for this stage), probe it with STAR-structure follow-ups, THEN move into ONE substantial coding problem, medium-to-hard difficulty, with a natural follow-up extension.
+- At least half of this round's substance should be the Leadership Principle discussion, not just a warm-up — real Amazon interviewers are documented as scoring LP answers independently and rigorously, with follow-up probing until the candidate demonstrates real depth or runs out of detail.
+- For the coding portion, expect the candidate to clarify requirements before coding — reward that the same way a standard technical round would.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness and complexity analysis of the coding solution. "jd_alignment" = depth and specificity of the Leadership Principle story — Amazon's own documented rubric looks for individual contribution (not team credit), depth of tradeoff thinking, and quantified scale/impact. "communication_clarity" = clear STAR structure and whether the candidate volunteered specifics without excessive prompting.`
+                    },
+                    system_design: {
+                        label: "System Design",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700, // 45 min
+                        sourceNote: "MEDIUM confidence. Amazon's system design round is well-documented as existing and being level-gated similarly to other big tech companies (light/absent at SDE1, a real dedicated round from SDE2 onward), but I found fewer independently-converging sources specifically detailing Amazon's system design format compared to Google's — treat the level-gating claim as more provisional than the Google equivalent.",
+                        promptBlock: `ROUND TYPE: System Design (this REPLACES the standard 5-question format).
+- Present ONE open-ended system design scenario relevant to the role's domain, grounded in realistic production constraints (Amazon's engineering culture is documented as placing heavy weight on operational excellence and scale — ask about failure handling, monitoring, and cost/frugality tradeoffs as real dimensions of the design, not just happy-path architecture).
+- LEVEL CALIBRATION: keep this lightweight or largely absent in substance for entry/SDE1 level — ask a simple, bounded design question instead of a full distributed system. At mid/SDE2, expect one coherent system with real trade-off discussion. At senior/SDE3+, expect deep architectural reasoning and explicit discussion of operational failure modes.
+- It is reasonable to weave in one brief Leadership Principle follow-up related to a design decision (e.g., "why did you choose that trade-off — walk me through how you'd defend it to stakeholders") since Amazon's culture blends the two even in this round, but the bulk of this round should remain technical.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = quality of architectural reasoning, calibrated to level, with real credit given for discussing operational/failure-mode concerns. "jd_alignment" = whether the scope and depth of the design matches what's expected at the candidate's detected level. "communication_clarity" = whether they structured the design conversation logically and defended trade-offs when pushed.`
+                    },
+                    leadership_principles: {
+                        label: "Leadership Principles (Bar Raiser Style)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3000, // ~50 min, sources describe this round as often running the full hour
+                        sourceNote: "HIGH confidence — this is Amazon's own published framework, not third-party speculation: the 16 Leadership Principles are Amazon's official, public content, and were completely consistent across every source checked. The Bar Raiser role and its veto power are also well and consistently documented. What's NOT officially published is exactly which LPs get weighted most for SDE roles specifically — that emphasis is reported by interview-coaching sources, not Amazon itself, so treat the SPECIFIC principles chosen for a given session as illustrative, not an official weighting.",
+                        promptBlock: `ROUND TYPE: Amazon Leadership Principles / Bar Raiser Round (this REPLACES the standard 5-question format — NO coding in this round at all).
+- You are playing the role of an Amazon Bar Raiser: an experienced interviewer from OUTSIDE the hiring team, trained to keep the hiring bar high, with real weight in the final decision. Be rigorous, not casual.
+- Ask behavioral questions, each one clearly targeting ONE specific named Leadership Principle. Choose from Amazon's actual 16: Customer Obsession, Ownership, Invent and Simplify, Are Right A Lot, Learn and Be Curious, Hire and Develop the Best, Insist on the Highest Standards, Think Big, Bias for Action, Frugality, Earn Trust, Dive Deep, Have Backbone; Disagree and Commit, Deliver Results, Strive to be Earth's Best Employer, Success and Scale Bring Broad Responsibility. Pick 4 DIFFERENT principles across your questions, not the same one repeated.
+- Demand real, specific stories — not hypotheticals. If an answer is vague, generic, or credits "the team" without clarifying the candidate's own individual contribution, push back exactly the way a real Bar Raiser is documented to: ask what THEY personally did, how it was measured, and what they'd do differently.
+- LEVEL CALIBRATION: for senior/lead candidates, expect and push for higher-stakes, cross-team examples rather than small individual tasks — this is a documented, real distinction Amazon makes by level.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of individual-contribution specificity and quantified impact in their stories (not coding ability). "jd_alignment" = how well their examples map to genuine Leadership Principle behavior rather than generic "teamwork" stories. "communication_clarity" = STAR structure and whether they volunteered concrete detail without needing to be dragged into it.`
+                    }
+                }
+            }
+        }
+    },
     google: {
         displayName: "Google",
         roles: {
