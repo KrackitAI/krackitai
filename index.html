@@ -236,6 +236,7 @@
                             <select id="company-select" onchange="renderCompanyRoundOptions()" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
                                 <option value="google">Google</option>
                                 <option value="amazon">Amazon</option>
+                                <option value="microsoft">Microsoft</option>
                             </select>
                         </div>
                         <div class="space-y-1.5">
@@ -818,6 +819,16 @@
                     { value: 'onsite_coding', label: 'Onsite Technical Round', meta: '3 questions · 45 min' },
                     { value: 'system_design', label: 'System Design', meta: '1 scenario · 45 min' },
                     { value: 'leadership_principles', label: 'Leadership Principles (Bar Raiser)', meta: '4 behavioral Qs · ~50 min' }
+                ]
+            }
+            microsoft: {
+                roleValue: 'swe',
+                roleLabel: 'Software Engineer',
+                rounds: [
+                    { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                    { value: 'onsite_coding', label: 'Onsite Data Structures & Algorithms', meta: '1-2 problems + behavioral · 45-60 min' },
+                    { value: 'system_design', label: 'System & Low-Level Design (LLD/HLD)', meta: '1 scenario · 45-60 min' },
+                    { value: 'behavioral_aa', label: 'As Appropriate (AA) / Hiring Manager', meta: 'Leadership & Culture Fit · 45-60 min' }
                 ]
             }
         };
