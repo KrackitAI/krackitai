@@ -279,6 +279,66 @@ const COMPANY_PROFILES = {
             }
         }
     }
+meta: {
+        displayName: "Meta",
+        roles: {
+            swe: {
+                displayName: "Software Engineer",
+                syntheticJDByLevel: {
+                    entry: "Software Engineer, Meta (E3, entry-level/new grad). Exceptionally strong coding fundamentals, speed, and accuracy across data structures and algorithms. Demonstrated ability to execute quickly.",
+                    mid:   "Software Engineer, Meta (E4, mid-level). Strong coding execution, solid system design foundations (Pirate), and proven project impact (Jedi).",
+                    senior:"Senior Software Engineer, Meta (E5, senior level). Fast and flawless coding execution, strong distributed system architecture experience (Pirate), and demonstrated cross-functional technical leadership (Jedi).",
+                    lead:  "Staff Software Engineer, Meta (E6). Architectural leadership, scaling systems to billions of users (Pirate), and driving cross-team technical direction and resolving organizational conflicts (Jedi)."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: multiple sources report a 45-minute phone screen consisting of 1-2 coding problems, expecting high speed and accuracy.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Present 1-2 coding problems, leaning towards arrays, strings, and trees (LeetCode Easy to Medium).
+- Meta emphasizes speed and accuracy. The candidate should ideally write bug-free code quickly on a plain text editor like CoderPad, with execution disabled.
+- Do not spend much time on behavioral questions; keep introductions to 2-5 minutes max.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness, execution speed, and bug-free implementation. "jd_alignment" = coding competency matching Meta's high execution bar. "communication_clarity" = clear, fast articulation of the chosen approach.`
+                    },
+                    ninja_coding: {
+                        label: "Ninja (Onsite Coding)",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: Meta's onsite coding round is internally known as the 'Ninja' interview. Standard structure is 2 algorithm questions in 45 minutes, prioritizing optimality and bug-free execution without IDE help.",
+                        promptBlock: `ROUND TYPE: Ninja / Onsite Coding (this REPLACES the standard 5-question format).
+- Present TWO coding problems consecutively within the 45-minute session. Keep the difficulty at LeetCode Medium.
+- Meta's "Ninja" interviews expect fast, highly optimal, and bug-free code. The candidate must dry-run their code manually, as they will not have an IDE or compiler.
+- If the candidate makes simple syntactical or logical errors, heavily penalize their technical depth score. Meta values execution speed and high precision.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = optimal time/space complexity, high coding speed, and manual dry-running of code. "jd_alignment" = meeting Meta's strict execution bar for the E-level. "communication_clarity" = concisely explaining trade-offs before diving into fast implementation.`
+                    },
+                    pirate_design: {
+                        label: "Pirate (System Design)",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: Meta's system design round is known as the 'Pirate' interview. Essential for leveling (E4 vs E5 vs E6). Focuses heavily on large-scale distributed systems, data storage, and APIs.",
+                        promptBlock: `ROUND TYPE: Pirate / System Design (this REPLACES the standard 5-question format).
+- Present ONE large-scale system design scenario (e.g., design Instagram, Facebook News Feed, or a Messenger backend).
+- LEVEL CALIBRATION: For E3, keep it to basic API and database schemas. For E4, expect a solid end-to-end architecture. For E5 and E6 (Senior/Staff), drill aggressively into deep data storage choices, extreme scale (billions of users), load balancing, and handling distributed system bottlenecks.
+- Push the candidate on the "how" and "why" of their design choices, specifically querying how they store and access massive datasets.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = deep architectural trade-offs, scalability, and data storage design. "jd_alignment" = scoping the architecture appropriately for Meta's massive user scale and their target E-level. "communication_clarity" = structuring the design cleanly from high-level to detailed components.`
+                    },
+                    jedi_behavioral: {
+                        label: "Jedi (Behavioral)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: Meta's behavioral round is known as the 'Jedi' interview. It focuses heavily on project impact, conflict resolution, and working in fast-paced environments.",
+                        promptBlock: `ROUND TYPE: Jedi / Behavioral (this REPLACES the standard 5-question format — NO coding here).
+- Ask behavioral questions probing project impact, conflict resolution (e.g., disagreements with peers or managers), and thriving in an unstructured, fast-paced environment.
+- Meta's "Jedi" round highly values candidates who take ownership, resolve conflicts empathetically, and drive results despite ambiguity. 
+- LEVEL CALIBRATION: For E4, focus on execution and small team conflicts. For E5/E6, focus heavily on cross-functional influence, leading without authority, and driving architectural standards across multiple teams.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of project scope and personal technical impact described. "jd_alignment" = demonstrated ability to resolve conflict and drive results at Meta's pace. "communication_clarity" = articulate, structured storytelling using the STAR method.`
+                    }
+                }
+            }
+        }
+    }
 };
 
 const REPORT_SCHEMA = {
