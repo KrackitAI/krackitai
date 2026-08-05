@@ -154,6 +154,7 @@ const COMPANY_PROFILES = {
     google: {
         displayName: "Google",
         roles: {
+            
             swe: {
                 displayName: "Software Engineer",
                 // Used to synthesize a jobDescription if the frontend doesn't
@@ -210,6 +211,74 @@ const COMPANY_PROFILES = {
 - Push for specific, concrete examples ("tell me about a real time this happened," not hypotheticals) and follow up on vague answers the same way you'd follow up on a weak technical answer.
 - This round is reported to be weighted heavily by Google's hiring committee — do not treat it as a soft formality even though it's non-technical.`,
                         rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of self-reflection and specificity of examples given (not coding ability). "jd_alignment" = alignment with the Googleyness attributes described above (ambiguity tolerance, collaboration, intellectual humility, bias to action). "communication_clarity" = clarity and structure of how they told their examples (e.g., a clear situation/action/outcome structure).`
+                    }
+                }
+            },
+            mle: {
+                displayName: "Machine Learning Engineer",
+                syntheticJDByLevel: {
+                    entry: "Machine Learning Engineer, Google (L3, entry-level/new grad). Strong fundamentals in Python, core ML algorithms, data structures, and algorithms. Capable of evaluating models and handling basic data pipelines.",
+                    mid:   "Machine Learning Engineer, Google (L4, mid-level, 2-5 years experience). Strong coding execution, deep understanding of applied ML (bias-variance trade-off, regularization, feature engineering), and ability to design bounded ML systems.",
+                    senior:"Senior Machine Learning Engineer, Google (L5+, senior level). End-to-end ML system design at Google scale (recommendations, ranking, LLM serving). Independent ownership of ambiguous ML product goals and architectural trade-offs.",
+                    lead:  "Staff Machine Learning Engineer, Google (L6+). Cross-team technical leadership, designing scalable ML infrastructure, and guiding AI strategy and organizational direction."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3000,
+                        sourceNote: "HIGH confidence: multiple sources report a 45-60 minute screen combining 1-2 Google-style coding problems with high expectations on basic DSA fluency.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Present 1-2 coding problems, medium difficulty, focusing on classic DSA (arrays, strings, trees, graphs). Even for ML roles, Google heavily emphasizes pure coding fluency during the screen.
+- Simulate a plain shared-document environment: no syntax highlighting.
+- Assess their ability to clarify edge cases before coding. If they jump straight into the solution, penalize their communication score.
+- Keep the tone efficient and screening-oriented.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness and complexity analysis of their coding solution. "jd_alignment" = baseline DSA competency required for Google MLEs. "communication_clarity" = structured thinking and clarifying requirements before writing code.`
+                    },
+                    onsite_coding: {
+                        label: "Onsite Coding & Algorithms",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: onsite loops typically feature 1-2 coding rounds of 45-60 minutes testing core engineering ability, distinct from ML theory.",
+                        promptBlock: `ROUND TYPE: Onsite Coding Round (this REPLACES the standard 5-question format).
+- Present ONE substantial algorithm problem (medium-to-hard). After a working solution, ask ONE optimization follow-up (e.g., reducing space complexity).
+- Interviewers reward structured decomposition, clean code, and test cases. A correct brute-force solution that is optimized out loud scores better than a half-finished optimal attempt.
+- Do not ask ML theory here. This round tests pure software engineering execution.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness, optimization, and edge-case handling. "jd_alignment" = execution speed matching Google's SWE bar. "communication_clarity" = narrating their optimization process out loud.`
+                    },
+                    applied_ml: {
+                        label: "Applied Machine Learning",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3000,
+                        sourceNote: "HIGH confidence: 45-60 min round focused on practical ML judgment, model evaluation, and tradeoffs rather than just coding.",
+                        promptBlock: `ROUND TYPE: Applied ML (this REPLACES the standard 5-question format).
+- Focus strictly on applied ML theory and real-world modeling decisions. Do NOT ask them to write software engineering algorithms here.
+- Ask questions probing the bias-variance trade-off, regularization (L1/L2), data leakage, feature engineering, and offline vs. online metrics.
+- Google's ML bar rewards judgment. Push the candidate for geometric or mathematical explanations (e.g., why L1 leads to sparsity).
+- For mid/senior candidates, transition into a deep dive on a past project: probe why specific model choices were made and how they handled class imbalance or distribution shift.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = mathematical/theoretical understanding of ML fundamentals. "jd_alignment" = ability to link theoretical choices (like loss functions) to actual product goals. "communication_clarity" = clear, precise explanation of tradeoffs without overclaiming.`
+                    },
+                    ml_system_design: {
+                        label: "ML System Design",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: 45-60 min round heavily emphasizing end-to-end architecture (data pipelines, serving, drift).",
+                        promptBlock: `ROUND TYPE: ML System Design (this REPLACES the standard 5-question format).
+- Present ONE open-ended ML system design scenario (e.g., designing a recommendation system, ranking pipeline, or LLM-powered feature).
+- Expect end-to-end thinking: force them to cover data collection, feature pipelines, training, latency-constrained serving, monitoring, and drift detection.
+- LEVEL CALIBRATION: At L3, keep it to basic model deployment. At L4, expect a solid end-to-end pipeline. At L5+, expect deep architectural reasoning around distributed ML, MLOps, and real-time inference bottlenecks.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = scalability, MLOps considerations, and addressing inference latency. "jd_alignment" = scoping the architecture appropriately for Google's massive scale. "communication_clarity" = structuring the design cleanly from data ingestion to model serving.`
+                    },
+                    googleyness: {
+                        label: "Behavioral & Googleyness",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: ~45 min behavioral round evaluating collaboration, ambiguity, and leadership.",
+                        promptBlock: `ROUND TYPE: Googleyness & Leadership (this REPLACES the standard 5-question format — NO technical questions).
+- Ask behavioral questions probing: comfort with ambiguity, collaborative instinct, responding to failure, and disagreeing constructively.
+- Push for specific, concrete examples ("tell me about a real time this happened," not hypotheticals). 
+- Strong answers are specific and technical, with clear trade-offs and stakeholder context. Vague "we shipped it" answers must be penalized.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of self-reflection and specificity of examples. "jd_alignment" = alignment with Google's cultural attributes (ambiguity tolerance, intellectual humility). "communication_clarity" = clear STAR structure.`
                     }
                 }
             }
