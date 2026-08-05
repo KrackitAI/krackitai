@@ -215,6 +215,70 @@ const COMPANY_PROFILES = {
             }
         }
     }
+    microsoft: {
+        displayName: "Microsoft",
+        roles: {
+            swe: {
+                displayName: "Software Engineer",
+                syntheticJDByLevel: {
+                    entry: "Software Engineer, Microsoft (L59-L60, entry-level/new grad). Strong coding fundamentals across data structures and algorithms, object-oriented design (OOD), and a demonstrated Growth Mindset.",
+                    mid:   "Software Engineer II, Microsoft (L61-L62, mid-level). Solid coding fundamentals, low-level design (LLD) proficiency, ownership of features, and behavioral alignment with Microsoft's Core Competencies.",
+                    senior:"Senior Software Engineer, Microsoft (L63-L64, senior level). Strong system design (HLD) and architectural judgment, Azure/distributed systems knowledge, mentorship, and high-impact cross-team collaboration.",
+                    lead:  "Principal Software Engineer, Microsoft (L65+). Organization-wide technical leadership, deep distributed system expertise, and leading major product initiatives while embodying One Microsoft values."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3000,
+                        sourceNote: "HIGH confidence: multiple sources consistently describe a 45-60 min round over Teams with a shared editor (no syntax highlighting), focusing on 1-2 medium DSA problems with behavioral questions mixed in.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Present 1-2 coding problems, medium difficulty. Common topics include arrays, strings, and linked lists.
+- Simulate a plain text editor on Microsoft Teams: no autocomplete or syntax highlighting.
+- Microsoft interviewers explicitly evaluate if the candidate clarifies requirements before coding. Do not give all constraints upfront; hold some back to see if they ask.
+- Dedicate a small portion of the conversation (1 question) to a behavioral check, explicitly probing their "Growth Mindset" or "Learn-It-All" attitude.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness and problem-solving process. "jd_alignment" = demonstrated Growth Mindset and alignment with Microsoft's cultural values. "communication_clarity" = clarifying requirements before writing code and clear articulation of edge cases.`
+                    },
+                    onsite_coding: {
+                        label: "Onsite Data Structures & Algorithms",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence. Onsite loop typically includes 1-2 coding rounds of 45-60 min each. Microsoft is known to heavily integrate behavioral questions (STAR method) directly into coding rounds rather than isolating them.",
+                        promptBlock: `ROUND TYPE: Onsite Coding Round (this REPLACES the standard 5-question format).
+- Present ONE substantial coding problem (medium to hard difficulty depending on level). After a working solution, ask an extension or optimization question.
+- Topics should skew towards classical DSA (trees, graphs, dynamic programming, strings).
+- Microsoft explicitly weaves behavioral questions into technical rounds. Before or after the coding problem, ask ONE behavioral question using the STAR format, focusing on collaboration, learning from failure, or overcoming an unexpected roadblock.
+- Look for clean, bug-free implementation. A buggy implementation of a basic string or array manipulation is a red flag.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = clean implementation, edge case handling, and complexity optimization. "jd_alignment" = fit with the coding bar for the level, plus the quality of their behavioral STAR response. "communication_clarity" = thinking out loud, structured communication, and receiving hints well.`
+                    },
+                    system_design: {
+                        label: "System & Low-Level Design",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence. Level-gated: L59-L60 focuses on Low-Level Design (OOD). L61+ focuses on High-Level System Design (HLD) or a mix of both. Problems often mirror Microsoft products (Teams, OneDrive, Azure).",
+                        promptBlock: `ROUND TYPE: System Design & Low-Level Design (this REPLACES the standard 5-question format).
+- Present ONE design scenario. 
+- LEVEL CALIBRATION: For entry-level (L59-L60), ask a Low-Level Design (LLD) / Object-Oriented Design question (e.g., design the classes for a parking lot, file system, or rate limiter). Expect clear class structure and relationships. For mid-level (L61-L62), blend LLD with some high-level component design. For senior+ (L63+), ask a High-Level System Design (HLD) question (e.g., design a distributed cache, Microsoft Teams backend, or Azure blob storage) expecting deep scale, fault tolerance, and database trade-offs.
+- Push the candidate to explain their trade-offs. Microsoft values extensible design and security/compliance considerations.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = appropriate use of design patterns (for LLD) or scalability/fault-tolerance strategies (for HLD). "jd_alignment" = designing for enterprise scale and addressing constraints typical of Microsoft platforms. "communication_clarity" = structured architecture discussion, moving logically from requirements to design.`
+                    },
+                    behavioral_aa: {
+                        label: "As Appropriate (AA) / Hiring Manager",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3000,
+                        sourceNote: "HIGH confidence. The 'As Appropriate' (AA) round is a hallmark of Microsoft's process. It serves as a final bar-raiser led by a senior manager or principal engineer. Focuses heavily on culture, impact, and probing weak signals.",
+                        promptBlock: `ROUND TYPE: As Appropriate (AA) / Hiring Manager Round (this REPLACES the standard 5-question format).
+- You are playing the role of the "AA" (As Appropriate) Interviewer — a senior leader with veto power over the hiring decision. This is a hybrid behavioral/strategic round.
+- Ask deep behavioral questions focused on Microsoft's core competencies: Growth Mindset, Customer Focus, Adaptability, and Cross-team Collaboration. Ask them to describe their biggest failure and what they learned.
+- Probe deeply. If they give a superficial answer, drill down into exactly what THEIR specific contribution was, how they handled conflict, and how they measured success.
+- If the candidate is senior (L63+), ask strategic questions about project impact, mentoring, and navigating organizational ambiguity.
+- You may ask one high-level technical/architecture question to double-check their fundamental understanding, but do not ask them to write code.`,
+                        rubricGuidance: `Interpret the rubric for this hybrid round: "technical_depth" = depth of technical impact and strategic thinking described in their past experience. "jd_alignment" = strong demonstration of Growth Mindset, taking feedback, and "One Microsoft" collaboration. "communication_clarity" = articulate storytelling using the STAR method and lack of defensiveness when probed.`
+                    }
+                }
+            }
+        }
+    }
 };
 
 const REPORT_SCHEMA = {
