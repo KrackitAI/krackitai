@@ -335,7 +335,63 @@ const COMPANY_PROFILES = {
                         rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of reflection and understanding of business impact. "jd_alignment" = empathy, resilience, and bias to action. "communication_clarity" = professional, structured storytelling.`
                     }
                 }
+            },
+        data_scientist: {
+                displayName: "Data Scientist",
+                syntheticJDByLevel: {
+                    entry: "Data Scientist, Google (L3). Strong fundamentals in probability, statistics, SQL, and Python/R. Capable of executing defined analytics and A/B tests.",
+                    mid:   "Data Scientist, Google (L4). Strong statistical modeling, causal inference, and ability to design complex A/B experiments and define core product metrics.",
+                    senior:"Senior Data Scientist, Google (L5). Leads high-impact analytical projects, designs advanced experimentation frameworks, and guides product strategy using data.",
+                    lead:  "Staff Data Scientist, Google (L6+). Defines the data strategy for entire product areas, mentors other DS, and solves the most ambiguous causal inference problems."
+                },
+                rounds: {
+                    tech_screen: {
+                        label: "Technical Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Mix of coding (SQL/Python) and basic probability/statistics.",
+                        promptBlock: `ROUND TYPE: Technical Screen (this REPLACES the standard 5-question format).
+- Ask ONE coding question (usually advanced SQL involving window functions or self-joins, or a Python data manipulation task).
+- Ask ONE probability/statistics question (e.g., Bayes Theorem, expected value, or combinatorial probability).
+- Focus on accuracy and ability to write clean data-transformation code.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness of SQL/Python and statistical math. "jd_alignment" = fundamental math and coding baseline for DS. "communication_clarity" = explaining their logic clearly before writing queries.`
+                    },
+                    project_deep_dive: {
+                        label: "Project & Causal Inference",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Deep dive into past projects and theoretical causal inference scenarios.",
+                        promptBlock: `ROUND TYPE: Project & Causal Inference (this REPLACES the standard 5-question format).
+- Deep dive into the candidate's past projects. Push them on WHY they chose a specific metric and HOW they handled confounding variables or data leakage.
+- Present ONE causal inference scenario (e.g., "How would you measure the impact of a new feature if we cannot run a standard A/B test?").
+- Expect discussion on difference-in-differences, propensity score matching, or synthetic controls for senior candidates.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = rigor of statistical methods and causal inference knowledge. "jd_alignment" = ability to link data to product impact. "communication_clarity" = defending technical choices without jargon.`
+                    },
+                    system_design: {
+                        label: "Data System Design",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Designing experimentation frameworks or metric pipelines at scale.",
+                        promptBlock: `ROUND TYPE: Data System Design (this REPLACES the standard 5-question format).
+- Present ONE open-ended product analytics scenario (e.g., "Design an experimentation framework for YouTube Shorts" or "How would you define and measure the success of Google Maps routing?").
+- Guide them to cover metric definition (North Star vs. guardrail metrics), logging/telemetry, and detecting network effects or cannibalization.
+- Prioritize product sense and statistical rigor over backend infrastructure.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = understanding of experimental design at scale. "jd_alignment" = product sense and metric formulation. "communication_clarity" = structured approach to breaking down ambiguous product goals.`
+                    },
+                    googleyness: {
+                        label: "Googleyness & Leadership",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Standard behavioral round.",
+                        promptBlock: `ROUND TYPE: Googleyness & Leadership (this REPLACES the standard 5-question format — NO technical questions).
+- Ask behavioral questions probing: comfort with ambiguity, influencing without authority, and intellectual humility.
+- Focus on how they handle situations where data contradicts the product manager's intuition.
+- Push for specific, concrete examples using the STAR method.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of self-reflection. "jd_alignment" = alignment with Google's cultural attributes. "communication_clarity" = clear STAR structure.`
+                    }
+                }
             }
+
         }
     }
     microsoft: {
