@@ -148,7 +148,122 @@ const COMPANY_PROFILES = {
                         rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of individual-contribution specificity and quantified impact in their stories (not coding ability). "jd_alignment" = how well their examples map to genuine Leadership Principle behavior rather than generic "teamwork" stories. "communication_clarity" = STAR structure and whether they volunteered concrete detail without needing to be dragged into it.`
                     }
                 }
+            },
+                        mle: {
+                displayName: "Machine Learning Engineer",
+                syntheticJDByLevel: {
+                    entry: "Machine Learning Engineer I, Amazon (L4, entry-level/new grad). Strong fundamentals in Python, core ML algorithms, evaluation metrics, and basic MLOps. Capable of executing defined ML tasks and demonstrating Amazon Leadership Principles.",
+                    mid:   "Machine Learning Engineer II, Amazon (L5, mid-level). Deep understanding of applied ML (bias-variance, handling class imbalance), model deployment, and production scaling. Owns end-to-end ML components and exhibits strong Leadership Principles.",
+                    senior:"Senior Machine Learning Engineer, Amazon (L6). End-to-end ML system design at Amazon scale (recommendations, search ranking). Independent ownership of ambiguous ML product goals, architectural trade-offs, and cross-team leadership.",
+                    lead:  "Principal Machine Learning Engineer, Amazon (L7+). Defines organization-wide ML infrastructure strategy, mentors senior engineers, and drives massive-scale business impact through AI."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: 45-60 min round combining ML fundamentals, basic Python implementation, and 1 Leadership Principle question.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Present ONE coding problem or ML implementation task (e.g., implementing an evaluation metric or processing a dataset).
+- Ask ONE theoretical ML question (e.g., explaining overfitting, regularization, or precision vs. recall).
+- Ask ONE behavioral question targeting an Amazon Leadership Principle (e.g., Deliver Results or Learn and Be Curious). Force the candidate to use the STAR method.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness of code and foundational ML knowledge. "jd_alignment" = quality and metrics-driven nature of the Leadership Principle story. "communication_clarity" = structured thinking and explaining technical concepts simply.`
+                    },
+                    ml_fundamentals: {
+                        label: "ML Fundamentals & Applied ML",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Deep dive into applied ML theory, diagnosing model degradation, and offline/online metrics, plus Leadership Principles.",
+                        promptBlock: `ROUND TYPE: ML Fundamentals & Applied ML (this REPLACES the standard 5-question format).
+- Do NOT ask standard SWE coding questions. Focus on applied ML theory: debugging models in production, handling class imbalance, feature engineering, and evaluation metrics (AUC, ROC).
+- Probe the bias-variance tradeoff from first principles. If they suggest adding data, ask what happens if the model capacity is too low.
+- Ask ONE behavioral question targeting an Amazon Leadership Principle (e.g., Dive Deep or Insist on Highest Standards). Probe heavily for what the candidate *personally* did, not the team.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = rigorous understanding of ML math and model diagnostics. "jd_alignment" = strong data-driven Leadership Principle example. "communication_clarity" = clear, precise explanation of tradeoffs without relying on framework buzzwords.`
+                    },
+                    ml_system_design: {
+                        label: "ML System Design",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: 45-60 min round evaluating end-to-end ML engineering judgment, scalability, and MLOps, plus Leadership Principles.",
+                        promptBlock: `ROUND TYPE: ML System Design (this REPLACES the standard 5-question format).
+- Present ONE open-ended ML system design scenario (e.g., designing a recommendation engine, fraud detection system, or search ranking model).
+- Force them to cover data pipelines, offline training vs. online inference, latency, scalability, and monitoring/retraining strategies.
+- Cost-awareness is a major Amazon grading factor. Push them on the trade-offs of deploying a heavier model vs. compute costs.
+- Ask ONE behavioral question targeting a Leadership Principle (e.g., Think Big or Invent and Simplify).`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = MLOps competence, scalability, and latency/cost trade-offs. "jd_alignment" = scoping the architecture appropriately for Amazon scale, plus a strong LP story. "communication_clarity" = structuring the design cleanly from data ingestion to model serving.`
+                    },
+                    leadership_principles: {
+                        label: "Leadership Principles (Bar Raiser)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: The final 55-minute Bar Raiser round strictly tests Amazon culture and ownership mentality.",
+                        promptBlock: `ROUND TYPE: Amazon Leadership Principles / Bar Raiser Round (this REPLACES the standard 5-question format — NO technical questions).
+- You are an Amazon Bar Raiser. Your job is to assess whether this candidate raises the average bar of the company.
+- Ask 4 behavioral questions targeting different Leadership Principles (e.g., Customer Obsession, Ownership, Have Backbone/Disagree and Commit).
+- Demand hard data and metrics. If a candidate says a project was successful, ask for the exact percentage improvement and business impact.
+- Push back on generic answers. Ask: "What would you have done differently?" and "What was the root cause of the failure?"`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of ownership and metric-driven impact in their stories. "jd_alignment" = absolute alignment with Amazon's 16 Leadership Principles. "communication_clarity" = strict adherence to the STAR method without rambling.`
+                    }
+                }
+            },
+            data_engineer: {
+                displayName: "Data Engineer",
+                syntheticJDByLevel: {
+                    entry: "Data Engineer I, Amazon (L4). Strong SQL fluency, basic Python scripting, and understanding of relational databases. Capable of building basic ETL pipelines.",
+                    mid:   "Data Engineer II, Amazon (L5). Expert in advanced SQL (window functions, CTEs), data warehouse modeling (Star/Snowflake schemas), and distributed systems. Owns reliable data pipelines.",
+                    senior:"Senior Data Engineer, Amazon (L6). Designs massive-scale data lakes and event-driven streaming architectures using AWS big data services. Drives data governance and cross-team architectural standards.",
+                    lead:  "Principal Data Engineer, Amazon (L7+). Defines the foundational data strategy and infrastructure for entire business units at Amazon."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 4500,
+                        sourceNote: "HIGH confidence: 60-75 min call assessing SQL fluency, basic scripting, and Leadership Principles.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Ask ONE advanced SQL question requiring joins, aggregations, and window functions.
+- Ask ONE coding/scripting question (Python) focused on data manipulation (e.g., removing duplicates, basic string/array processing).
+- Ask ONE behavioral question targeting an Amazon Leadership Principle (e.g., Deliver Results).
+- Interviewers evaluate edge-case handling (nulls, duplicates) and code readability under time pressure.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = SQL efficiency and Python clean code. "jd_alignment" = clear Amazon Leadership Principle alignment. "communication_clarity" = thinking out loud while writing queries.`
+                    },
+                    data_modeling: {
+                        label: "SQL, Data Modeling & ETL",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: The most heavily weighted technical round, focusing on query optimization, schema design, and pipelines.",
+                        promptBlock: `ROUND TYPE: SQL, Data Modeling & ETL (this REPLACES the standard 5-question format).
+- Present ONE complex data modeling scenario (e.g., designing an analytical schema for an e-commerce checkout flow). Expect discussion of fact vs. dimension tables.
+- Drill into query performance, indexing, partitioning, and handling skewed data.
+- Ask ONE Leadership Principle question (e.g., Dive Deep) focused on a time they had to track down a complex data discrepancy or pipeline failure.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = knowledge of indexing, partitioning, and warehouse optimization. "jd_alignment" = data-driven Leadership Principle answers. "communication_clarity" = ability to logically explain data schema decisions.`
+                    },
+                    system_design: {
+                        label: "Data System Architecture",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Focuses on practical, data-heavy AWS architecture tied to massive ingestion and availability.",
+                        promptBlock: `ROUND TYPE: Data System Architecture (this REPLACES the standard 5-question format).
+- Present ONE distributed system design scenario (e.g., "Design an event-driven streaming ingestion system for Amazon logistics").
+- Expect discussion of AWS big data services (S3, EMR, Redshift, Kinesis) or open-source equivalents.
+- Push the candidate on scalability, data deduplication, cost efficiency, and handling late-arriving streaming data.
+- Ask ONE Leadership Principle question (e.g., Invent and Simplify) related to replacing a legacy system.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = mastery of distributed data systems and streaming architecture. "jd_alignment" = designing for AWS scale and cost limits, plus an LP story. "communication_clarity" = structured architectural blueprinting.`
+                    },
+                    leadership_principles: {
+                        label: "Leadership Principles (Bar Raiser)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: The final 55-minute Bar Raiser round strictly tests Amazon culture and ownership mentality.",
+                        promptBlock: `ROUND TYPE: Amazon Leadership Principles / Bar Raiser Round (this REPLACES the standard 5-question format — NO technical questions).
+- You are an Amazon Bar Raiser. Ask 4 behavioral questions targeting different Leadership Principles (e.g., Customer Obsession, Ownership, Bias for Action).
+- Demand hard data and metrics. If a candidate says a project was successful, ask for the exact percentage improvement.
+- Push back on generic answers. Ask: "What would you have done differently?" and "What was the root cause of the failure?"`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of ownership and metric-driven impact in their stories. "jd_alignment" = absolute alignment with Amazon's 16 Leadership Principles. "communication_clarity" = strict adherence to the STAR method without rambling.`
+                    }
+                }
             }
+
         }
     },
     google: {
