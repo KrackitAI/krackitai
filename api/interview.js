@@ -281,6 +281,60 @@ const COMPANY_PROFILES = {
                         rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of self-reflection and specificity of examples. "jd_alignment" = alignment with Google's cultural attributes (ambiguity tolerance, intellectual humility). "communication_clarity" = clear STAR structure.`
                     }
                 }
+            },
+                        cloud_architect: {
+                displayName: "Cloud Architect",
+                syntheticJDByLevel: {
+                    entry: "Cloud Architect, Google Cloud (L3). Basic understanding of cloud infrastructure, networking, and core GCP services.",
+                    mid:   "Cloud Architect, Google Cloud (L4). Solid experience designing cloud-native solutions, migrating workloads, and utilizing core GCP compute, networking, and storage.",
+                    senior:"Senior Cloud Architect, Google Cloud (L5). Expert in large-scale enterprise cloud transformations, hybrid/multi-cloud architectures, and distributed systems design.",
+                    lead:  "Principal Cloud Architect, Google Cloud (L6+). Defines industry-wide reference architectures, drives strategic enterprise adoption of Google Cloud."
+                },
+                rounds: {
+                    infrastructure: {
+                        label: "Infrastructure & Networking",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Expect deep dives into VPCs, subnets, routing, Cloud Armor, and hybrid connectivity (Interconnect/VPN).",
+                        promptBlock: `ROUND TYPE: Infrastructure & Networking (this REPLACES the standard 5-question format).
+- Present ONE comprehensive networking and infrastructure scenario (e.g., "Design the network topology for a global enterprise migrating to GCP").
+- Force the candidate to address VPC design, subnetting, hybrid connectivity, and security perimeters.
+- Evaluate how well they explain these concepts to a technical stakeholder.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = knowledge of networking protocols and GCP networking. "jd_alignment" = architectural judgment matching the seniority level. "communication_clarity" = ability to articulate tradeoffs clearly.`
+                    },
+                    compute: {
+                        label: "Compute & Scalability",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Tests Kubernetes (GKE), serverless (Cloud Run), and IaaS (Compute Engine) tradeoffs.",
+                        promptBlock: `ROUND TYPE: Compute & Scalability (this REPLACES the standard 5-question format).
+- Present ONE architectural scenario focused on compute selection and scaling.
+- Evaluate tradeoffs between Compute Engine (IaaS), GKE, and Cloud Run/Cloud Functions (Serverless).
+- Probe on auto-scaling, stateless vs. stateful application design, and cost optimization.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = understanding of containerization and auto-scaling. "jd_alignment" = matching compute products to operational maturity. "communication_clarity" = structuring the migration strategy logically.`
+                    },
+                    data_storage: {
+                        label: "Storage & Databases",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Deep dives into relational vs. NoSQL tradeoffs, data warehousing, and global consistency.",
+                        promptBlock: `ROUND TYPE: Storage & Databases (this REPLACES the standard 5-question format).
+- Present ONE data architecture scenario.
+- Require the candidate to justify their database selection across Cloud SQL, Cloud Spanner, Bigtable, Firestore, and BigQuery.
+- Push hard on tradeoffs: ACID compliance vs. eventual consistency, latency vs. throughput.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = database internals and CAP theorem. "jd_alignment" = designing for reliability, scale, and cost. "communication_clarity" = clear articulation of database choices.`
+                    },
+                    googleyness: {
+                        label: "Googleyness & Leadership",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Heavily indexes on stakeholder management, navigating customer objections, and cross-functional collaboration.",
+                        promptBlock: `ROUND TYPE: Googleyness & Leadership (this REPLACES the standard 5-question format — NO technical questions).
+- Ask behavioral questions probing: navigating ambiguity, handling difficult customer situations, leading without authority.
+- Assess their "executive presence"—can they remain calm, structured, and empathetic when their ideas are challenged?`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of reflection and understanding of business impact. "jd_alignment" = empathy, resilience, and bias to action. "communication_clarity" = professional, structured storytelling.`
+                    }
+                }
             }
         }
     }
