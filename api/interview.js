@@ -796,7 +796,152 @@ meta: {
                         rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of project scope and personal technical impact described. "jd_alignment" = demonstrated ability to resolve conflict and drive results at Meta's pace. "communication_clarity" = articulate, structured storytelling using the STAR method.`
                     }
                 }
+            },
+                        mle: {
+                displayName: "Machine Learning Engineer",
+                syntheticJDByLevel: {
+                    entry: "Machine Learning Engineer, Meta (E3, entry-level/new grad). Exceptionally strong coding fundamentals, speed, and accuracy across data structures, algorithms, and core ML math.",
+                    mid:   "Machine Learning Engineer, Meta (E4, mid-level). Fast coding execution (Ninja), solid ML system design foundations for ranking/recommendations (Pirate), and proven project impact (Jedi).",
+                    senior:"Senior Machine Learning Engineer, Meta (E5, senior level). Flawless execution, strong ML architecture experience scaling to billions of users (Pirate), and cross-functional technical leadership (Jedi).",
+                    lead:  "Staff Machine Learning Engineer, Meta (E6). Architectural leadership, designing org-wide ML infrastructure (Pirate), and driving cross-team technical direction to resolve organizational conflicts (Jedi)."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: 45-minute phone screen consisting of 1-2 coding or applied ML problems, expecting high speed and accuracy.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Present 1-2 coding problems or applied ML math problems (e.g., computing gradients, implementing k-means from scratch).
+- Meta emphasizes speed and accuracy. The candidate must write bug-free code quickly on a plain text editor without execution capabilities.
+- Keep introductions under 2 minutes.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness, execution speed, and bug-free implementation. "jd_alignment" = coding competency matching Meta's high execution bar. "communication_clarity" = fast articulation of the chosen approach.`
+                    },
+                    ninja_coding: {
+                        label: "Ninja (Onsite Coding & ML)",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: Meta's onsite coding round expects 2 problems in 45 minutes, prioritizing optimality and bug-free execution.",
+                        promptBlock: `ROUND TYPE: Ninja / Onsite Coding & ML (this REPLACES the standard 5-question format).
+- Present TWO coding problems consecutively within 45 minutes. Lean toward ML-adjacent DSA (e.g., matrix operations, probabilistic sampling) or standard LeetCode Mediums.
+- The candidate must dry-run their code manually. Penalize syntactical or logical errors heavily. Meta values execution speed and high precision above all else in this round.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = optimal time/space complexity, high coding speed, and manual dry-running. "jd_alignment" = meeting Meta's strict execution bar. "communication_clarity" = concisely explaining trade-offs before fast implementation.`
+                    },
+                    pirate_design: {
+                        label: "Pirate (ML System Design)",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: Focuses heavily on large-scale recommendation systems, ad targeting, and News Feed ranking.",
+                        promptBlock: `ROUND TYPE: Pirate / ML System Design (this REPLACES the standard 5-question format).
+- Present ONE massive-scale ML design scenario (e.g., design Instagram Reels recommendation algorithm or Facebook Ads CTR prediction).
+- Force them to cover the funnel: candidate generation (retrieval), heavy ranking, and re-ranking.
+- Probe heavily into feature engineering, handling highly imbalanced data, and serving latency.
+- LEVEL CALIBRATION: For E5/E6, drill aggressively into extreme scale, continuous training pipelines, and embedding storage bottlenecks.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = deep ML architectural trade-offs, retrieval vs. ranking balance. "jd_alignment" = scoping the architecture appropriately for Meta's billion-user scale. "communication_clarity" = structuring the design cleanly.`
+                    },
+                    jedi_behavioral: {
+                        label: "Jedi (Behavioral)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700, 
+                        sourceNote: "HIGH confidence: Focuses on project impact, conflict resolution, and moving fast.",
+                        promptBlock: `ROUND TYPE: Jedi / Behavioral (this REPLACES the standard 5-question format — NO coding here).
+- Ask behavioral questions probing project impact, conflict resolution, and thriving in an unstructured, fast-paced environment.
+- Meta highly values candidates who take ownership and resolve conflicts empathetically to maintain execution speed.
+- LEVEL CALIBRATION: For E5/E6, focus heavily on cross-functional influence and driving architectural standards without formal authority.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of project scope and personal technical impact. "jd_alignment" = demonstrated ability to resolve conflict and drive results at Meta's pace. "communication_clarity" = articulate, structured storytelling using the STAR method.`
+                    }
+                }
+            },
+            data_engineer: {
+                displayName: "Data Engineer",
+                syntheticJDByLevel: {
+                    entry: "Data Engineer, Meta (E3). Flawless SQL writing, strong Python scripting, and fundamental understanding of data warehousing concepts.",
+                    mid:   "Data Engineer, Meta (E4). Fast execution in SQL/Python (Ninja), solid ETL and data pipeline design (Pirate), and proven ability to work with product teams (Jedi).",
+                    senior:"Senior Data Engineer, Meta (E5). Expert in distributed data processing (Presto, Spark), designing massive batch/streaming pipelines (Pirate), and leading data strategy (Jedi).",
+                    lead:  "Staff Data Engineer, Meta (E6). Defines org-wide data architectures, solves Petabyte-scale scaling issues, and drives cross-functional data governance."
+                },
+                rounds: {
+                    ninja_sql: {
+                        label: "Ninja (SQL & Data Processing)",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Meta tests SQL and Python speed heavily. Expect multiple queries in a 45 min window.",
+                        promptBlock: `ROUND TYPE: Ninja / SQL & Data Processing (this REPLACES the standard 5-question format).
+- Present 1-2 advanced SQL questions (complex joins, window functions, self-joins, handling NULLs) and 1 Python data manipulation question.
+- Meta emphasizes speed and absolute accuracy. The candidate must write optimal, bug-free queries without an IDE.
+- Do not let them linger. If they solve it, immediately present the next challenge or a scaling follow-up.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = flawless syntax, handling edge cases, and query optimization. "jd_alignment" = meeting Meta's strict data execution bar. "communication_clarity" = fast, accurate translation of business logic into code.`
+                    },
+                    pirate_data: {
+                        label: "Pirate (Data Architecture & ETL)",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Focuses on dimensional modeling and pipeline design at Meta's scale.",
+                        promptBlock: `ROUND TYPE: Pirate / Data Architecture (this REPLACES the standard 5-question format).
+- Present ONE large-scale data architecture scenario (e.g., "Design the logging and ETL pipeline for WhatsApp message delivery statuses").
+- Require them to design the data model (fact/dimension tables) and the processing architecture (batch vs. streaming, idempotency).
+- Push hard on how they handle late-arriving data, backfilling, and data quality checks at Petabyte scale.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = mastery of dimensional modeling and distributed processing tradeoffs. "jd_alignment" = designing for Meta's extreme scale. "communication_clarity" = structuring the ETL blueprint clearly.`
+                    },
+                    jedi_behavioral: {
+                        label: "Jedi (Behavioral & Product Sense)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Focuses on resolving ambiguity and working with Product Managers.",
+                        promptBlock: `ROUND TYPE: Jedi / Behavioral & Product Sense (this REPLACES the standard 5-question format — NO coding here).
+- Ask behavioral questions probing conflict resolution and thriving in fast-paced, ambiguous environments.
+- Blend in one Product Sense question: ask how they would handle a PM requesting a metric that is computationally too expensive to calculate.
+- Evaluate their ability to push back constructively and prioritize engineering bandwidth.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = understanding of business impact and engineering constraints. "jd_alignment" = ability to partner with Product teams efficiently. "communication_clarity" = articulate storytelling using the STAR method.`
+                    }
+                }
+            },
+            data_scientist: {
+                displayName: "Data Scientist (Product Analytics)",
+                syntheticJDByLevel: {
+                    entry: "Data Scientist, Meta (E3). Flawless SQL, strong statistical intuition, and basic product sense.",
+                    mid:   "Data Scientist, Meta (E4). Fast execution in SQL (Ninja), strong product metric formulation (Pirate), and proven project impact (Jedi).",
+                    senior:"Senior Data Scientist, Meta (E5). Deep expertise in A/B testing, causal inference, driving product strategy (Pirate), and cross-functional leadership (Jedi).",
+                    lead:  "Staff Data Scientist, Meta (E6). Identifies entirely new product growth vectors, scales experimentation platforms, and resolves deep analytical conflicts."
+                },
+                rounds: {
+                    ninja_sql: {
+                        label: "Ninja (Applied Data & SQL)",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Meta DS loops expect incredibly fast, accurate SQL querying combined with data investigation.",
+                        promptBlock: `ROUND TYPE: Ninja / Applied Data & SQL (this REPLACES the standard 5-question format).
+- Present ONE advanced SQL problem involving tracking user states over time (e.g., active vs. churned users using window functions).
+- Present ONE data investigation scenario (e.g., "Active users dropped by 10% yesterday. How do you investigate?").
+- The candidate must write optimal, bug-free queries and demonstrate MECE (Mutually Exclusive, Collectively Exhaustive) root-cause analysis.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = flawless SQL syntax and rigorous analytical troubleshooting. "jd_alignment" = meeting Meta's execution and analytical bar. "communication_clarity" = clear, structured hypothesis testing.`
+                    },
+                    pirate_product: {
+                        label: "Pirate (Product Sense & Metrics)",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: The most critical round for Meta DS. Defining success metrics and evaluating tradeoffs.",
+                        promptBlock: `ROUND TYPE: Pirate / Product Sense (this REPLACES the standard 5-question format).
+- Present ONE ambiguous product scenario (e.g., "We want to launch a new Reactions feature on Instagram. How do you measure its success?").
+- Force them to define a North Star metric, counter-metrics (guardrails), and secondary metrics.
+- Push hard on cannibalization: if Reactions increase, do Comments decrease? How do we evaluate that tradeoff?
+- LEVEL CALIBRATION: For E5/E6, expect deep experimental design discussion (network effects, bipartite testing).`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = experimental design rigor and metric selection. "jd_alignment" = deep user empathy and product intuition. "communication_clarity" = structuring product breakdowns logically.`
+                    },
+                    jedi_behavioral: {
+                        label: "Jedi (Behavioral)",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 2700,
+                        sourceNote: "HIGH confidence: Focuses heavily on stakeholder influence and driving product changes.",
+                        promptBlock: `ROUND TYPE: Jedi / Behavioral (this REPLACES the standard 5-question format — NO technical questions).
+- Ask behavioral questions probing project impact, conflict resolution, and moving fast.
+- Focus specifically on a time the candidate's data contradicted the leadership's roadmap. How did they influence the outcome?
+- Evaluate their ability to communicate complex statistical realities to non-technical stakeholders.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of project scope and personal analytical impact. "jd_alignment" = demonstrated ability to influence product teams. "communication_clarity" = structured storytelling using the STAR method.`
+                    }
+                }
             }
+
         }
     }
 };
