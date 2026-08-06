@@ -508,7 +508,7 @@ const COMPANY_PROFILES = {
             }
 
         }
-    }
+    },
     microsoft: {
         displayName: "Microsoft",
         roles: {
@@ -570,9 +570,175 @@ const COMPANY_PROFILES = {
                         rubricGuidance: `Interpret the rubric for this hybrid round: "technical_depth" = depth of technical impact and strategic thinking described in their past experience. "jd_alignment" = strong demonstration of Growth Mindset, taking feedback, and "One Microsoft" collaboration. "communication_clarity" = articulate storytelling using the STAR method and lack of defensiveness when probed.`
                     }
                 }
+            },
+                        mle: {
+                displayName: "Machine Learning Engineer",
+                syntheticJDByLevel: {
+                    entry: "Machine Learning Engineer, Microsoft (L59-L60, entry-level/new grad). Strong fundamentals in Python, core ML algorithms, data structures, and a demonstrated Growth Mindset.",
+                    mid:   "Machine Learning Engineer II, Microsoft (L61-L62, mid-level). Deep understanding of applied ML (bias-variance, regularization), model deployment, and behavioral alignment with Microsoft's core competencies.",
+                    senior:"Senior Machine Learning Engineer, Microsoft (L63-L64, senior level). End-to-end ML system design (Azure ML, deep learning inference). Independent ownership of ambiguous AI product goals and architectural trade-offs.",
+                    lead:  "Principal Machine Learning Engineer, Microsoft (L65+). Organization-wide technical leadership, designing scalable AI infrastructure, and driving strategic multi-team ML initiatives."
+                },
+                rounds: {
+                    phone_screen: {
+                        label: "Technical Phone Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3000,
+                        sourceNote: "HIGH confidence: 45-60 min round combining ML fundamentals, basic Python implementation, and assessing Growth Mindset.",
+                        promptBlock: `ROUND TYPE: Technical Phone Screen (this REPLACES the standard 5-question format).
+- Present ONE coding problem or ML implementation task (e.g., array manipulation or implementing an evaluation metric).
+- Ask ONE theoretical ML question (e.g., explaining overfitting, regularization, or precision vs. recall).
+- Dedicate a small portion to explicitly probing their "Growth Mindset" or "Learn-It-All" attitude.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness of code and foundational ML knowledge. "jd_alignment" = demonstrated Growth Mindset and alignment with Microsoft values. "communication_clarity" = structured thinking and explaining technical concepts simply.`
+                    },
+                    applied_ml: {
+                        label: "Applied ML & Algorithms",
+                        maxQuestions: 3,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Deep dive into applied ML theory, diagnosing model degradation, and offline/online metrics.",
+                        promptBlock: `ROUND TYPE: Applied ML & Algorithms (this REPLACES the standard 5-question format).
+- Focus on applied ML theory: debugging models in production, handling class imbalance, feature engineering, and evaluation metrics.
+- Probe the bias-variance tradeoff from first principles. Test their understanding of model capacity versus data volume.
+- Microsoft explicitly weaves behavioral questions into technical rounds. Ask ONE behavioral question using the STAR format, focusing on collaboration or learning from failure.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = rigorous understanding of ML math and model diagnostics. "jd_alignment" = quality of their behavioral STAR response. "communication_clarity" = clear, precise explanation of tradeoffs.`
+                    },
+                    ml_system_design: {
+                        label: "ML System Architecture",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: 45-60 min round evaluating end-to-end ML engineering judgment, scalability, and MLOps.",
+                        promptBlock: `ROUND TYPE: ML System Architecture (this REPLACES the standard 5-question format).
+- Present ONE open-ended ML system design scenario (e.g., designing a recommendation engine or an LLM deployment architecture).
+- Force them to cover data pipelines, offline training vs. online inference, latency, scalability, and monitoring.
+- Microsoft values enterprise security and compliance. Push them on how they handle sensitive data (PII) during model training.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = MLOps competence, scalability, and latency trade-offs. "jd_alignment" = designing for enterprise scale and security compliance. "communication_clarity" = structuring the design cleanly from data ingestion to serving.`
+                    },
+                    behavioral_aa: {
+                        label: "As Appropriate (AA) / Hiring Manager",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: The AA round is a hallmark of Microsoft's process. It serves as a final bar-raiser led by a senior manager.",
+                        promptBlock: `ROUND TYPE: As Appropriate (AA) / Hiring Manager Round (this REPLACES the standard 5-question format — NO technical questions).
+- You are playing the role of the "AA" (As Appropriate) Interviewer — a senior leader with veto power.
+- Ask deep behavioral questions focused on Microsoft's core competencies: Growth Mindset, Customer Focus, Adaptability, and Cross-team Collaboration. 
+- Ask them to describe their biggest failure and what they learned. Probe deeply into their specific contribution and how they handled conflict.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of technical impact in their past experience. "jd_alignment" = strong demonstration of Growth Mindset and "One Microsoft" collaboration. "communication_clarity" = articulate storytelling using the STAR method without defensiveness.`
+                    }
+                }
+            },
+            cloud_architect: {
+                displayName: "Cloud Solutions Architect",
+                syntheticJDByLevel: {
+                    entry: "Cloud Solutions Architect, Microsoft (L59-L60). Basic understanding of cloud infrastructure, networking, and core Azure services. Can assist in designing foundational cloud architectures.",
+                    mid:   "Cloud Solutions Architect, Microsoft (L61-L62). Solid experience designing cloud-native solutions, migrating workloads to Azure, and utilizing core compute, networking, and storage products. Customer-facing experience.",
+                    senior:"Senior Cloud Solutions Architect, Microsoft (L63-L64). Expert in enterprise cloud transformations, hybrid architectures (Azure Arc), and distributed systems design. Acts as a trusted advisor to C-level executives.",
+                    lead:  "Principal Cloud Solutions Architect, Microsoft (L65+). Defines industry-wide reference architectures, drives strategic enterprise adoption of Azure, and mentors senior architects."
+                },
+                rounds: {
+                    infrastructure: {
+                        label: "Infrastructure & Security",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Microsoft CSAs must deeply understand enterprise networking, ExpressRoute, and Azure Active Directory (Entra ID).",
+                        promptBlock: `ROUND TYPE: Infrastructure & Security (this REPLACES the standard 5-question format).
+- Present ONE comprehensive networking and security scenario (e.g., "Design a secure, compliant hybrid-cloud topology for a financial institution migrating to Azure").
+- Force the candidate to address VNets, subnetting, hybrid connectivity (ExpressRoute vs. VPN Gateway), and Identity/Access Management (RBAC, Entra ID).
+- Cloud Architects at Microsoft are highly customer-facing: evaluate how well they explain these concepts to a hypothetical technical stakeholder.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = knowledge of networking protocols and identity management. "jd_alignment" = architectural judgment matching enterprise compliance standards. "communication_clarity" = ability to articulate complex infrastructure tradeoffs clearly to stakeholders.`
+                    },
+                    compute_migration: {
+                        label: "Compute & Migration Strategy",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Focuses on workload migration (lift-and-shift vs. refactoring) and cloud-native application design.",
+                        promptBlock: `ROUND TYPE: Compute & Migration Strategy (this REPLACES the standard 5-question format).
+- Present ONE architectural scenario focused on compute selection and scaling (e.g., "A customer wants to modernize a legacy monolithic application. Walk me through the migration and modernization strategy").
+- Guide the conversation to evaluate tradeoffs between Azure Virtual Machines (IaaS), Azure Kubernetes Service (AKS), and Azure App Service / Functions (PaaS/Serverless).
+- Probe on auto-scaling mechanisms, state management, and minimizing downtime during the migration.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = understanding of containerization (AKS) and auto-scaling. "jd_alignment" = matching compute products to the customer's operational maturity. "communication_clarity" = structuring the migration strategy logically.`
+                    },
+                    data_storage: {
+                        label: "Storage & Data Architecture",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Expect deep dives into Cosmos DB (NoSQL), Azure SQL, and global distribution.",
+                        promptBlock: `ROUND TYPE: Storage & Data Architecture (this REPLACES the standard 5-question format).
+- Present ONE data architecture scenario (e.g., "Design a globally distributed, low-latency inventory system").
+- Require the candidate to justify their database selection across Azure SQL, Cosmos DB, and Blob Storage.
+- Push hard on Cosmos DB consistency levels (Strong, Bounded Staleness, Session, Eventual) and latency vs. throughput tradeoffs.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = database internals and distributed systems consistency models. "jd_alignment" = designing for reliability, scale, and cost. "communication_clarity" = clear articulation of why a specific database was chosen.`
+                    },
+                    behavioral_aa: {
+                        label: "As Appropriate (AA) / Customer Empathy",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: The AA round for CSAs heavily indexes on customer empathy, objection handling, and executive presence.",
+                        promptBlock: `ROUND TYPE: As Appropriate (AA) / Customer Empathy (this REPLACES the standard 5-question format — NO technical questions).
+- You are the AA Interviewer. Focus heavily on Customer Focus, navigating ambiguity, and handling difficult client situations.
+- Ask for examples of how they handled a stakeholder who strongly disagreed with their technical recommendation, or how they rescued a failing client engagement.
+- Assess their "executive presence"—can they remain calm, structured, and empathetic when their ideas are challenged?`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of reflection and understanding of business impact. "jd_alignment" = customer empathy and Growth Mindset. "communication_clarity" = professional, structured storytelling.`
+                    }
+                }
+            },
+            data_scientist: {
+                displayName: "Data Scientist",
+                syntheticJDByLevel: {
+                    entry: "Data Scientist, Microsoft (L59-L60). Strong fundamentals in probability, statistics, SQL, and Python. Capable of executing defined analytics and A/B tests with a Growth Mindset.",
+                    mid:   "Data Scientist II, Microsoft (L61-L62). Strong statistical modeling, causal inference, and ability to design complex A/B experiments. Owns data-driven product insights.",
+                    senior:"Senior Data Scientist, Microsoft (L63-L64). Leads high-impact analytical projects, designs advanced experimentation frameworks, and guides product strategy using data.",
+                    lead:  "Principal Data Scientist, Microsoft (L65+). Defines the data strategy for entire product areas, mentors others, and solves the most ambiguous causal inference problems."
+                },
+                rounds: {
+                    tech_screen: {
+                        label: "Technical Screen",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3000,
+                        sourceNote: "HIGH confidence: Mix of coding (SQL/Python) and basic probability/statistics.",
+                        promptBlock: `ROUND TYPE: Technical Screen (this REPLACES the standard 5-question format).
+- Ask ONE coding question (usually advanced SQL involving window functions, or a Python data manipulation task).
+- Ask ONE probability/statistics question (e.g., Bayes Theorem, expected value, or combinatorial probability).
+- Focus on accuracy and ability to write clean data-transformation code.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = correctness of SQL/Python and statistical math. "jd_alignment" = fundamental math and coding baseline for DS. "communication_clarity" = explaining their logic clearly before writing queries.`
+                    },
+                    stats_and_modeling: {
+                        label: "Statistics & Applied Modeling",
+                        maxQuestions: 2,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Deep dive into statistical rigor, A/B testing, and causal inference scenarios.",
+                        promptBlock: `ROUND TYPE: Statistics & Applied Modeling (this REPLACES the standard 5-question format).
+- Present ONE A/B testing or experimental design scenario (e.g., "How do you measure the impact of a new feature if there are network effects?").
+- Deep dive into causal inference and hypothesis testing. Push them on p-values, statistical power, and handling confounding variables.
+- Expect discussion on difference-in-differences or propensity score matching for senior candidates.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = rigor of statistical methods and causal inference knowledge. "jd_alignment" = ability to link data to product impact. "communication_clarity" = defending technical choices without jargon.`
+                    },
+                    data_systems: {
+                        label: "Data Systems & Product Analytics",
+                        maxQuestions: 1,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Designing experimentation frameworks or metric pipelines.",
+                        promptBlock: `ROUND TYPE: Data Systems & Product Analytics (this REPLACES the standard 5-question format).
+- Present ONE open-ended product analytics scenario (e.g., "Design telemetry and success metrics for a new feature in Microsoft Teams").
+- Guide them to cover metric definition (North Star vs. guardrail metrics), logging, and detecting cannibalization.
+- Prioritize product sense and statistical rigor over backend infrastructure.`,
+                        rubricGuidance: `Interpret the rubric: "technical_depth" = understanding of experimental design at scale. "jd_alignment" = product sense and metric formulation. "communication_clarity" = structured approach to breaking down ambiguous product goals.`
+                    },
+                    behavioral_aa: {
+                        label: "As Appropriate (AA) / Hiring Manager",
+                        maxQuestions: 4,
+                        timeCeilingSeconds: 3600,
+                        sourceNote: "HIGH confidence: Standard AA behavioral round.",
+                        promptBlock: `ROUND TYPE: As Appropriate (AA) / Hiring Manager Round (this REPLACES the standard 5-question format — NO technical questions).
+- You are the AA Interviewer. Focus on Growth Mindset, navigating ambiguity, and intellectual humility.
+- Focus on how they handle situations where data contradicts a Product Manager's intuition.
+- Push for specific, concrete examples using the STAR method.`,
+                        rubricGuidance: `Interpret the rubric for this NON-technical round: "technical_depth" = depth of self-reflection. "jd_alignment" = alignment with Microsoft's Growth Mindset. "communication_clarity" = clear STAR structure.`
+                    }
+                }
             }
+
         }
-    }
+    },
 meta: {
         displayName: "Meta",
         roles: {
