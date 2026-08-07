@@ -233,8 +233,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
                             <label for="company-select" class="text-xs font-bold tracking-wider text-ink400 uppercase">Company</label>
-                            <select id="company-select" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
+                            <select id="company-select" onchange="renderCompanyRoundOptions()" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
                                 <option value="google">Google</option>
+                                <option value="amazon">Amazon</option>
+                                <option value="microsoft">Microsoft</option>
+                                <option value="meta">Meta</option>
                             </select>
                         </div>
                         <div class="space-y-1.5">
@@ -251,29 +254,14 @@
                     <div class="space-y-1.5">
                         <label for="company-role-select" class="text-xs font-bold tracking-wider text-ink400 uppercase">Role</label>
                         <select id="company-role-select" class="w-full bg-surface border border-hairline rounded-xl px-3 py-3 text-sm text-ink100 focus:outline-none focus:border-signal cursor-pointer">
-                            <option value="swe">Software Engineer</option>
+                            <!-- Populated dynamically by renderCompanyRoundOptions() based on selected company -->
                         </select>
                     </div>
 
                     <div class="space-y-1.5">
                         <span class="text-xs font-bold tracking-wider text-ink400 uppercase block">Interview Round</span>
                         <div class="grid grid-cols-2 gap-2" id="round-selector-grid">
-                            <button type="button" data-round="phone_screen" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
-                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">01</span><span class="font-bold text-xs text-ink100">Phone Screen</span></span>
-                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">2 questions · ~50 min</span>
-                            </button>
-                            <button type="button" data-round="onsite_coding" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
-                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">02</span><span class="font-bold text-xs text-ink100">Onsite Coding</span></span>
-                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">1 problem + follow-up · 45 min</span>
-                            </button>
-                            <button type="button" data-round="system_design" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
-                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">03</span><span class="font-bold text-xs text-ink100">System Design</span></span>
-                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">1 scenario · 45 min</span>
-                            </button>
-                            <button type="button" data-round="googleyness" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
-                                <span class="flex items-baseline gap-2"><span class="font-mono text-[10px] text-ink400">04</span><span class="font-bold text-xs text-ink100">Googleyness &amp; Leadership</span></span>
-                                <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">4 behavioral Qs · 45 min</span>
-                            </button>
+                            <!-- Populated dynamically by renderCompanyRoundOptions() based on selected company -->
                         </div>
                     </div>
 
@@ -762,7 +750,10 @@
         // Setting it false hides the mode toggle entirely (so the page behaves
         // exactly like the pre-company-mode version) without deleting any of
         // the underlying company/round code, config, or JS logic below.
-        const COMPANY_ROUND_MODE_ENABLED = false;
+
+        const COMPANY_ROUND_MODE_ENABLED = true;
+       
+
 
         // Company-round practice mode. null when using the generic JD flow.
         // Set by switchInterviewMode()/selectCompanyRound() before a session
@@ -808,6 +799,216 @@
             btn.classList.add('border-signal', 'bg-surface2');
             window.selectedCompanyRoundType = btn.dataset.round;
         }
+
+        // Display-only metadata mirroring the backend's COMPANY_PROFILES —
+        // labels and descriptions only, no interview logic here. This just
+        // drives what the role dropdown and round cards show; the actual
+        // prompts/rubrics live exclusively in interview.js.
+        const COMPANY_DISPLAY_META = {
+            google: {
+                roles: {
+                    swe: {
+                        roleLabel: 'Software Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                            { value: 'onsite_coding', label: 'Onsite Coding', meta: '1 problem + follow-up · 45 min' },
+                            { value: 'system_design', label: 'System Design', meta: '1 scenario · 45 min' },
+                            { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
+                        ]
+                    },
+                    mle: {
+                        roleLabel: 'Machine Learning Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                            { value: 'onsite_coding', label: 'Onsite Coding & Algorithms', meta: '1-2 problems · 45-60 min' },
+                            { value: 'applied_ml', label: 'Applied Machine Learning', meta: 'Theory & Tradeoffs · 45-60 min' },
+                            { value: 'ml_system_design', label: 'ML System Design', meta: 'End-to-End Pipeline · 45-60 min' },
+                            { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
+                        ]
+                    },
+                    cloud_architect: {
+                        roleLabel: 'Cloud Architect',
+                        rounds: [
+                            { value: 'infrastructure', label: 'Infrastructure & Networking', meta: 'VPCs & Load Balancing · 60 min' },
+                            { value: 'compute', label: 'Compute & Scalability', meta: 'GKE & Auto-scaling · 60 min' },
+                            { value: 'data_storage', label: 'Storage & Databases', meta: 'Cloud SQL & Spanner · 60 min' },
+                            { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
+                        ]
+                    },
+                    data_scientist: {
+                        roleLabel: 'Data Scientist',
+                        rounds: [
+                            { value: 'tech_screen', label: 'Technical Screen', meta: 'Probability & Coding · 45 min' },
+                            { value: 'project_deep_dive', label: 'Project & Causal Inference', meta: 'Research & Impact · 60 min' },
+                            { value: 'system_design', label: 'Data System Design', meta: 'A/B Testing Frameworks · 60 min' },
+                            { value: 'googleyness', label: 'Googleyness & Leadership', meta: '4 behavioral Qs · 45 min' }
+                        ]
+                    }
+                }
+            },
+            amazon: {
+                roles: {
+                    sde: {
+                        roleLabel: 'Software Development Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1 coding + 1 LP · ~50 min' },
+                            { value: 'onsite_coding', label: 'Onsite Technical Round', meta: '1 coding + 1 LP · 45 min' },
+                            { value: 'system_design', label: 'System Design', meta: '1 scenario + 1 LP · 45 min' },
+                            { value: 'leadership_principles', label: 'Leadership Principles (Bar Raiser)', meta: '4 behavioral Qs · ~50 min' }
+                        ]
+                    },
+                       mle: {
+                        roleLabel: 'Machine Learning Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: 'ML + Coding + 1 LP · 60 min' },
+                            { value: 'ml_fundamentals', label: 'ML Fundamentals & Applied ML', meta: 'Theory + 1 LP · 60 min' },
+                            { value: 'ml_system_design', label: 'ML System Design', meta: '1 scenario + 1 LP · 60 min' },
+                            { value: 'leadership_principles', label: 'Leadership Principles (Bar Raiser)', meta: '4 behavioral Qs · 60 min' }
+                        ]
+                    },
+                    data_engineer: {
+                        roleLabel: 'Data Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: 'SQL + Coding + 1 LP · 75 min' },
+                            { value: 'data_modeling', label: 'SQL, Data Modeling & ETL', meta: 'Schema Design + 1 LP · 60 min' },
+                            { value: 'system_design', label: 'Data System Architecture', meta: 'Pipelines/AWS + 1 LP · 60 min' },
+                            { value: 'leadership_principles', label: 'Leadership Principles (Bar Raiser)', meta: '4 behavioral Qs · 60 min' }
+                        ]
+                    }
+                }
+            },
+            microsoft: {
+                roles: {
+                    swe: {
+                        roleLabel: 'Software Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45-60 min' },
+                            { value: 'onsite_coding', label: 'Onsite Data Structures & Algorithms', meta: '1-2 problems + behavioral · 45-60 min' },
+                            { value: 'system_design', label: 'System & Low-Level Design', meta: '1 scenario · 45-60 min' },
+                            { value: 'behavioral_aa', label: 'As Appropriate (AA) / Hiring Manager', meta: 'Leadership & Culture Fit · 45-60 min' }
+                        ]
+                    },
+                    mle: {
+                        roleLabel: 'Machine Learning Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: 'Coding + ML + Behavioral · 45-60 min' },
+                            { value: 'applied_ml', label: 'Applied ML & Algorithms', meta: 'Theory & Diagnostics · 60 min' },
+                            { value: 'ml_system_design', label: 'ML System Architecture', meta: '1 scenario · 60 min' },
+                            { value: 'behavioral_aa', label: 'As Appropriate (AA) / Hiring Manager', meta: 'Leadership & Culture Fit · 60 min' }
+                        ]
+                    },
+                    cloud_architect: {
+                        roleLabel: 'Cloud Solutions Architect',
+                        rounds: [
+                            { value: 'infrastructure', label: 'Infrastructure & Security', meta: 'VNets & Identity · 60 min' },
+                            { value: 'compute_migration', label: 'Compute & Migration Strategy', meta: 'AKS & Modernization · 60 min' },
+                            { value: 'data_storage', label: 'Storage & Data Architecture', meta: 'Cosmos DB & Tradeoffs · 60 min' },
+                            { value: 'behavioral_aa', label: 'As Appropriate (AA) / Customer Empathy', meta: 'Stakeholder Mgmt · 60 min' }
+                        ]
+                    },
+                    data_scientist: {
+                        roleLabel: 'Data Scientist',
+                        rounds: [
+                            { value: 'tech_screen', label: 'Technical Screen', meta: 'SQL/Python + Stats · 50 min' },
+                            { value: 'stats_and_modeling', label: 'Statistics & Applied Modeling', cast: 'A/B Testing & Causal Inference · 60 min' },
+                            { value: 'data_systems', label: 'Data Systems & Product Analytics', meta: 'Metric Frameworks · 60 min' },
+                            { value: 'behavioral_aa', label: 'As Appropriate (AA) / Hiring Manager', meta: 'Leadership & Culture Fit · 60 min' }
+                        ]
+                    }
+                }
+            },
+            meta: {
+                roles: {
+                    swe: {
+                        roleLabel: 'Software Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45 min' },
+                            { value: 'ninja_coding', label: 'Ninja (Onsite Coding)', meta: '2 problems · 45 min' },
+                            { value: 'pirate_design', label: 'Pirate (System Design)', meta: '1 scenario · 45 min' },
+                            { value: 'jedi_behavioral', label: 'Jedi (Behavioral)', meta: 'Culture & Impact · 45 min' }
+                        ]
+                    },
+                    mle: {
+                        roleLabel: 'Machine Learning Engineer',
+                        rounds: [
+                            { value: 'phone_screen', label: 'Technical Phone Screen', meta: '1-2 questions · 45 min' },
+                            { value: 'ninja_coding', label: 'Ninja (Onsite Coding & ML)', meta: '2 problems · 45 min' },
+                            { value: 'pirate_design', label: 'Pirate (ML System Design)', meta: '1 scenario · 45 min' },
+                            { value: 'jedi_behavioral', label: 'Jedi (Behavioral)', meta: 'Culture & Impact · 45 min' }
+                        ]
+                    },
+                    data_engineer: {
+                        roleLabel: 'Data Engineer',
+                        rounds: [
+                            { value: 'ninja_sql', label: 'Ninja (SQL & Data Processing)', meta: 'SQL/Python · 45 min' },
+                            { value: 'pirate_data', label: 'Pirate (Data Architecture)', meta: 'ETL Pipelines · 45 min' },
+                            { value: 'jedi_behavioral', label: 'Jedi (Behavioral & Product)', meta: 'Culture & Impact · 45 min' }
+                        ]
+                    },
+                    data_scientist: {
+                        roleLabel: 'Data Scientist (Product)',
+                        rounds: [
+                            { value: 'ninja_sql', label: 'Ninja (Applied Data & SQL)', meta: 'Queries & Logic · 45 min' },
+                            { value: 'pirate_product', label: 'Pirate (Product Sense)', meta: 'Metrics & Testing · 45 min' },
+                            { value: 'jedi_behavioral', label: 'Jedi (Behavioral)', meta: 'Influence & Impact · 45 min' }
+                        ]
+                    }
+                }
+            }
+        };
+
+        function renderCompanyRoundOptions() {
+            const companySelect = document.getElementById('company-select');
+            const roleSelect = document.getElementById('company-role-select');
+            const grid = document.getElementById('round-selector-grid');
+
+            if (!companySelect || !roleSelect || !grid) return;
+
+            const companyKey = companySelect.value.toLowerCase();
+            const companyMeta = COMPANY_DISPLAY_META[companyKey];
+
+            if (!companyMeta || !companyMeta.roles) return;
+
+            // 1. Rebuild the Role Select Dropdown for the chosen company
+            roleSelect.innerHTML = Object.entries(companyMeta.roles).map(([roleKey, roleData]) => 
+                `<option value="${roleKey}">${roleData.roleLabel}</option>`
+            ).join('');
+
+            // 2. Helper function to render round cards for whatever role is currently selected
+            const renderRoundsForActiveRole = () => {
+                const currentRoleKey = roleSelect.value;
+                const roleMeta = companyMeta.roles[currentRoleKey];
+
+                if (!roleMeta || !roleMeta.rounds) {
+                    grid.innerHTML = '<p class="text-xs text-ink400 col-span-2">No rounds available for this role.</p>';
+                    window.selectedCompanyRoundType = null;
+                    return;
+                }
+
+                grid.innerHTML = roleMeta.rounds.map((r, i) => `
+                    <button type="button" data-round="${r.value}" onclick="selectCompanyRound(this)" class="round-select-btn text-left bg-surface border-2 border-hairline hover:border-neutral-700 rounded-xl p-3 transition-all cursor-pointer">
+                        <span class="flex items-baseline gap-2">
+                            <span class="font-mono text-[10px] text-ink400">${String(i + 1).padStart(2, '0')}</span>
+                            <span class="font-bold text-xs text-ink100">${r.label}</span>
+                        </span>
+                        <span class="block text-[10px] text-ink400 mt-0.5 pl-[26px]">${r.meta}</span>
+                    </button>
+                `).join('');
+
+                // Clear stale round selection state whenever role or company changes
+                window.selectedCompanyRoundType = null;
+            };
+
+            // 3. Render rounds immediately for the default role
+            renderRoundsForActiveRole();
+
+            // 4. Attach event handler so changing the role dropdown hot-swaps the round cards
+            roleSelect.onchange = renderRoundsForActiveRole;
+        }
+
+        // Populate the selectors once on load so Google's rounds are ready
+        // by default the first time someone opens company mode.
+        renderCompanyRoundOptions();
 
         // Single source of truth for every /api/interview request body, so
         // company-mode fields (or their absence) can never drift out of sync
